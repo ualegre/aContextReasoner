@@ -17,6 +17,8 @@
 package org.poseidon_project.context;
 
 import android.content.Context;
+import android.content.Intent;
+import android.util.Log;
 
 import org.poseidon_project.context.management.ContextManager;
 import org.poseidon_project.context.reasoner.OntologyManager;
@@ -31,12 +33,15 @@ public class ContextReasonerCore {
     private ContextManager mContextManager;
     private OntologyManager mOntologyManager;
     private Context mContext;
+    public static final String BROADCAST_INTENT = "org.poseidon_project.context.CONTEXT_UPDATE";
+    private static final String LOGTAG = "ContextService";
+    private static final String CONTEXT_VALUE = "context_value";
 
 
     public ContextReasonerCore(Context c) {
 
         mContext = c;
-        mOntologyManager = new OntologyManager(c);
+        mOntologyManager = new OntologyManager(c, this);
         mContextManager = new ContextManager(c);
 
     }
@@ -53,6 +58,19 @@ public class ContextReasonerCore {
 
     public boolean removeContextRequirement(String appkey, String observerName) {
         return mContextManager.removeObserverRequirement(appkey, observerName);
+    }
+
+    public void sendContextResult(String contextValue) {
+
+        Intent intent = new Intent();
+        try {
+            intent.setAction(BROADCAST_INTENT);
+            intent.putExtra(CONTEXT_VALUE, contextValue);
+            mContext.sendBroadcast(intent);
+        } catch (Exception e) {
+            Log.e(LOGTAG, "Cannot Broadcast Context Change");
+        }
+
     }
 
 

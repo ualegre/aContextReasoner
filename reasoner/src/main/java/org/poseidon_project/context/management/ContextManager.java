@@ -49,10 +49,6 @@ import static android.content.Context.MODE_PRIVATE;
  */
 public class ContextManager {
 
-    public interface ExternalContextHandler {
-        void handleExternalContext();
-    }
-
     private Context mContext;
     private static final String LOGTAG = "ContextManager";
     private final HashMap<String, ContextObserver> mActiveContexts = new HashMap<>();

@@ -1,0 +1,7 @@
+.gradle
+/libs/POSEIDON-Contexts/local.properties
+/.idea/workspace.xml
+/.idea/libraries
+.DS_Store
+/build
+openWeatherMapAPI

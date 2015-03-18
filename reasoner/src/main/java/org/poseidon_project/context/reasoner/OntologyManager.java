@@ -29,6 +29,8 @@ import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 
+import org.poseidon_project.context.ContextReasonerCore;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -46,8 +48,12 @@ public class OntologyManager {
     private Context mContext;
     private OntModel mModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
     private static final String LOGTAG  = "OntologyManager";
+    private ContextReasonerCore mReasonerCore;
 
-    public OntologyManager(Context context){ mContext = context; }
+    public OntologyManager(Context context, ContextReasonerCore core){
+        mContext = context;
+        mReasonerCore = core;
+    }
 
     public void loadOntologyFromFile(OntModel model, String location) {
         try {

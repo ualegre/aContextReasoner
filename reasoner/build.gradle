@@ -10,6 +10,7 @@ android {
         targetSdkVersion 21
         versionCode 1
         versionName "1.0"
+        multiDexEnabled true
     }
     buildTypes {
         release {
@@ -22,10 +23,5 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:appcompat-v7:21.0.3'
-    compile files('libs/jena-arq-2.12.1-jarjar.jar')
-    compile files('libs/jena-core-2.12.1-jarjar.jar')
-    compile files('libs/jena-iri-1.1.1-jarjar.jar')
-    compile files('libs/slf4j-api-1.7.6-jarjar.jar')
-    compile files('libs/xercesImpl-repack.jar')
     compile project(':libs:POSEIDON-Contexts:library')
 }

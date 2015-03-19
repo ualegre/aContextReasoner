@@ -30,28 +30,7 @@ import android.util.Log;
  */
 public class ContextReasonerService extends Service{
 
-    private ContextReasonerCore mReasonerCore;
-    private Context mContext;
     private static final String LOGTAG = "ContextService";
-
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        mContext = getApplicationContext();
-        mReasonerCore = new ContextReasonerCore(mContext);
-    }
-
-    @Override
-    public IBinder onBind(Intent intent) {
-
-        if (IContextReasoner.class.getName().equals(intent.getAction())) {
-            Log.d(LOGTAG, "binding");
-            return mContextBinder;
-        }
-
-        return null;
-    }
-
     public final IContextReasoner.Stub mContextBinder = new IContextReasoner.Stub() {
 
         @Override
@@ -71,5 +50,31 @@ public class ContextReasonerService extends Service{
                 throws RemoteException {
             return mReasonerCore.removeContextRequirement(appKey, observerName);
         }
+
+        @Override
+        public void importOntologyURLMappingFile(String appkey, String fileLocation)
+                throws RemoteException {
+            mReasonerCore.importOntologyURLMappingFile(fileLocation);
+        }
     };
+    private ContextReasonerCore mReasonerCore;
+    private Context mContext;
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        mContext = getApplicationContext();
+        mReasonerCore = new ContextReasonerCore(mContext);
+    }
+
+    @Override
+    public IBinder onBind(Intent intent) {
+
+        if (IContextReasoner.class.getName().equals(intent.getAction())) {
+            Log.d(LOGTAG, "binding");
+            return mContextBinder;
+        }
+
+        return null;
+    }
 }

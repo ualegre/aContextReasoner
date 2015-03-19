@@ -30,12 +30,12 @@ import org.poseidon_project.context.reasoner.OntologyManager;
  */
 public class ContextReasonerCore {
 
-    private ContextManager mContextManager;
-    private OntologyManager mOntologyManager;
-    private Context mContext;
     public static final String BROADCAST_INTENT = "org.poseidon_project.context.CONTEXT_UPDATE";
     private static final String LOGTAG = "ContextService";
     private static final String CONTEXT_VALUE = "context_value";
+    private ContextManager mContextManager;
+    private OntologyManager mOntologyManager;
+    private Context mContext;
 
 
     public ContextReasonerCore(Context c) {
@@ -50,6 +50,10 @@ public class ContextReasonerCore {
     public void importDexFile(String appkey, final String newDex,
                                  String[] contexts, String packagename, int permission) {
         mContextManager.copyDexFile(appkey, newDex, contexts, packagename, permission);
+    }
+
+    public void importOntologyURLMappingFile(String location) {
+        mOntologyManager.parseURLtoFileMappingFile(location);
     }
 
     public boolean addContextRequirement(String appkey, String observerName) {

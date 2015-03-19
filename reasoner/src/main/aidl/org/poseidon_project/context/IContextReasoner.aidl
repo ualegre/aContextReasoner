@@ -29,6 +29,9 @@ interface IContextReasoner {
     //***Asks for a particular context to be used***
     boolean addContextRequirement(in String appKey, in String observerName);
 
-    //**Removes the need for a particular context***
+    //***Removes the need for a particular context***
     boolean removeContextRequirement(in String appKey, in String observerName);
+
+    //***imports Ontology URL-File mappings***
+    void importOntologyURLMappingFile(in String appkey, in String fileLocation);
 }

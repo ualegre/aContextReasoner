@@ -26,6 +26,6 @@
         android:text="@string/test_aidl" />
     <Button android:id="@+id/btnExit" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignLeft="@+id/TextView01" android:layout_below="@+id/btnTestAidl"
         android:width="200dip" android:clickable="true"
-        android:onClick="finishTest"
+        android:onClick="exitApp"
         android:text="@string/exitApp" />
 </RelativeLayout>

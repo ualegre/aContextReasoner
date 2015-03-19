@@ -16,29 +16,33 @@
 
 package org.poseidon_project.context.test;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import org.poseidon_project.context.ContextReasonerCore;
 import org.poseidon_project.context.R;
 
+public class CoreTest extends ActionBarActivity {
 
-public class TestActivity extends ActionBarActivity {
-
+    private static final String LOGTAG = "CoreTest";
+    private static final String APPID = "TestApp";
+    private ContextReasonerCore mTestService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
+        setContentView(R.layout.activity_test);
     }
+
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_test, menu);
+        getMenuInflater().inflate(R.menu.menu_core_test, menu);
         return true;
     }
 
@@ -57,17 +61,11 @@ public class TestActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void testAidl(View v) {
-        Intent i = new Intent(this, AIDLTest.class);
-        startActivity(i);
-    }
-
-    public void testCore(View v) {
-        Intent i = new Intent(this, CoreTest.class);
-        startActivity(i);
-    }
-
-    public void exitApp(View v) {
+    public void finishTest(View v){
         finish();
+    }
+
+    protected void setupService(View v){
+
     }
 }

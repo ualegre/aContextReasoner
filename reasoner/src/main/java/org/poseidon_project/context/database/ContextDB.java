@@ -41,9 +41,9 @@ public interface ContextDB {
 
     List<String> getLoadComponentInfo(String applicationId, String componentName);
 
-    long startContextComponentUse(String name);
+    long startContextComponentUse(String name, String date);
 
-    long endContextComponentUse(long id, String name);
+    long endContextComponentUse(long id, String name, String date);
 
     int getNumberOfReceivers();
 

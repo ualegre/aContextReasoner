@@ -21,8 +21,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Vector;
 
@@ -36,8 +34,6 @@ public class ContextDBImpl implements ContextDB{
     private OpenDbHelper dbHelper;
     public static final String CONTEXTTABLE = "usable_contexts";
     public static final String USEDCONTEXTTABLE = "used_contexts";
-    private SimpleDateFormat mDateFormater = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    private Calendar mCalendar = Calendar.getInstance();
 
     public ContextDBImpl(Context context) {
         dbHelper = new OpenDbHelper(context);
@@ -233,9 +229,7 @@ public class ContextDBImpl implements ContextDB{
     }
 
     @Override
-    public long startContextComponentUse(String name) {
-
-        String date = mDateFormater.format(mCalendar.getTime());
+    public long startContextComponentUse(String name, String date) {
 
         try {
             SQLiteDatabase sqlite = dbHelper.getWritableDatabase();
@@ -254,9 +248,8 @@ public class ContextDBImpl implements ContextDB{
     }
 
     @Override
-    public long endContextComponentUse(long id, String name) {
+    public long endContextComponentUse(long id, String name, String date) {
 
-        String date = mDateFormater.format(mCalendar.getTime());
         String where = "id=?";
         String[] whereargs = new String[] { String.valueOf(id) };
 

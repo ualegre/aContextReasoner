@@ -97,7 +97,8 @@ public class ContextManager {
                 observer.stop();
                 mActiveContexts.remove(observerName);
                 long cID = mContextUseIds.remove(observerName);
-                mContextDatabase.endContextComponentUse(cID, observerName);
+                mContextDatabase.
+                        endContextComponentUse(cID, observerName, mDateFormater.format(mCalendar.getTime()));
                 observer = null;
             }
 
@@ -197,7 +198,8 @@ public class ContextManager {
             context.addRequiringApp(appId);
             context.start();
 
-            long cId = mContextDatabase.startContextComponentUse(componentName);
+            long cId = mContextDatabase.
+                    startContextComponentUse(componentName, mDateFormater.format(mCalendar.getTime()));
             mContextUseIds.put(componentName, cId);
 
             mActiveContexts.put(componentName, context);

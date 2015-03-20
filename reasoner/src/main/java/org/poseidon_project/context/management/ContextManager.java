@@ -17,6 +17,7 @@ package org.poseidon_project.context.management;
 
 import android.content.Context;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.Environment;
 import android.util.Log;
 
@@ -32,6 +33,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Constructor;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,7 +46,7 @@ import dalvik.system.DexClassLoader;
 import static android.content.Context.MODE_PRIVATE;
 
 /**
- * Class to handle runtime management of Context observers.
+ * Class to handle runtime management of Context observers and receivers.
  *
  * @author Dean Kramer <d.kramer@mdx.ac.uk>
  */
@@ -54,6 +59,9 @@ public class ContextManager {
     private ContextDB mContextDatabase;
     private ContextReceiver mContextReceiver;
     private ExternalContextReceiver mExternalContextReceiver;
+    private SimpleDateFormat mDateFormater = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private Calendar mCalendar = Calendar.getInstance();
+    public static final String CONTEXT_PREFS = "ContextPrefs";
 
     public ContextManager(Context c) {
 
@@ -254,6 +262,42 @@ public class ContextManager {
             Log.e(LOGTAG, e.getStackTrace().toString());
             return false;
         }
+    }
+
+    public boolean needHouseClearing(){
+
+        SharedPreferences settings = mContext.getSharedPreferences(CONTEXT_PREFS, 0);
+        String lastDateString = settings.getString("lastclearing", "");
+
+        if (! lastDateString.equals("") ) {
+            try {
+                Date lastTime = mDateFormater.parse(lastDateString);
+                Date today = mCalendar.getTime();
+
+                int m1 = lastTime.getYear() * 12 + lastTime.getMonth();
+                int m2 = lastTime.getYear() * 12 + lastTime.getMonth();
+
+                if (m2 - m1 == 0) {
+                    return false;
+                } else {
+                    return true;
+                }
+            } catch (ParseException e) {
+                Log.e(LOGTAG, e.getStackTrace().toString());
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+
+    public void houseClearing() {
+
+        SharedPreferences settings = mContext.getSharedPreferences(CONTEXT_PREFS, 0);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putString("lastclearing", mDateFormater.format(mCalendar.getTime()));
+        editor.commit();
+
     }
 
     public void newExternalContextValue(String name, long contextValue) {

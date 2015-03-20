@@ -276,6 +276,39 @@ public class ContextDBImpl implements ContextDB{
     }
 
     @Override
+    public int getNumberOfReceivers() {
+        return 1;
+    }
+
+    @Override
+    public List<String> getContextReceiver(long id) {
+        List<String> returnValues = new Vector<String>();
+        try {
+            SQLiteDatabase sqlite = dbHelper.getReadableDatabase();
+            Cursor crsr = sqlite
+                    .rawQuery(
+                            "Select dex_file, packageName, name from usable_contexts where id='"
+                                    + String.valueOf(id) + "';", null);
+            crsr.moveToFirst();
+
+            int numRows = crsr.getCount();
+            if (numRows > 0) {
+
+                returnValues.add(crsr.getString(0));
+                returnValues.add(crsr.getString(1));
+                returnValues.add(crsr.getString(2));
+
+            }
+
+        } catch (Exception sqlerror) {
+            Log.v("Table read error", sqlerror.getMessage());
+            return null;
+        }
+
+        return returnValues;
+    }
+
+    @Override
     public List<String> getAppContextList(String applicationId) {
         List<String> contexts = new Vector<String>();
 

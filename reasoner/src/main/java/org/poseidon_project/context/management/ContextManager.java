@@ -32,8 +32,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -60,7 +58,8 @@ public class ContextManager {
     public ContextManager(Context c) {
 
         mContext = c;
-        mContextReceiver = new POSEIDONReceiver();
+        //mContextReceiver = new POSEIDONReceiver();
+        loadAllReceiverClasses();
         mExternalContextReceiver = new ExternalContextReceiver(this);
         IntentFilter filter = new IntentFilter(mExternalContextReceiver.CONTEXT_INTENT);
         mContext.registerReceiver(mExternalContextReceiver, filter);
@@ -204,6 +203,18 @@ public class ContextManager {
             Log.e(LOGTAG, e.getStackTrace().toString());
             return false;
         }
+    }
+
+    private boolean loadAllReceiverClasses() {
+
+        int numOfReceivers = mContextDatabase.getNumberOfReceivers();
+
+        for (int i = 0; i < numOfReceivers; i++) {
+            List<String> classInfo = mContextDatabase.getContextReceiver(i+1);
+            return loadReceiverClass(classInfo.get(2), classInfo.get(0), classInfo.get(1));
+        }
+
+        return false;
     }
 
     private boolean loadReceiverClass(String componentName, String dex,

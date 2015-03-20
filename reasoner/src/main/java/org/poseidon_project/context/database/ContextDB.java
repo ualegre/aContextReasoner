@@ -45,6 +45,10 @@ public interface ContextDB {
 
     long endContextComponentUse(long id, String name);
 
+    int getNumberOfReceivers();
+
+    List<String> getContextReceiver(long id);
+
     void closeDB();
 
 }

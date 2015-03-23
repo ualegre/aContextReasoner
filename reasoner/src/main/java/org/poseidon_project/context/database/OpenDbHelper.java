@@ -70,18 +70,19 @@ public class OpenDbHelper extends SQLiteOpenHelper{
         //Usable Context DB
         //Example
         //db.execSQL("insert into usable_contexts values (1, 'uk.ac.tvu.mdse.contextengine.contexts', 'BatteryContext', 'contextengine', 0, 'classes.dex')");
-        /*db.execSQL("insert into usable_contexts values (1, 'org.poseidon_project.contexts.envir.LocationWeatherContext', 'LocationWeatherContext', 'contextengine', 0, 'classes.dex')");
-        db.execSQL("insert into usable_contexts values (2, 'org.poseidon_project.contexts.envir.weather.BadWeatherContext', 'BadWeatherContext', 'contextengine', 0, 'classes.dex')");
-        db.execSQL("insert into usable_contexts values (3, 'org.poseidon_project.contexts.hardware.BatteryContext', 'BatteryContext', 'contextengine', 0, 'classes.dex')");
-        db.execSQL("insert into usable_contexts values (4, 'org.poseidon_project.contexts.hardware.CompassContext', 'CompassContext', 'contextengine', 0, 'classes.dex')");
-        db.execSQL("insert into usable_contexts values (5, 'org.poseidon_project.contexts.hardware.ExternalStorageSpaceContext', 'ExternalStorageSpaceContext', 'contextengine', 0, 'classes.dex')");
-        db.execSQL("insert into usable_contexts values (6, 'org.poseidon_project.contexts.hardware.GPSIndoorOutdoorContext', 'GPSIndoorOutdoorContext', 'contextengine', 0, 'classes.dex')");
-        db.execSQL("insert into usable_contexts values (7, 'org.poseidon_project.contexts.hardware.LightContext', 'LightContext', 'contextengine', 0, 'classes.dex')");
-        db.execSQL("insert into usable_contexts values (8, 'org.poseidon_project.contexts.hardware.TelephonyContext', 'TelephonyContext', 'contextengine', 0, 'classes.dex')");
-        db.execSQL("insert into usable_contexts values (9, 'org.poseidon_project.contexts.hardware.WifiContext', 'WifiContext', 'contextengine', 0, 'classes.dex')");
+        db.execSQL("insert into usable_contexts values (1, 'org.poseidon_project.contexts.envir', 'LocationWeatherContext', 'contextengine', 0, 'classes.dex')");
+        db.execSQL("insert into usable_contexts values (2, 'org.poseidon_project.contexts.envir.weather', 'BadWeatherContext', 'contextengine', 0, 'classes.dex')");
+        db.execSQL("insert into usable_contexts values (3, 'org.poseidon_project.contexts.hardware', 'BatteryContext', 'contextengine', 0, 'classes.dex')");
+        db.execSQL("insert into usable_contexts values (4, 'org.poseidon_project.contexts.hardware', 'CompassContext', 'contextengine', 0, 'classes.dex')");
+        db.execSQL("insert into usable_contexts values (5, 'org.poseidon_project.contexts.hardware', 'ExternalStorageSpaceContext', 'contextengine', 0, 'classes.dex')");
+        db.execSQL("insert into usable_contexts values (6, 'org.poseidon_project.contexts.hardware', 'GPSIndoorOutdoorContext', 'contextengine', 0, 'classes.dex')");
+        db.execSQL("insert into usable_contexts values (7, 'org.poseidon_project.contexts.hardware', 'LightContext', 'contextengine', 0, 'classes.dex')");
+        db.execSQL("insert into usable_contexts values (8, 'org.poseidon_project.contexts.hardware', 'TelephonyContext', 'contextengine', 0, 'classes.dex')");
+        db.execSQL("insert into usable_contexts values (9, 'org.poseidon_project.contexts.hardware', 'WifiContext', 'contextengine', 0, 'classes.dex')");
 
         //Context Receiver DB
-        db.execSQL("insert into usable_receivers values (1, 'org.poseidon_project.context.management', 'POSEIDONReceiver', 'contextengine', 'classes.dex')");
-        */
+        //Example
+        //db.execSQL("insert into usable_receivers values (1, 'org.poseidon_project.context.management', 'POSEIDONReceiver', 'contextengine', 'classes.dex')");
+
     }
 }

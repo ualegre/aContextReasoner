@@ -270,7 +270,7 @@ public class ContextDBImpl implements ContextDB{
 
     @Override
     public int getNumberOfReceivers() {
-        return 1;
+        return 0;
     }
 
     @Override

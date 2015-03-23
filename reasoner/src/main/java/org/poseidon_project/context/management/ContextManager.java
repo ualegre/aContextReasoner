@@ -22,6 +22,7 @@ import android.os.Environment;
 import android.util.Log;
 
 import org.poseidon_project.context.database.ContextDB;
+import org.poseidon_project.context.database.ContextDBImpl;
 import org.poseidon_project.contexts.ContextObserver;
 import org.poseidon_project.contexts.ContextReceiver;
 
@@ -66,8 +67,9 @@ public class ContextManager {
     public ContextManager(Context c) {
 
         mContext = c;
-        //mContextReceiver = new POSEIDONReceiver();
-        loadAllReceiverClasses();
+        mContextDatabase = new ContextDBImpl(mContext);
+        mContextReceiver = new POSEIDONReceiver();
+        loadAllOtherReceiverClasses();
         mExternalContextReceiver = new ExternalContextReceiver(this);
         IntentFilter filter = new IntentFilter(mExternalContextReceiver.CONTEXT_INTENT);
         mContext.registerReceiver(mExternalContextReceiver, filter);
@@ -215,7 +217,7 @@ public class ContextManager {
         }
     }
 
-    private boolean loadAllReceiverClasses() {
+    private boolean loadAllOtherReceiverClasses() {
 
         int numOfReceivers = mContextDatabase.getNumberOfReceivers();
 
@@ -331,6 +333,7 @@ public class ContextManager {
             co.stop();
             mActiveContexts.remove(co);
             co.removeAllRequiringApps();
+            co = null;
         }
 
         return true;

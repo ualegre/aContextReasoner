@@ -78,4 +78,7 @@ public class ContextReasonerCore {
     }
 
 
+    public void onDestroy() {
+        mContextManager.stop();
+    }
 }

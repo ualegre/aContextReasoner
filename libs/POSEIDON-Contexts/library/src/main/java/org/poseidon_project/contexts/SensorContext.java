@@ -87,7 +87,7 @@ public abstract class SensorContext extends ContextObserver implements SensorEve
 	@Override
 	public boolean start() {
 
-        if (mSensorType == -2) {
+        if (mSensorType != -2) {
             mSensorManager.registerListener(this, mSensor, mInterval);
             return true;
         } else {

@@ -36,7 +36,7 @@ public class GPSIndoorOutdoorContext extends LocationContext {
     private int signalNeeded;
 
 	public GPSIndoorOutdoorContext(Context c, ContextReceiver cr) {
-		super(c, cr, 3000, 0, "GPSIndoorOutdoor");
+		super(c, cr, 3000, 0, "GPSIndoorOutdoorContext");
 		gpsStatus = mLocationManager.getGpsStatus(null);
         if (isTablet(c)) {
             signalNeeded = 30;

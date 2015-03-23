@@ -21,6 +21,8 @@ import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 
+import java.util.Map;
+
 /**
  * Gets the level of light lumens
  * @author Dean Kramer <d.kramer@mdx.ac.uk>
@@ -29,7 +31,8 @@ import android.hardware.SensorManager;
 public class LightContext extends SensorContext{
 
 	private long mCurrentValue;
-	private long mContextDifference = 300;
+	private long mContextDifferenceHigher = 0;
+    private long mContextDifferenceLower = 0;
 
 	public LightContext(Context c, ContextReceiver cr) {
 		super(c, cr, Sensor.TYPE_LIGHT, SensorManager.SENSOR_DELAY_NORMAL, "LightContext");
@@ -38,22 +41,31 @@ public class LightContext extends SensorContext{
 
 	public LightContext(Context c, ContextReceiver cr, long difference) {
 		super(c, cr, Sensor.TYPE_LIGHT, SensorManager.SENSOR_DELAY_NORMAL, "LightContext");
-		mContextDifference = difference;
+		mContextDifferenceHigher = difference;
 	}
 
 	public void setContextDifference(long difference) {
-		mContextDifference = difference;
+		mContextDifferenceHigher = difference;
 	}
 
 	@Override
 	protected void checkContext(float[] values) {
 		long value = Math.round(values[0]);
 
-		long difference = Math.abs(mCurrentValue-value);
+        long difference = Math.abs(mCurrentValue-value);
+        long threshold;
+        if (value > mCurrentValue) {
+            threshold = mContextDifferenceHigher;
+        } else {
+            threshold = mContextDifferenceLower;
+        }
 
-		if (difference >=mContextDifference) {
+
+		if (difference >= threshold) {
 			mCurrentValue = value;
 			mReceiver.newContextValue("sensor.light_lumens", mCurrentValue);
+            mContextDifferenceHigher = value * 2;
+            mContextDifferenceLower = value / 2;
 		}
 
 	}

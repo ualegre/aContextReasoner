@@ -22,6 +22,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.RemoteException;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -84,6 +85,11 @@ public class AIDLTest extends ActionBarActivity {
     }
 
     public void finishTest(View v){
+        try {
+            mTestService.removeContextRequirement("test", "BatteryContext");
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
         finish();
     }
 
@@ -108,5 +114,14 @@ public class AIDLTest extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void testStartContexts(View v) {
+        try {
+            //mTestService.addContextRequirement("test", "BatteryContext");
+            mTestService.addContextRequirement("test", "LightContext");
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
     }
 }

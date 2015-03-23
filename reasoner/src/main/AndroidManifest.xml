@@ -7,18 +7,18 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
 
     <application
+        android:name="android.support.multidex.MultiDexApplication"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme"
-        android:name="android.support.multidex.MultiDexApplication">
+        android:theme="@style/AppTheme" >
         <activity
             android:name=".test.TestActivity"
             android:label="@string/app_name" >
@@ -28,11 +28,21 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <service android:name="org.poseidon_project.context.ContextReasonerService">
+
+        <service android:name=".ContextReasonerService" >
             <intent-filter>
-                <action android:name="org.poseidon_project.context.IContextReasoner"/>
+                <action android:name="org.poseidon_project.context.IContextReasoner" />
             </intent-filter>
         </service>
+
+        <activity
+            android:name=".test.AIDLTest"
+            android:label="@string/title_activity_aidltest" >
+        </activity>
+        <activity
+            android:name=".test.CoreTest"
+            android:label="@string/title_activity_core_test" >
+        </activity>
     </application>
 
 </manifest>

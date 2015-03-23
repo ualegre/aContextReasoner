@@ -16,11 +16,11 @@
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="fill_parent" android:layout_height="fill_parent">
     <TextView android:id="@+id/TextView01" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_centerHorizontal="true" android:layout_centerInParent="false" android:paddingTop="5dp" android:text="@string/title" android:textSize="15sp" android:textStyle="bold"/>
-    <Button android:id="@+id/btnTestCore" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignStart="@+id/btnTestAidl" android:layout_below="@+id/TextView01" android:layout_marginTop="176dp" android:width="200dip" android:clickable="true"
+    <Button android:id="@+id/btnTestStart" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignStart="@+id/btnTestAidl" android:layout_below="@+id/TextView01" android:layout_marginTop="176dp" android:width="200dip" android:clickable="true"
         android:onClick="testCore"
         android:text="@string/test_core" />
     <Button android:id="@+id/btnTestAidl" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignStart="@+id/btnExit"
-        android:layout_below="@+id/btnTestCore" android:width="200dip"
+        android:layout_below="@+id/btnTestStart" android:width="200dip"
         android:clickable="true"
         android:onClick="testAidl"
         android:text="@string/test_aidl" />

@@ -91,4 +91,9 @@ public class ContextReasonerCore {
     public void onDestroy() {
         mContextManager.stop();
     }
+
+    public boolean addContextRequirementWithParameters
+            (String appkey, String observerName, Map parameters) {
+        return mContextManager.addObserverRequirementWithParameters(appkey, observerName, parameters);
+    }
 }

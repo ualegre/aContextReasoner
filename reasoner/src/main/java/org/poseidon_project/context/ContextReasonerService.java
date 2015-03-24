@@ -75,6 +75,12 @@ public class ContextReasonerService extends Service{
         }
 
         @Override
+        public boolean addContextRequirementWithParameters
+                (String appkey, String observerName, Map parameters) throws RemoteException {
+            return mReasonerCore.addContextRequirementWithParameters(appkey, observerName, parameters);
+        }
+
+        @Override
         public boolean removeContextRequirement(String appKey, String observerName)
                 throws RemoteException {
             return mReasonerCore.removeContextRequirement(appKey, observerName);

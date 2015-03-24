@@ -29,6 +29,9 @@ interface IContextReasoner {
     //***Asks for a particular context to be used***
     boolean addContextRequirement(in String appKey, in String observerName);
 
+    //***Asks for a particular context to be used, with parameters***
+    boolean addContextRequirementWithParameters(in String appkey, in String observerName, in Map parameters);
+
     //***Removes the need for a particular context***
     boolean removeContextRequirement(in String appKey, in String observerName);
 

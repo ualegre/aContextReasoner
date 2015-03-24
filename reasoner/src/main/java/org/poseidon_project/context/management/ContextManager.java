@@ -88,7 +88,13 @@ public class ContextManager implements IContextManager{
             observer.addRequiringApp(appkey);
             return true;
         } else {
-            return loadContextClass(appkey, observerName);
+            observer = loadContextClass(appkey, observerName);
+
+            if (observer == null) {
+                return false;
+            } else {
+                return observer.start();
+            }
         }
     }
 
@@ -163,7 +169,7 @@ public class ContextManager implements IContextManager{
         }
     }
 
-    protected boolean loadContextClass(String appId, String componentName) {
+    protected ContextObserver loadContextClass(String appId, String componentName) {
         List<String> componentInfo = mContextDatabase.getLoadComponentInfo(appId,
                 componentName);
 
@@ -172,11 +178,11 @@ public class ContextManager implements IContextManager{
                     componentInfo.get(1));
         }
 
-        return false;
+        return null;
 
     }
 
-    private boolean loadContextClass(String appId, String componentName, String dex,
+    private ContextObserver loadContextClass(String appId, String componentName, String dex,
                               String packagename) {
 
         final File optimizedDexOutputPath = mContext.getDir("outdex",
@@ -202,7 +208,6 @@ public class ContextManager implements IContextManager{
                     .newInstance(mContext, mContextReceiver);
 
             context.addRequiringApp(appId);
-            context.start();
 
             long cId = mContextDatabase.
                     startContextComponentUse(componentName, mDateFormater.format(mCalendar.getTime()));
@@ -210,14 +215,14 @@ public class ContextManager implements IContextManager{
 
             mActiveContexts.put(componentName, context);
 
-            return true;
+            return context;
 
         } catch (ClassNotFoundException cnfe) {
             Log.e(LOGTAG, "Context Observer Class not found!");
-            return false;
+            return null;
         } catch (Exception e) {
             Log.e(LOGTAG, e.getStackTrace().toString());
-            return false;
+            return null;
         }
     }
 
@@ -355,4 +360,23 @@ public class ContextManager implements IContextManager{
     }
 
 
+    public boolean addObserverRequirementWithParameters
+            (String appkey, String observerName, Map parameters) {
+        ContextObserver observer = mActiveContexts.get(observerName);
+
+        if (observer != null) {
+            Log.v(LOGTAG, "Observer already running, adding requirement");
+            observer.addRequiringApp(appkey);
+            return true;
+        } else {
+            observer = loadContextClass(appkey, observerName);
+
+            if (observer == null) {
+                return false;
+            } else {
+                observer.setContextParameters((HashMap<String, Object>) parameters);
+                return observer.start();
+            }
+        }
+    }
 }

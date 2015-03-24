@@ -342,4 +342,17 @@ public class ContextManager implements IContextManager{
 
         return true;
     }
+
+    public boolean setContextParameters(String appkey, String observerName, Map parameters) {
+
+        ContextObserver observer = mActiveContexts.get(observerName);
+
+        if (observer == null) {
+            return false;
+        } else {
+            return observer.setContextParameters((HashMap<String, Object>) parameters);
+        }
+    }
+
+
 }

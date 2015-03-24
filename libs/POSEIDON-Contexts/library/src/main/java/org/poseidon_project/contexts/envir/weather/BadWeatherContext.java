@@ -30,7 +30,9 @@ import org.poseidon_project.contexts.TimerContext;
 import org.poseidon_project.contexts.envir.weather.source.WeatherPeriod;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Class Description
@@ -48,6 +50,28 @@ public class BadWeatherContext extends TimerContext{
     public BadWeatherContext(Context c, ContextReceiver cr) {
         super(c, cr, 5000, "BadWeatherContext");
         mWeatherSource = new OpenWeatherMapSource();
+    }
+
+    @Override
+    public boolean setContextParameters(HashMap<String, Object> parameters) {
+        if (super.setContextParameters(parameters)) {
+            List<String> stringPlaces = (List<String>) parameters.get("stringPlaces");
+            List<Location> locationPlaces = (List<Location>) parameters.get("locationPlaces");
+
+            if ( stringPlaces != null && locationPlaces == null) {
+                setPlace(stringPlaces, true);
+                return true;
+            } else if (stringPlaces == null && locationPlaces != null ) {
+                setPlace(locationPlaces, false);
+                return true;
+            } else {
+                Log.e(mName, "You shouldn't send both!");
+                return false;
+            }
+
+        } else {
+            return false;
+        }
     }
 
     public BadWeatherContext(Context c, ContextReceiver cr, List places, boolean strings) {

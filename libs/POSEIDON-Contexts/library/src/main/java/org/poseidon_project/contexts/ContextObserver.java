@@ -16,11 +16,13 @@
 package org.poseidon_project.contexts;
 
 import android.content.Context;
+import android.util.Log;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 
@@ -49,6 +51,21 @@ public abstract class ContextObserver {
         mContext = context;
         mReceiver = cr;
         mName = name;
+    }
+
+    public boolean setContextParameters(HashMap<String, Object> parameters) {
+        if (parameters == null) {
+            Log.e(mName, "Parameter Map is null!");
+            return false;
+        } else {
+            if (parameters.isEmpty()) {
+                Log.e(mName, "There are no parameters!");
+                return false;
+            } else {
+                return true;
+            }
+        }
+
     }
 
 	/*

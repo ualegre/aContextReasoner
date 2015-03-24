@@ -23,6 +23,8 @@ import android.util.Log;
 import org.poseidon_project.context.management.ContextManager;
 import org.poseidon_project.context.reasoner.OntologyManager;
 
+import java.util.Map;
+
 /**
  * Core class for service management
  *
@@ -42,9 +44,13 @@ public class ContextReasonerCore {
 
         mContext = c;
         mOntologyManager = new OntologyManager(c, this);
-        mContextManager = new ContextManager(c);
+        mContextManager = new ContextManager(c, this);
 
     }
+
+    public OntologyManager getOntologyManager() {return mOntologyManager;}
+
+    public ContextManager getContextManager() {return mContextManager;}
 
 
     public void importDexFile(String appkey, final String newDex,
@@ -62,6 +68,10 @@ public class ContextReasonerCore {
 
     public boolean removeContextRequirement(String appkey, String observerName) {
         return mContextManager.removeObserverRequirement(appkey, observerName);
+    }
+
+    public boolean setContextParameters(String appkey, String observerName, Map parameters) {
+        return mContextManager.setContextParameters(appkey, observerName, parameters);
     }
 
     public void sendContextResult(String contextValue) {

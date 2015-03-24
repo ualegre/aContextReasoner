@@ -23,6 +23,8 @@ import org.poseidon_project.contexts.envir.weather.source.Weather;
 import android.content.Context;
 import android.util.Log;
 
+import java.util.HashMap;
+
 /**
  * Monitors Weather Data for specific locations
  * @author Dean Kramer <d.kramer@mdx.ac.uk>
@@ -45,7 +47,19 @@ public class LocationWeatherContext extends TimerContext{
 		mWeatherSource = new OpenWeatherMapSource();
 	}
 
-	@Override
+    @Override
+    public boolean setContextParameters(HashMap<String, Object> parameters) {
+        if (super.setContextParameters(parameters)) {
+            String place = (String) parameters.get("place");
+            mPlace = place;
+            return true;
+        } else {
+            return false;
+        }
+
+    }
+
+    @Override
 	protected void checkContext() {
 		try {
 			mCurrentWeather = mWeatherSource.query(mPlace,0);
@@ -55,6 +69,16 @@ public class LocationWeatherContext extends TimerContext{
 		}
 
 	}
+
+    @Override
+    public boolean start() {
+        if (mPlace == null) {
+            Log.e("LocationWeatherContext", "No locations to monitor!");
+            return false;
+        } else {
+            return super.start();
+        }
+    }
 
 	public String getPlace() {
 		return mPlace;

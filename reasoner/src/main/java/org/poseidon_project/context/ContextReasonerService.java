@@ -23,6 +23,8 @@ import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
 
+import java.util.Map;
+
 /**
  * Android Service to handle Context Reasoner requests.
  *
@@ -82,6 +84,11 @@ public class ContextReasonerService extends Service{
         public void importOntologyURLMappingFile(String appkey, String fileLocation)
                 throws RemoteException {
             mReasonerCore.importOntologyURLMappingFile(fileLocation);
+        }
+
+        @Override
+        public boolean setContextParameters(String appkey, String observerName, Map parameters) throws RemoteException {
+            return mReasonerCore.setContextParameters(appkey, observerName, parameters);
         }
     };
 }

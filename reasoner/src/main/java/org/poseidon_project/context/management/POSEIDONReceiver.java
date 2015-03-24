@@ -16,7 +16,11 @@
 
 package org.poseidon_project.context.management;
 
+import android.util.Log;
+
 import org.poseidon_project.contexts.ContextReceiver;
+import org.poseidon_project.contexts.IContextManager;
+import org.poseidon_project.contexts.IOntologyManager;
 import org.poseidon_project.contexts.UIEvent;
 
 import java.util.Map;
@@ -28,9 +32,17 @@ import java.util.Map;
  */
 public class POSEIDONReceiver extends ContextReceiver{
 
+    public POSEIDONReceiver(IContextManager contextManager, IOntologyManager ontologyManager) {
+        super(contextManager, ontologyManager);
+    }
+
     @Override
     public void newContextValue(String name, long value) {
-
+           if(name.equals("sensor.battery_level")) {
+               Log.d("receiver", "battery Context value: " + String.valueOf(value));
+           } else if (name.equals("sensor.light_lumens")) {
+               Log.d("receiver", "Light Context value: " + String.valueOf(value));
+           }
     }
 
     @Override

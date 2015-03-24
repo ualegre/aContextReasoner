@@ -23,6 +23,33 @@ import java.util.Map;
  */
 public abstract class ContextReceiver {
 
+    private IContextManager mContextManager;
+    private IOntologyManager mOntologyManager;
+
+    public ContextReceiver() {
+
+    }
+
+    public ContextReceiver(IContextManager contextManager) {
+        mContextManager = contextManager;
+    }
+
+    public ContextReceiver(IOntologyManager ontologyManager) {
+        mOntologyManager = ontologyManager;
+    }
+
+    public ContextReceiver(IContextManager contextManager, IOntologyManager ontologyManager) {
+        mContextManager = contextManager;
+        mOntologyManager = ontologyManager;
+    }
+
+    public IContextManager getContextManager() {
+        return mContextManager;
+    }
+
+    public IOntologyManager getOntologyManager() {
+        return mOntologyManager;
+    }
 
 	public abstract void newContextValue(String name, long value);
 

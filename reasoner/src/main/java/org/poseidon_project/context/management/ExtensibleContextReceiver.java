@@ -32,8 +32,8 @@ public abstract class ExtensibleContextReceiver extends ContextReceiver{
 
 
     public ExtensibleContextReceiver (ContextReceiver extendedReceiver) {
+        super(extendedReceiver.getContextManager(), extendedReceiver.getOntologyManager());
         mExtendedReciever = extendedReceiver;
-
     }
 
     @Override

@@ -21,10 +21,12 @@ import android.content.SharedPreferences;
 import android.os.Environment;
 import android.util.Log;
 
+import org.poseidon_project.context.ContextReasonerCore;
 import org.poseidon_project.context.database.ContextDB;
 import org.poseidon_project.context.database.ContextDBImpl;
 import org.poseidon_project.contexts.ContextObserver;
 import org.poseidon_project.contexts.ContextReceiver;
+import org.poseidon_project.contexts.IContextManager;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -51,7 +53,7 @@ import static android.content.Context.MODE_PRIVATE;
  *
  * @author Dean Kramer <d.kramer@mdx.ac.uk>
  */
-public class ContextManager {
+public class ContextManager implements IContextManager{
 
     private Context mContext;
     private static final String LOGTAG = "ContextManager";
@@ -63,12 +65,14 @@ public class ContextManager {
     private SimpleDateFormat mDateFormater = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private Calendar mCalendar = Calendar.getInstance();
     public static final String CONTEXT_PREFS = "ContextPrefs";
+    private ContextReasonerCore mReasonerCore;
 
-    public ContextManager(Context c) {
+    public ContextManager(Context c, ContextReasonerCore reasonerCore) {
 
         mContext = c;
+        mReasonerCore = reasonerCore;
         mContextDatabase = new ContextDBImpl(mContext);
-        mContextReceiver = new POSEIDONReceiver();
+        mContextReceiver = new POSEIDONReceiver(this, mReasonerCore.getOntologyManager());
         loadAllOtherReceiverClasses();
         mExternalContextReceiver = new ExternalContextReceiver(this);
         IntentFilter filter = new IntentFilter(mExternalContextReceiver.CONTEXT_INTENT);

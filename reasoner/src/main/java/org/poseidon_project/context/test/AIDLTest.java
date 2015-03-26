@@ -16,9 +16,11 @@
 
 package org.poseidon_project.context.test;
 
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -28,9 +30,13 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 
 import org.poseidon_project.context.IContextReasoner;
 import org.poseidon_project.context.R;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 
 public class AIDLTest extends ActionBarActivity {
 
@@ -38,6 +44,9 @@ public class AIDLTest extends ActionBarActivity {
     private static final String APPID = "TestApp";
     private IContextReasoner mTestService;
     private boolean mBound = false;
+    private BroadcastReceiver mContextBR;
+    private TextView mResult;
+
     private ServiceConnection mConnection  = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
@@ -60,9 +69,29 @@ public class AIDLTest extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_test);
+        mResult = (TextView) findViewById(R.id.lblResult);
         mContext = getApplicationContext();
+        setupBroadcastReceivers();
 
+    }
 
+    private void setupBroadcastReceivers() {
+        IntentFilter filter = new IntentFilter("org.poseidon_project.context.CONTEXT_UPDATE");
+        mContextBR = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+
+                Bundle bundle = intent.getExtras();
+
+                String contextName = bundle.getString("context_name");
+                String contextType = bundle.getString("context_value");
+
+                mResult.setText(contextName + " : " + contextType);
+
+            }
+        };
+
+        mContext.registerReceiver(mContextBR, filter);
     }
 
     protected void setupService(View v){
@@ -86,7 +115,10 @@ public class AIDLTest extends ActionBarActivity {
 
     public void finishTest(View v){
         try {
-            mTestService.removeContextRequirement("test", "BatteryContext");
+            //mTestService.removeContextRequirement("test", "BatteryContext");
+            mTestService.removeContextRequirement("test", "LightContext");
+            mTestService.removeContextRequirement("test", "GPSIndoorOutdoorContext");
+            mTestService.removeContextRequirement("test", "BadWeatherContext");
         } catch (RemoteException e) {
             e.printStackTrace();
         }
@@ -118,8 +150,15 @@ public class AIDLTest extends ActionBarActivity {
 
     public void testStartContexts(View v) {
         try {
+            HashMap<String, Object> paras = new HashMap<>();
+            ArrayList<String> locations = new ArrayList<String>();
+            locations.add("London,UK");
+            locations.add("Southend,UK");
+            paras.put("stringPlaces", locations);
             //mTestService.addContextRequirement("test", "BatteryContext");
             mTestService.addContextRequirement("test", "LightContext");
+            mTestService.addContextRequirement("test", "GPSIndoorOutdoorContext");
+            mTestService.addContextRequirementWithParameters("test", "BadWeatherContext", paras);
         } catch (RemoteException e) {
             e.printStackTrace();
         }

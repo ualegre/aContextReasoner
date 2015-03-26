@@ -379,4 +379,9 @@ public class ContextManager implements IContextManager{
             }
         }
     }
+
+    public void sendContextUpdate(String contextName, String contextValue) {
+
+        mReasonerCore.sendContextResult(contextName, contextValue);
+    }
 }

@@ -34,6 +34,7 @@ public class ContextReasonerCore {
 
     public static final String BROADCAST_INTENT = "org.poseidon_project.context.CONTEXT_UPDATE";
     private static final String LOGTAG = "ContextService";
+    private static final String CONTEXT_NAME = "context_name";
     private static final String CONTEXT_VALUE = "context_value";
     private ContextManager mContextManager;
     private OntologyManager mOntologyManager;
@@ -74,11 +75,12 @@ public class ContextReasonerCore {
         return mContextManager.setContextParameters(appkey, observerName, parameters);
     }
 
-    public void sendContextResult(String contextValue) {
+    public void sendContextResult(String contextName, String contextValue) {
 
         Intent intent = new Intent();
         try {
             intent.setAction(BROADCAST_INTENT);
+            intent.putExtra(CONTEXT_NAME, contextName);
             intent.putExtra(CONTEXT_VALUE, contextValue);
             mContext.sendBroadcast(intent);
         } catch (Exception e) {

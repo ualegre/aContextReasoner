@@ -18,6 +18,7 @@ package org.poseidon_project.context.management;
 
 import android.util.Log;
 
+import org.openrdf.query.algebra.Str;
 import org.poseidon_project.contexts.ContextReceiver;
 import org.poseidon_project.contexts.IContextManager;
 import org.poseidon_project.contexts.IOntologyManager;
@@ -53,6 +54,40 @@ public class POSEIDONReceiver extends ContextReceiver{
     @Override
     public void newContextValue(String name, boolean value) {
 
+        String responseString = name;
+        String valueString = String.valueOf(value);
+
+           if(name.equals("weather:cold")) {
+               responseString = "badWeather";
+               if (value) {
+                   valueString = "isCold";
+               } else {
+                   valueString = "isNotCold";
+               }
+           } else if (name.equals("weather:rain")) {
+               responseString = "badWeather";
+               if (value) {
+                   valueString = "isRaining";
+               } else {
+                   valueString = "isNotRaining";
+               }
+           } else if (name.equals("weather:rainAndCold")) {
+               responseString = "badWeather";
+               if (value) {
+                   valueString = "isRainingAndCold";
+               } else {
+                   valueString = "isNotRainingAndCold";
+               }
+           } else if (name.equals("sensor.gps_indoor_outdoor")) {
+               responseString = "indoorOutdoor";
+               if (value) {
+                   valueString = "isOutdoors";
+               } else {
+                   valueString = "isIndoors";
+               }
+           }
+
+           getContextManager().sendContextUpdate(responseString, valueString);
     }
 
     @Override

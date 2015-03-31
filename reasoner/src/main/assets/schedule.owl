@@ -1,0 +1,104 @@
+<?xml version="1.0"?>
+<!DOCTYPE rdf:RDF [
+   <!ENTITY soupa  "http://pervasive.semanticweb.org/ont/2004/06/">
+   <!ENTITY rdf    "http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <!ENTITY rdfs   "http://www.w3.org/2000/01/rdf-schema#">
+   <!ENTITY xsd    "http://www.w3.org/2001/XMLSchema#"> 
+   <!ENTITY owl    "http://www.w3.org/2002/07/owl#"> 
+   <!ENTITY tme    "http://pervasive.semanticweb.org/ont/2004/06/time#">
+   <!ENTITY sch    "http://pervasive.semanticweb.org/ont/2004/06/schedule#">
+   <!ENTITY spc    "http://pervasive.semanticweb.org/ont/2004/06/space#">
+   <!ENTITY mtg    "http://pervasive.semanticweb.org/ont/2004/06/meeting#">
+   <!ENTITY per    "http://pervasive.semanticweb.org/ont/2004/06/person#">
+   ]>
+<!--
+    This ontology document is licensed under the Creative Commons
+    Attribution License. To view a copy of this license, visit 
+    http://creativecommons.org/licenses/by/1.0/ or send a letter to
+    Creative Commons, 559 Nathan Abbott Way, Stanford, California
+    94305, USA. 
+-->
+<rdf:RDF
+   xmlns:rdf  = "&rdf;"
+   xmlns:rdfs = "&rdfs;"
+   xmlns:owl  = "&owl;"
+   xmlns:spc  = "&spc;"
+   xmlns:xsd  = "&xsd;"
+   xmlns      = "&sch;"
+   xml:base   = "http://pervasive.semanticweb.org/ont/2004/06/schedule">
+
+  <owl:Ontology rdf:about="&soupa;schedule">
+    <owl:imports rdf:resource="&soupa;time"/>
+    <owl:imports rdf:resource="&soupa;person"/>
+    <owl:imports rdf:resource="&soupa;space"/>
+    <owl:imports rdf:resource="&soupa;meeting"/>
+    <owl:versionInfo>cvs:$Revision: 1.3 $, $Date: 2004/03/07 18:26:58 $</owl:versionInfo>
+    <rdfs:label>SOUPA Meeting Schedule Ontology</rdfs:label>
+    <rdfs:comment></rdfs:comment>     
+  </owl:Ontology>
+
+  <owl:Class rdf:ID="MeetingSchedule">
+    <rdfs:label>MeetingSchedule</rdfs:label>
+    <rdfs:subClassOf rdf:resource="&tme;IntervalThing"/>
+
+    <rdfs:subClassOf>
+      <owl:Restriction>
+	<owl:onProperty rdf:resource="#name"/>
+	<owl:cardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:cardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <rdfs:subClassOf>
+      <owl:Restriction>
+	<owl:onProperty rdf:resource="#location"/>
+	<owl:cardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:cardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+
+    <rdfs:subClassOf>
+      <owl:Restriction>
+	<owl:onProperty rdf:resource="#createdBy"/>
+	<owl:maxCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:maxCardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+  </owl:Class>
+
+  <owl:ObjectProperty rdf:ID="location">
+    <rdfs:label>location</rdfs:label>
+    <rdfs:domain rdf:resource="#MeetingSchedule"/>
+    <rdfs:range rdf:resource="&spc;SpaceInAFixedStructure"/>
+    <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+  </owl:ObjectProperty>
+
+  <owl:ObjectProperty rdf:ID="createdBy">
+    <rdfs:label>createdBy</rdfs:label>
+    <rdfs:domain rdf:resource="#MeetingSchedule"/>
+    <rdfs:range rdf:resource="&per;Person"/>
+  </owl:ObjectProperty>
+
+  <owl:DatatypeProperty rdf:ID="name">
+    <rdfs:label>name</rdfs:label>
+    <rdfs:domain rdf:resource="#MeetingSchedule"/>
+    <rdfs:range rdf:resource="&xsd;string"/>
+  </owl:DatatypeProperty>
+
+  <owl:DatatypeProperty rdf:ID="description">
+    <rdfs:label>description</rdfs:label>
+    <rdfs:domain rdf:resource="#MeetingSchedule"/>
+    <rdfs:range rdf:resource="&xsd;string"/>
+  </owl:DatatypeProperty>
+
+  <owl:ObjectProperty rdf:ID="invitedParticipant">
+    <rdfs:label>invitedParticipant</rdfs:label>
+    <rdfs:domain rdf:resource="#MeetingSchedule"/>
+    <rdfs:range rdf:resource="&per;Person"/>
+  </owl:ObjectProperty>
+
+  <owl:ObjectProperty rdf:ID="scheduleOf">
+    <rdfs:label>scheduleOf</rdfs:label>
+    <rdfs:domain rdf:resource="#MeetingSchedule"/>
+    <rdfs:range rdf:resource="&mtg;Meeting"/>
+    <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+  </owl:ObjectProperty>
+
+</rdf:RDF>

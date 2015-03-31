@@ -1,0 +1,545 @@
+<?xml version="1.0"?>
+
+
+<!DOCTYPE Ontology [
+    <!ENTITY xsd "http://www.w3.org/2001/XMLSchema#" >
+    <!ENTITY xml "http://www.w3.org/XML/1998/namespace" >
+    <!ENTITY rdfs "http://www.w3.org/2000/01/rdf-schema#" >
+    <!ENTITY rdf "http://www.w3.org/1999/02/22-rdf-syntax-ns#" >
+]>
+
+
+<Ontology xmlns="http://www.w3.org/2002/07/owl#"
+     xml:base="http://ie.cs.mdx.ac.uk/POSEIDON/envir"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:xml="http://www.w3.org/XML/1998/namespace"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+     ontologyIRI="http://ie.cs.mdx.ac.uk/POSEIDON/envir">
+    <Prefix name="" IRI="http://www.w3.org/2002/07/owl#"/>
+    <Prefix name="owl" IRI="http://www.w3.org/2002/07/owl#"/>
+    <Prefix name="rdf" IRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+    <Prefix name="xsd" IRI="http://www.w3.org/2001/XMLSchema#"/>
+    <Prefix name="rdfs" IRI="http://www.w3.org/2000/01/rdf-schema#"/>
+    <Import>http://pervasive.semanticweb.org/ont/2004/06/geo-measurement</Import>
+    <Import>http://pervasive.semanticweb.org/ont/2004/06/time</Import>
+    <Annotation>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <Literal datatypeIRI="&rdf;PlainLiteral">POSEIDON Environment Context Ontology</Literal>
+    </Annotation>
+    <Declaration>
+        <Class IRI="#Cloudiness"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#CloudinessUnit"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#CurrentWeatherReport"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#ForecastWeatherReport"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Humidity"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Precipitation"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#PrecipitationUnit"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Temperature"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#TemperatureUnit"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#WeatherPeriod"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#WeatherPhenomenon"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#WeatherReport"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Wind"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#WindDirectionUnit"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#WindSpeedUnit"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#cloudinessUnit"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#hasHumidityValue"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#hasPrecipitationValue"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#hasTemperatureValue"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#hasWeatherPeriods"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#hasWindValue"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#precipitationUnit"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#temperatureUnit"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#windDirectionUnit"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#windSpeedUnit"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#cloudValue"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#humidityValue"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#percipitationValue"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#precipitationHoursValue"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#temperatureValue"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#windSpeedValue"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#C"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#F"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#FPS"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#K"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#KN"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#KPH"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#MPH"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#MPS"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#MilliMeter"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#OKTA"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#PC"/>
+    </Declaration>
+    <EquivalentClasses>
+        <Class IRI="#CloudinessUnit"/>
+        <ObjectOneOf>
+            <NamedIndividual IRI="#PC"/>
+            <NamedIndividual IRI="#OKTA"/>
+        </ObjectOneOf>
+    </EquivalentClasses>
+    <EquivalentClasses>
+        <Class IRI="#PrecipitationUnit"/>
+        <ObjectOneOf>
+            <NamedIndividual IRI="#MilliMeter"/>
+            <NamedIndividual IRI="http://pervasive.semanticweb.org/ont/2004/06/geo-measurement#Inch"/>
+        </ObjectOneOf>
+    </EquivalentClasses>
+    <EquivalentClasses>
+        <Class IRI="#TemperatureUnit"/>
+        <ObjectOneOf>
+            <NamedIndividual IRI="#K"/>
+            <NamedIndividual IRI="#F"/>
+            <NamedIndividual IRI="#C"/>
+        </ObjectOneOf>
+    </EquivalentClasses>
+    <EquivalentClasses>
+        <Class IRI="#WeatherReport"/>
+        <ObjectUnionOf>
+            <Class IRI="#CurrentWeatherReport"/>
+            <Class IRI="#ForecastWeatherReport"/>
+        </ObjectUnionOf>
+    </EquivalentClasses>
+    <EquivalentClasses>
+        <Class IRI="#WindDirectionUnit"/>
+        <ObjectOneOf>
+            <NamedIndividual IRI="http://pervasive.semanticweb.org/ont/2004/06/geo-measurement#NW"/>
+            <NamedIndividual IRI="http://pervasive.semanticweb.org/ont/2004/06/geo-measurement#NE"/>
+            <NamedIndividual IRI="http://pervasive.semanticweb.org/ont/2004/06/geo-measurement#W"/>
+            <NamedIndividual IRI="http://pervasive.semanticweb.org/ont/2004/06/geo-measurement#E"/>
+            <NamedIndividual IRI="http://pervasive.semanticweb.org/ont/2004/06/geo-measurement#SW"/>
+            <NamedIndividual IRI="http://pervasive.semanticweb.org/ont/2004/06/geo-measurement#S"/>
+            <NamedIndividual IRI="http://pervasive.semanticweb.org/ont/2004/06/geo-measurement#SE"/>
+            <NamedIndividual IRI="http://pervasive.semanticweb.org/ont/2004/06/geo-measurement#N"/>
+        </ObjectOneOf>
+    </EquivalentClasses>
+    <EquivalentClasses>
+        <Class IRI="#WindSpeedUnit"/>
+        <ObjectOneOf>
+            <NamedIndividual IRI="#MPS"/>
+            <NamedIndividual IRI="#KPH"/>
+            <NamedIndividual IRI="#KN"/>
+            <NamedIndividual IRI="#MPH"/>
+            <NamedIndividual IRI="#FPS"/>
+        </ObjectOneOf>
+    </EquivalentClasses>
+    <SubClassOf>
+        <Class IRI="#Cloudiness"/>
+        <Class IRI="#WeatherPhenomenon"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Cloudiness"/>
+        <ObjectExactCardinality cardinality="1">
+            <ObjectProperty IRI="#cloudinessUnit"/>
+        </ObjectExactCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Cloudiness"/>
+        <DataExactCardinality cardinality="1">
+            <DataProperty IRI="#cloudValue"/>
+        </DataExactCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#CurrentWeatherReport"/>
+        <Class IRI="#WeatherReport"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#CurrentWeatherReport"/>
+        <ObjectMaxCardinality cardinality="1">
+            <ObjectProperty IRI="#hasWeatherPeriods"/>
+        </ObjectMaxCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#ForecastWeatherReport"/>
+        <Class IRI="#WeatherReport"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#ForecastWeatherReport"/>
+        <ObjectMinCardinality cardinality="1">
+            <ObjectProperty IRI="#hasWeatherPeriods"/>
+        </ObjectMinCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Humidity"/>
+        <Class IRI="#WeatherPhenomenon"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Humidity"/>
+        <DataExactCardinality cardinality="1">
+            <DataProperty IRI="#humidityValue"/>
+        </DataExactCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Precipitation"/>
+        <Class IRI="#WeatherPhenomenon"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Precipitation"/>
+        <ObjectExactCardinality cardinality="1">
+            <ObjectProperty IRI="#precipitationUnit"/>
+        </ObjectExactCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Precipitation"/>
+        <DataExactCardinality cardinality="1">
+            <DataProperty IRI="#percipitationValue"/>
+        </DataExactCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Precipitation"/>
+        <DataExactCardinality cardinality="1">
+            <DataProperty IRI="#precipitationHoursValue"/>
+        </DataExactCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Temperature"/>
+        <Class IRI="#WeatherPhenomenon"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Temperature"/>
+        <ObjectExactCardinality cardinality="1">
+            <ObjectProperty IRI="#temperatureUnit"/>
+        </ObjectExactCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Temperature"/>
+        <DataExactCardinality cardinality="1">
+            <DataProperty IRI="#temperatureValue"/>
+        </DataExactCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#WeatherPeriod"/>
+        <ObjectExactCardinality cardinality="1">
+            <ObjectProperty IRI="#hasHumidityValue"/>
+        </ObjectExactCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#WeatherPeriod"/>
+        <ObjectExactCardinality cardinality="1">
+            <ObjectProperty IRI="#hasPrecipitationValue"/>
+        </ObjectExactCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#WeatherPeriod"/>
+        <ObjectExactCardinality cardinality="1">
+            <ObjectProperty IRI="#hasTemperatureValue"/>
+        </ObjectExactCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#WeatherPeriod"/>
+        <ObjectExactCardinality cardinality="1">
+            <ObjectProperty IRI="#hasWindValue"/>
+        </ObjectExactCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#WeatherPeriod"/>
+        <ObjectMaxCardinality cardinality="1">
+            <ObjectProperty IRI="http://pervasive.semanticweb.org/ont/2004/06/time#from"/>
+        </ObjectMaxCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#WeatherPeriod"/>
+        <ObjectMaxCardinality cardinality="1">
+            <ObjectProperty IRI="http://pervasive.semanticweb.org/ont/2004/06/time#to"/>
+        </ObjectMaxCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Wind"/>
+        <Class IRI="#WeatherPhenomenon"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Wind"/>
+        <ObjectExactCardinality cardinality="1">
+            <ObjectProperty IRI="#windDirectionUnit"/>
+        </ObjectExactCardinality>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Wind"/>
+        <ObjectExactCardinality cardinality="1">
+            <ObjectProperty IRI="#windSpeedUnit"/>
+        </ObjectExactCardinality>
+    </SubClassOf>
+    <ClassAssertion>
+        <Class IRI="#TemperatureUnit"/>
+        <NamedIndividual IRI="#C"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#TemperatureUnit"/>
+        <NamedIndividual IRI="#F"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#WindSpeedUnit"/>
+        <NamedIndividual IRI="#FPS"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#TemperatureUnit"/>
+        <NamedIndividual IRI="#K"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#WindSpeedUnit"/>
+        <NamedIndividual IRI="#KN"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#WindSpeedUnit"/>
+        <NamedIndividual IRI="#KPH"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#WindSpeedUnit"/>
+        <NamedIndividual IRI="#MPH"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#WindSpeedUnit"/>
+        <NamedIndividual IRI="#MPS"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#PrecipitationUnit"/>
+        <NamedIndividual IRI="#MilliMeter"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#CloudinessUnit"/>
+        <NamedIndividual IRI="#OKTA"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#CloudinessUnit"/>
+        <NamedIndividual IRI="#PC"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#WindDirectionUnit"/>
+        <NamedIndividual IRI="http://pervasive.semanticweb.org/ont/2004/06/geo-measurement#E"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#PrecipitationUnit"/>
+        <NamedIndividual IRI="http://pervasive.semanticweb.org/ont/2004/06/geo-measurement#Inch"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#WindDirectionUnit"/>
+        <NamedIndividual IRI="http://pervasive.semanticweb.org/ont/2004/06/geo-measurement#N"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#WindDirectionUnit"/>
+        <NamedIndividual IRI="http://pervasive.semanticweb.org/ont/2004/06/geo-measurement#NE"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#WindDirectionUnit"/>
+        <NamedIndividual IRI="http://pervasive.semanticweb.org/ont/2004/06/geo-measurement#NW"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#WindDirectionUnit"/>
+        <NamedIndividual IRI="http://pervasive.semanticweb.org/ont/2004/06/geo-measurement#S"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#WindDirectionUnit"/>
+        <NamedIndividual IRI="http://pervasive.semanticweb.org/ont/2004/06/geo-measurement#SE"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#WindDirectionUnit"/>
+        <NamedIndividual IRI="http://pervasive.semanticweb.org/ont/2004/06/geo-measurement#SW"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#WindDirectionUnit"/>
+        <NamedIndividual IRI="http://pervasive.semanticweb.org/ont/2004/06/geo-measurement#W"/>
+    </ClassAssertion>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#cloudinessUnit"/>
+        <Class IRI="#Cloudiness"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#hasHumidityValue"/>
+        <Class IRI="#WeatherPeriod"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#hasPrecipitationValue"/>
+        <Class IRI="#WeatherPeriod"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#hasTemperatureValue"/>
+        <Class IRI="#WeatherPeriod"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#hasWeatherPeriods"/>
+        <Class IRI="#WeatherReport"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#hasWindValue"/>
+        <Class IRI="#WeatherPeriod"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#precipitationUnit"/>
+        <Class IRI="#Precipitation"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#temperatureUnit"/>
+        <Class IRI="#Temperature"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#windDirectionUnit"/>
+        <Class IRI="#Wind"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#windSpeedUnit"/>
+        <Class IRI="#Wind"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#cloudinessUnit"/>
+        <Class IRI="#CloudinessUnit"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#hasPrecipitationValue"/>
+        <Class IRI="#Precipitation"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#hasTemperatureValue"/>
+        <Class IRI="#Temperature"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#hasWeatherPeriods"/>
+        <Class IRI="#WeatherPeriod"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#hasWindValue"/>
+        <Class IRI="#Wind"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#precipitationUnit"/>
+        <Class IRI="#PrecipitationUnit"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#temperatureUnit"/>
+        <Class IRI="#TemperatureUnit"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#windDirectionUnit"/>
+        <Class IRI="#WindDirectionUnit"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#windSpeedUnit"/>
+        <Class IRI="#WindSpeedUnit"/>
+    </ObjectPropertyRange>
+    <DataPropertyDomain>
+        <DataProperty IRI="#percipitationValue"/>
+        <Class IRI="#Precipitation"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#precipitationHoursValue"/>
+        <Class IRI="#Precipitation"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#temperatureValue"/>
+        <Class IRI="#Temperature"/>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
+        <DataProperty IRI="#windSpeedValue"/>
+        <Class IRI="#Wind"/>
+    </DataPropertyDomain>
+    <DataPropertyRange>
+        <DataProperty IRI="#cloudValue"/>
+        <Datatype abbreviatedIRI="xsd:integer"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#humidityValue"/>
+        <Datatype abbreviatedIRI="xsd:integer"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#percipitationValue"/>
+        <Datatype abbreviatedIRI="xsd:float"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#precipitationHoursValue"/>
+        <Datatype abbreviatedIRI="xsd:integer"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#temperatureValue"/>
+        <Datatype abbreviatedIRI="xsd:integer"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#windSpeedValue"/>
+        <Datatype abbreviatedIRI="xsd:integer"/>
+    </DataPropertyRange>
+</Ontology>
+
+
+
+<!-- Generated by the OWL API (version 3.5.1) http://owlapi.sourceforge.net -->
+

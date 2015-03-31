@@ -1,0 +1,93 @@
+<?xml version="1.0"?>
+<!DOCTYPE rdf:RDF [
+   <!ENTITY soupa  "http://pervasive.semanticweb.org/ont/2004/06/">
+   <!ENTITY rdf    "http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <!ENTITY rdfs   "http://www.w3.org/2000/01/rdf-schema#">
+   <!ENTITY owl    "http://www.w3.org/2002/07/owl#"> 
+   <!ENTITY xsd    "http://www.w3.org/2001/XMLSchema#"> 
+   <!ENTITY know   "http://pervasive.semanticweb.org/ont/2004/06/knowledge#">
+   ]>
+<!--
+    This ontology document is licensed under the Creative Commons
+    Attribution License. To view a copy of this license, visit 
+    http://creativecommons.org/licenses/by/1.0/ or send a letter to
+    Creative Commons, 559 Nathan Abbott Way, Stanford, California
+    94305, USA. 
+-->
+<rdf:RDF
+   xmlns:rdf  = "&rdf;"
+   xmlns:rdfs = "&rdfs;"
+   xmlns:owl  = "&owl;"
+   xmlns:xsd  = "&xsd;"
+   xmlns:know = "&know;"
+   xmlns      = "&know;"
+   xml:base   = "http://pervasive.semanticweb.org/ont/2004/06/knowledge">
+  <owl:Ontology rdf:about="&soupa;knowledge">
+    <owl:versionInfo>$Revision: 1.1 $, $Date: 2004/05/15 18:55:09 $</owl:versionInfo>
+    <rdfs:label>SOUPA Context Knowledge Ontology</rdfs:label>
+    <rdfs:comment></rdfs:comment>     
+  </owl:Ontology>
+
+  <owl:Class rdf:ID="Knowledge">
+    <rdfs:label>Knowledge</rdfs:label>    
+    <owl:unionOf rdf:parseType="Collection">
+      <owl:Class rdf:about="#ConsistentKnowledge"/>
+      <owl:Class rdf:about="#InconsistentKnowledge"/>
+    </owl:unionOf>
+  </owl:Class>
+
+  <owl:Class rdf:ID="ConsistentKnowledge">
+    <rdfs:label>ConsistentKnowledge</rdfs:label>
+    <rdfs:subClassOf rdf:resource="#Knowledge"/>
+
+    <owl:disjointWith rdf:resource="#InconsistentKnowledge"/>
+    
+    <rdfs:subClassOf>
+      <owl:Restriction>
+	<owl:onProperty rdf:resource="#inconsistentWith"/>
+	<owl:cardinality rdf:datatype="&xsd;nonNegativeInteger">0</owl:cardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+  </owl:Class>
+
+  <owl:Class rdf:ID="InconsistentKnowledge">
+    <rdfs:label>InconsistentKnowledge</rdfs:label>
+    <rdfs:subClassOf rdf:resource="#Knowledge"/>
+
+    <owl:disjointWith rdf:resource="#ConsistentKnowledge"/>
+    
+    <rdfs:subClassOf>
+      <owl:Restriction>
+	<owl:onProperty rdf:resource="#inconsistentWith"/>
+	<owl:minCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:minCardinality>
+      </owl:Restriction>
+    </rdfs:subClassOf>
+  </owl:Class>
+
+  <owl:ObjectProperty rdf:ID="inconsistentWith">
+    <rdfs:label>inconsistentWith</rdfs:label>
+    <rdfs:domain rdf:resource="#Knowledge"/>
+    <rdfs:range rdf:resource="#Knowledge"/>
+    
+    <rdf:type rdf:resource="&owl;SymmetricProperty"/>
+  </owl:ObjectProperty>
+
+  <owl:ObjectProperty rdf:ID="source">
+    <rdfs:label>source</rdfs:label>
+    <rdfs:domain rdf:resource="#Knowledge"/>
+  </owl:ObjectProperty>
+
+  <owl:DatatypeProperty rdf:ID="reliabilityRating">
+    <rdfs:label>reliabilityRating</rdfs:label>
+    <rdfs:domain rdf:resource="#Knowledge"/>
+    <rdfs:range rdf:resource="&xsd;float"/>
+  </owl:DatatypeProperty>
+
+  <owl:DatatypeProperty rdf:ID="inconsistentWithCount">
+    <rdfs:label>inconsistentWithCounty</rdfs:label>
+    <rdfs:domain rdf:resource="#Knowledge"/>
+    <rdfs:range rdf:resource="&xsd;nonNegativeInteger"/>
+  </owl:DatatypeProperty>
+
+
+</rdf:RDF>

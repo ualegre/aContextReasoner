@@ -32,6 +32,7 @@ import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 
 import org.poseidon_project.context.ContextReasonerCore;
+import org.poseidon_project.context.utility.FileOperations;
 import org.poseidon_project.contexts.IOntologyManager;
 
 import java.io.File;
@@ -69,6 +70,11 @@ public class OntologyManager implements IOntologyManager{
 
         if (! beenRun ) {
             try {
+                File existingDir = new File(
+                        Environment.getExternalStorageDirectory().getAbsolutePath() + "/ontologies");
+
+                FileOperations.deleteDirectory(existingDir);
+
                 InputStream in = mContext.getAssets().open("ontologyMap.json");
 
                 OntologyFileMapParser parser = new OntologyFileMapParser(in);
@@ -100,20 +106,8 @@ public class OntologyManager implements IOntologyManager{
             String filename = filepath.substring(filepath.lastIndexOf("/"));
 
             InputStream in = mContext.getAssets().open(filename);
-            File output = new File(filepath);
-            OutputStream out = new FileOutputStream(output);
 
-            byte[] buffer = new byte[8192];
-            int read;
-            while ((read = in.read(buffer)) != -1)
-            {
-                out.write(buffer, 0, read);
-            }
-            in.close();
-            in = null;
-            out.flush();
-            out.close();
-            out = null;
+            FileOperations.copyFile(in, filepath);
 
         } catch (IOException e) {
             Log.e(LOGTAG, e.getStackTrace().toString());

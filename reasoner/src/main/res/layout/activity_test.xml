@@ -28,4 +28,15 @@
         android:width="200dip" android:clickable="true"
         android:onClick="finishTest"
         android:text="@string/exitApp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Large Text"
+        android:id="@+id/lblResult"
+        android:layout_below="@+id/TextView01"
+        android:layout_alignStart="@+id/btnTestStart"
+        android:layout_marginTop="76dp"
+        android:layout_alignEnd="@+id/btnTestStart" />
 </RelativeLayout>

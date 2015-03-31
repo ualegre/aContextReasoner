@@ -13,7 +13,7 @@
 			"url" : "http://pervasive.semanticweb.org/ont/2004/06/bdi"
 		},
 		{
-			"file_location" : "$SD$/ontologies/SOUPAAdevice.owl",
+			"file_location" : "$SD$/ontologies/SOUPA/device.owl",
 			"url" : "http://pervasive.semanticweb.org/ont/2004/06/device"
 		},;
 		{

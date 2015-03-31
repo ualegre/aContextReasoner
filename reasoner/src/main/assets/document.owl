@@ -1,0 +1,62 @@
+<?xml version="1.0"?>
+<!DOCTYPE rdf:RDF [
+   <!ENTITY soupa   "http://pervasive.semanticweb.org/ont/2004/06/">
+   <!ENTITY rdf    "http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <!ENTITY rdfs   "http://www.w3.org/2000/01/rdf-schema#">
+   <!ENTITY xsd    "http://www.w3.org/2001/XMLSchema#"> 
+   <!ENTITY owl    "http://www.w3.org/2002/07/owl#"> 
+   <!ENTITY per    "http://pervasive.semanticweb.org/ont/2004/06/person#">
+   <!ENTITY doc    "http://pervasive.semanticweb.org/ont/2004/06/document#">
+   <!ENTITY tme    "http://pervasive.semanticweb.org/ont/2004/06/time#">
+   ]>
+<!--
+    This ontology document is licensed under the Creative Commons
+    Attribution License. To view a copy of this license, visit 
+    http://creativecommons.org/licenses/by/1.0/ or send a letter to
+    Creative Commons, 559 Nathan Abbott Way, Stanford, California
+    94305, USA. 
+-->
+<rdf:RDF
+   xmlns:rdf  = "&rdf;"
+   xmlns:rdfs = "&rdfs;"
+   xmlns:owl  = "&owl;"
+   xmlns:xsd  = "&xsd;"
+   xmlns:per  = "&per;"
+   xmlns:tme  = "&tme;"
+   xmlns      = "&doc;"
+   xml:base   = "http://pervasive.semanticweb.org/ont/2004/06/document">
+
+  <owl:Ontology rdf:about="&soupa;document">
+    <owl:imports rdf:resource="&soupa;person"/>
+    <owl:imports rdf:resource="&soupa;time"/>
+    <owl:versionInfo>cvs:$Revision: 1.2 $, $Date: 2004/05/15 18:55:08 $</owl:versionInfo>
+    <rdfs:label>SOUPA Document Ontology</rdfs:label>
+  </owl:Ontology>
+  
+  <owl:Class rdf:ID="Document">
+    <rdfs:label>Document</rdfs:label>
+  </owl:Class>
+  
+  <owl:ObjectProperty rdf:ID="createdBy">
+    <rdfs:label>createdBy</rdfs:label>
+    <rdfs:domain rdf:resource="#Document"/>
+  </owl:ObjectProperty>
+  
+  <owl:DatatypeProperty rdf:ID="createdOn">
+    <rdfs:label>createdOn</rdfs:label>
+    <rdfs:domain rdf:resource="#Document"/>
+    <rdfs:range rdf:resource="&xsd;dateTime"/>
+  </owl:DatatypeProperty>
+
+  <owl:ObjectProperty rdf:ID="createdOnAsInstantThing">
+    <rdfs:label>createdOnAsInstantThing</rdfs:label>
+    <rdfs:domain rdf:resource="#Document"/>
+    <rdfs:range rdf:resource="&tme;InstantThing"/>
+  </owl:ObjectProperty>
+
+  <owl:ObjectProperty rdf:ID="copyrightedBy">
+    <rdfs:label>copyrightedBy</rdfs:label>
+    <rdfs:domain rdf:resource="#Document"/>
+  </owl:ObjectProperty>
+
+</rdf:RDF>

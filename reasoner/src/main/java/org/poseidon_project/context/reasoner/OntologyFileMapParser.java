@@ -22,6 +22,7 @@ import android.util.Log;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.poseidon_project.context.utility.FileOperations;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -46,7 +47,7 @@ public class OntologyFileMapParser {
     public HashMap<String, String> parse() {
         HashMap<String, String> result = new HashMap<>();
 
-        final String jsonText = convertStreamToString(mFileToParse);
+        final String jsonText = FileOperations.convertStreamToString(mFileToParse);
 
         try {
             final JSONObject json = new JSONObject(jsonText);
@@ -61,7 +62,7 @@ public class OntologyFileMapParser {
         return result;
     }
 
-    private void parseOntologies(JSONArray ontologies, HashMap<String, String> result)
+    private static void parseOntologies(JSONArray ontologies, HashMap<String, String> result)
             throws JSONException {
 
         final int numOfOntologies = ontologies.length();
@@ -77,29 +78,5 @@ public class OntologyFileMapParser {
 
             result.put(ontologyURL, ontologyFileLocation);
         }
-    }
-
-
-    protected static String convertStreamToString(final InputStream input) {
-        if (input == null) return null;
-
-        final BufferedReader reader = new BufferedReader(new InputStreamReader(input));
-        final StringBuilder sBuf = new StringBuilder();
-
-        String line = null;
-        try {
-            while ((line = reader.readLine()) != null) {
-                sBuf.append(line);
-            }
-        } catch (IOException e) {
-            Log.e(LOGTAG, e.getMessage());
-        } finally {
-            try {
-                input.close();
-            } catch (IOException e) {
-                Log.e(LOGTAG, e.getMessage());
-            }
-        }
-        return sBuf.toString();
     }
 }

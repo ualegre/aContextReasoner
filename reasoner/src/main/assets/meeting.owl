@@ -1,0 +1,293 @@
+<?xml version="1.0"?>
+
+
+<!DOCTYPE rdf:RDF [
+    <!ENTITY owl "http://www.w3.org/2002/07/owl#" >
+    <!ENTITY xsd "http://www.w3.org/2001/XMLSchema#" >
+    <!ENTITY rdfs "http://www.w3.org/2000/01/rdf-schema#" >
+    <!ENTITY ace_lexicon "http://attempto.ifi.uzh.ch/ace_lexicon#" >
+    <!ENTITY rdf "http://www.w3.org/1999/02/22-rdf-syntax-ns#" >
+]>
+
+
+<rdf:RDF xmlns="http://pervasive.semanticweb.org/ont/2004/06/meeting#"
+     xml:base="http://pervasive.semanticweb.org/ont/2004/06/meeting"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:ace_lexicon="http://attempto.ifi.uzh.ch/ace_lexicon#">
+    <owl:Ontology rdf:about="http://pervasive.semanticweb.org/ont/2004/06/meeting">
+        <rdfs:label>SOUPA Meeting Ontology</rdfs:label>
+        <rdfs:comment></rdfs:comment>
+        <owl:versionInfo>cvs:$Revision: 1.4 $, $Date: 2004/05/15 18:55:09 $</owl:versionInfo>
+        <owl:imports rdf:resource="http://pervasive.semanticweb.org/ont/2004/06/person"/>
+        <owl:imports rdf:resource="http://pervasive.semanticweb.org/ont/2004/06/space"/>
+        <owl:imports rdf:resource="http://pervasive.semanticweb.org/ont/2004/06/time"/>
+    </owl:Ontology>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Object Properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://pervasive.semanticweb.org/ont/2004/06/meeting#attendee -->
+
+    <owl:ObjectProperty rdf:about="http://pervasive.semanticweb.org/ont/2004/06/meeting#attendee">
+        <rdfs:label>attendee</rdfs:label>
+        <ace_lexicon:TV_pl>attendee</ace_lexicon:TV_pl>
+        <ace_lexicon:TV_sg>attendees</ace_lexicon:TV_sg>
+        <ace_lexicon:TV_vbg>attendeed</ace_lexicon:TV_vbg>
+        <rdfs:domain rdf:resource="http://pervasive.semanticweb.org/ont/2004/06/meeting#Meeting"/>
+        <rdfs:range rdf:resource="http://pervasive.semanticweb.org/ont/2004/06/person#Person"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://pervasive.semanticweb.org/ont/2004/06/meeting#attends -->
+
+    <owl:ObjectProperty rdf:about="http://pervasive.semanticweb.org/ont/2004/06/meeting#attends">
+        <rdfs:label>attends</rdfs:label>
+        <ace_lexicon:TV_pl>attends</ace_lexicon:TV_pl>
+        <ace_lexicon:TV_vbg>attendsed</ace_lexicon:TV_vbg>
+        <ace_lexicon:TV_sg>attendses</ace_lexicon:TV_sg>
+        <owl:inverseOf rdf:resource="http://pervasive.semanticweb.org/ont/2004/06/meeting#attendee"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://pervasive.semanticweb.org/ont/2004/06/meeting#homepage -->
+
+    <owl:ObjectProperty rdf:about="http://pervasive.semanticweb.org/ont/2004/06/meeting#homepage">
+        <rdfs:label>homepage</rdfs:label>
+        <ace_lexicon:TV_pl>homepage</ace_lexicon:TV_pl>
+        <ace_lexicon:TV_sg>homepages</ace_lexicon:TV_sg>
+        <ace_lexicon:TV_vbg>homepaged</ace_lexicon:TV_vbg>
+        <rdfs:domain rdf:resource="http://pervasive.semanticweb.org/ont/2004/06/meeting#Meeting"/>
+        <rdfs:range rdf:resource="http://pervasive.semanticweb.org/ont/2004/06/person#Homepage"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://pervasive.semanticweb.org/ont/2004/06/meeting#location -->
+
+    <owl:ObjectProperty rdf:about="http://pervasive.semanticweb.org/ont/2004/06/meeting#location">
+        <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <rdfs:label>location</rdfs:label>
+        <ace_lexicon:TV_pl>location</ace_lexicon:TV_pl>
+        <ace_lexicon:TV_vbg>locationed</ace_lexicon:TV_vbg>
+        <ace_lexicon:TV_sg>locations</ace_lexicon:TV_sg>
+        <rdfs:domain rdf:resource="http://pervasive.semanticweb.org/ont/2004/06/meeting#Meeting"/>
+        <rdfs:range rdf:resource="http://pervasive.semanticweb.org/ont/2004/06/space#SpaceInAFixedStructure"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://pervasive.semanticweb.org/ont/2004/06/meeting#organizedBy -->
+
+    <owl:ObjectProperty rdf:about="http://pervasive.semanticweb.org/ont/2004/06/meeting#organizedBy">
+        <rdfs:label>organizedBy</rdfs:label>
+        <ace_lexicon:TV_sg>organizedBies</ace_lexicon:TV_sg>
+        <ace_lexicon:TV_pl>organizedBy</ace_lexicon:TV_pl>
+        <ace_lexicon:TV_vbg>organizedBied</ace_lexicon:TV_vbg>
+        <rdfs:domain rdf:resource="http://pervasive.semanticweb.org/ont/2004/06/meeting#Meeting"/>
+        <rdfs:range rdf:resource="http://pervasive.semanticweb.org/ont/2004/06/person#Person"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Data properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://pervasive.semanticweb.org/ont/2004/06/meeting#description -->
+
+    <owl:DatatypeProperty rdf:about="http://pervasive.semanticweb.org/ont/2004/06/meeting#description">
+        <rdfs:label>description</rdfs:label>
+        <ace_lexicon:TV_pl>description</ace_lexicon:TV_pl>
+        <ace_lexicon:TV_vbg>descriptioned</ace_lexicon:TV_vbg>
+        <ace_lexicon:TV_sg>descriptions</ace_lexicon:TV_sg>
+        <rdfs:domain rdf:resource="http://pervasive.semanticweb.org/ont/2004/06/meeting#Meeting"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://pervasive.semanticweb.org/ont/2004/06/meeting#eventCancelled -->
+
+    <owl:DatatypeProperty rdf:about="http://pervasive.semanticweb.org/ont/2004/06/meeting#eventCancelled">
+        <rdfs:label>eventCancelled</rdfs:label>
+        <ace_lexicon:TV_sg>eventCancelleds</ace_lexicon:TV_sg>
+        <ace_lexicon:TV_pl>eventCancelled</ace_lexicon:TV_pl>
+        <ace_lexicon:TV_vbg>eventCancelleded</ace_lexicon:TV_vbg>
+        <rdfs:domain rdf:resource="http://pervasive.semanticweb.org/ont/2004/06/meeting#Meeting"/>
+        <rdfs:range rdf:resource="&xsd;boolean"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://pervasive.semanticweb.org/ont/2004/06/meeting#eventRescheduled -->
+
+    <owl:DatatypeProperty rdf:about="http://pervasive.semanticweb.org/ont/2004/06/meeting#eventRescheduled">
+        <rdfs:label>eventRescheduled</rdfs:label>
+        <ace_lexicon:TV_pl>eventRescheduled</ace_lexicon:TV_pl>
+        <ace_lexicon:TV_vbg>eventRescheduleded</ace_lexicon:TV_vbg>
+        <ace_lexicon:TV_sg>eventRescheduleds</ace_lexicon:TV_sg>
+        <rdfs:domain rdf:resource="http://pervasive.semanticweb.org/ont/2004/06/meeting#Meeting"/>
+        <rdfs:range rdf:resource="&xsd;boolean"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://pervasive.semanticweb.org/ont/2004/06/meeting#name -->
+
+    <owl:DatatypeProperty rdf:about="http://pervasive.semanticweb.org/ont/2004/06/meeting#name">
+        <rdfs:label>name</rdfs:label>
+        <ace_lexicon:TV_pl>name</ace_lexicon:TV_pl>
+        <ace_lexicon:TV_sg>names</ace_lexicon:TV_sg>
+        <ace_lexicon:TV_vbg>named</ace_lexicon:TV_vbg>
+        <rdfs:domain rdf:resource="http://pervasive.semanticweb.org/ont/2004/06/meeting#Meeting"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Classes
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://pervasive.semanticweb.org/ont/2004/06/meeting#Meeting -->
+
+    <owl:Class rdf:about="http://pervasive.semanticweb.org/ont/2004/06/meeting#Meeting">
+        <rdfs:label>Meeting</rdfs:label>
+        <owl:equivalentClass>
+            <owl:Class>
+                <owl:unionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://pervasive.semanticweb.org/ont/2004/06/meeting#ScheduledMeetingIsCancelled"/>
+                    <rdf:Description rdf:about="http://pervasive.semanticweb.org/ont/2004/06/meeting#ScheduledMeetingIsOnTime"/>
+                    <rdf:Description rdf:about="http://pervasive.semanticweb.org/ont/2004/06/meeting#ScheduledMeetingIsRescheduled"/>
+                </owl:unionOf>
+            </owl:Class>
+        </owl:equivalentClass>
+        <rdfs:subClassOf rdf:resource="http://pervasive.semanticweb.org/ont/2004/06/time#IntervalEvent"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://pervasive.semanticweb.org/ont/2004/06/meeting#location"/>
+                <owl:cardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:cardinality>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <ace_lexicon:CN_pl>Meetings</ace_lexicon:CN_pl>
+        <ace_lexicon:CN_sg>Meeting</ace_lexicon:CN_sg>
+    </owl:Class>
+    
+
+
+    <!-- http://pervasive.semanticweb.org/ont/2004/06/meeting#ScheduledMeetingIsCancelled -->
+
+    <owl:Class rdf:about="http://pervasive.semanticweb.org/ont/2004/06/meeting#ScheduledMeetingIsCancelled">
+        <rdfs:label>ScheduledMeetingIsCancelled</rdfs:label>
+        <rdfs:subClassOf rdf:resource="http://pervasive.semanticweb.org/ont/2004/06/meeting#Meeting"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://pervasive.semanticweb.org/ont/2004/06/meeting#eventCancelled"/>
+                <owl:hasValue rdf:datatype="&xsd;boolean">true</owl:hasValue>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <owl:disjointWith rdf:resource="http://pervasive.semanticweb.org/ont/2004/06/meeting#ScheduledMeetingIsOnTime"/>
+        <owl:disjointWith rdf:resource="http://pervasive.semanticweb.org/ont/2004/06/meeting#ScheduledMeetingIsRescheduled"/>
+        <ace_lexicon:CN_pl>ScheduledMeetingIsCancelleds</ace_lexicon:CN_pl>
+        <ace_lexicon:CN_sg>ScheduledMeetingIsCancelled</ace_lexicon:CN_sg>
+    </owl:Class>
+    
+
+
+    <!-- http://pervasive.semanticweb.org/ont/2004/06/meeting#ScheduledMeetingIsOnTime -->
+
+    <owl:Class rdf:about="http://pervasive.semanticweb.org/ont/2004/06/meeting#ScheduledMeetingIsOnTime">
+        <rdfs:label>ScheduledMeetingIsOnTime</rdfs:label>
+        <rdfs:subClassOf rdf:resource="http://pervasive.semanticweb.org/ont/2004/06/meeting#Meeting"/>
+        <owl:disjointWith rdf:resource="http://pervasive.semanticweb.org/ont/2004/06/meeting#ScheduledMeetingIsRescheduled"/>
+        <ace_lexicon:CN_sg>ScheduledMeetingIsOnTime</ace_lexicon:CN_sg>
+        <ace_lexicon:CN_pl>ScheduledMeetingIsOnTimes</ace_lexicon:CN_pl>
+    </owl:Class>
+    
+
+
+    <!-- http://pervasive.semanticweb.org/ont/2004/06/meeting#ScheduledMeetingIsRescheduled -->
+
+    <owl:Class rdf:about="http://pervasive.semanticweb.org/ont/2004/06/meeting#ScheduledMeetingIsRescheduled">
+        <rdfs:label>ScheduledMeetingIsRescheduled</rdfs:label>
+        <rdfs:subClassOf rdf:resource="http://pervasive.semanticweb.org/ont/2004/06/meeting#Meeting"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://pervasive.semanticweb.org/ont/2004/06/meeting#eventRescheduled"/>
+                <owl:hasValue rdf:datatype="&xsd;boolean">true</owl:hasValue>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <ace_lexicon:CN_sg>ScheduledMeetingIsRescheduled</ace_lexicon:CN_sg>
+        <ace_lexicon:CN_pl>ScheduledMeetingIsRescheduleds</ace_lexicon:CN_pl>
+    </owl:Class>
+    
+
+
+    <!-- http://pervasive.semanticweb.org/ont/2004/06/person#Homepage -->
+
+    <rdf:Description rdf:about="http://pervasive.semanticweb.org/ont/2004/06/person#Homepage">
+        <ace_lexicon:CN_pl>Homepages</ace_lexicon:CN_pl>
+        <ace_lexicon:CN_sg>Homepage</ace_lexicon:CN_sg>
+    </rdf:Description>
+    
+
+
+    <!-- http://pervasive.semanticweb.org/ont/2004/06/person#Person -->
+
+    <rdf:Description rdf:about="http://pervasive.semanticweb.org/ont/2004/06/person#Person">
+        <ace_lexicon:CN_pl>Persons</ace_lexicon:CN_pl>
+        <ace_lexicon:CN_sg>Person</ace_lexicon:CN_sg>
+    </rdf:Description>
+    
+
+
+    <!-- http://pervasive.semanticweb.org/ont/2004/06/space#SpaceInAFixedStructure -->
+
+    <rdf:Description rdf:about="http://pervasive.semanticweb.org/ont/2004/06/space#SpaceInAFixedStructure">
+        <ace_lexicon:CN_pl>SpaceInAFixedStructures</ace_lexicon:CN_pl>
+        <ace_lexicon:CN_sg>SpaceInAFixedStructure</ace_lexicon:CN_sg>
+    </rdf:Description>
+    
+
+
+    <!-- http://pervasive.semanticweb.org/ont/2004/06/time#IntervalEvent -->
+
+    <rdf:Description rdf:about="http://pervasive.semanticweb.org/ont/2004/06/time#IntervalEvent">
+        <ace_lexicon:CN_sg>IntervalEvent</ace_lexicon:CN_sg>
+        <ace_lexicon:CN_pl>IntervalEvents</ace_lexicon:CN_pl>
+    </rdf:Description>
+</rdf:RDF>
+
+
+
+<!-- Generated by the OWL API (version 3.4.2) http://owlapi.sourceforge.net -->
+

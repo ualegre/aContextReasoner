@@ -1,0 +1,282 @@
+<?xml version="1.0"?>
+
+
+<!DOCTYPE rdf:RDF [
+    <!ENTITY owl "http://www.w3.org/2002/07/owl#" >
+    <!ENTITY xsd "http://www.w3.org/2001/XMLSchema#" >
+    <!ENTITY rdfs "http://www.w3.org/2000/01/rdf-schema#" >
+    <!ENTITY ace_lexicon "http://attempto.ifi.uzh.ch/ace_lexicon#" >
+    <!ENTITY rdf "http://www.w3.org/1999/02/22-rdf-syntax-ns#" >
+    <!ENTITY tme "http://pervasive.semanticweb.org/ont/2004/06/time#" >
+    <!ENTITY act "http://pervasive.semanticweb.org/ont/2004/06/action#" >
+    <!ENTITY pol "http://pervasive.semanticweb.org/ont/2004/06/policy#" >
+]>
+
+
+<rdf:RDF xmlns="http://pervasive.semanticweb.org/ont/2004/06/policy#"
+     xml:base="http://pervasive.semanticweb.org/ont/2004/06/policy"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+     xmlns:tme="http://pervasive.semanticweb.org/ont/2004/06/time#"
+     xmlns:pol="http://pervasive.semanticweb.org/ont/2004/06/policy#"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:act="http://pervasive.semanticweb.org/ont/2004/06/action#"
+     xmlns:ace_lexicon="http://attempto.ifi.uzh.ch/ace_lexicon#">
+    <owl:Ontology rdf:about="http://pervasive.semanticweb.org/ont/2004/06/policy">
+        <rdfs:label>SOUPA Policy Ontology</rdfs:label>
+        <owl:versionInfo>$Revision: 1.7 $, $Date: 2004/06/03 20:27:01 $</owl:versionInfo>
+        <owl:imports rdf:resource="http://pervasive.semanticweb.org/ont/2004/06/action"/>
+        <owl:imports rdf:resource="http://pervasive.semanticweb.org/ont/2004/06/time"/>
+    </owl:Ontology>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Annotation properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://attempto.ifi.uzh.ch/ace_lexicon#PN_sg -->
+
+    <owl:AnnotationProperty rdf:about="&ace_lexicon;PN_sg"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Object Properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://pervasive.semanticweb.org/ont/2004/06/policy#createdOn -->
+
+    <owl:ObjectProperty rdf:about="&pol;createdOn">
+        <rdfs:label>createdOn</rdfs:label>
+        <ace_lexicon:TV_vbg>createdOned</ace_lexicon:TV_vbg>
+        <ace_lexicon:TV_sg>createdOns</ace_lexicon:TV_sg>
+        <ace_lexicon:TV_pl>createdOn</ace_lexicon:TV_pl>
+        <rdfs:domain rdf:resource="&pol;Policy"/>
+        <rdfs:range rdf:resource="&tme;InstantThing"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://pervasive.semanticweb.org/ont/2004/06/policy#creator -->
+
+    <owl:ObjectProperty rdf:about="&pol;creator">
+        <rdfs:label>creator</rdfs:label>
+        <ace_lexicon:TV_pl>creator</ace_lexicon:TV_pl>
+        <ace_lexicon:TV_vbg>creatored</ace_lexicon:TV_vbg>
+        <ace_lexicon:TV_sg>creators</ace_lexicon:TV_sg>
+        <rdfs:domain rdf:resource="&pol;Policy"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://pervasive.semanticweb.org/ont/2004/06/policy#defaultPolicyMode -->
+
+    <owl:ObjectProperty rdf:about="&pol;defaultPolicyMode">
+        <rdfs:label>rulePrecedence</rdfs:label>
+        <ace_lexicon:TV_vbg>defaultPolicyModed</ace_lexicon:TV_vbg>
+        <ace_lexicon:TV_sg>defaultPolicyModes</ace_lexicon:TV_sg>
+        <ace_lexicon:TV_pl>defaultPolicyMode</ace_lexicon:TV_pl>
+        <rdfs:range rdf:resource="&pol;Mode"/>
+        <rdfs:domain rdf:resource="&pol;Policy"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://pervasive.semanticweb.org/ont/2004/06/policy#enforcer -->
+
+    <owl:ObjectProperty rdf:about="&pol;enforcer">
+        <rdfs:label>enforcer</rdfs:label>
+        <ace_lexicon:TV_sg>enforcers</ace_lexicon:TV_sg>
+        <ace_lexicon:TV_vbg>enforcered</ace_lexicon:TV_vbg>
+        <ace_lexicon:TV_pl>enforcer</ace_lexicon:TV_pl>
+        <rdfs:domain rdf:resource="&pol;Policy"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://pervasive.semanticweb.org/ont/2004/06/policy#forbids -->
+
+    <owl:ObjectProperty rdf:about="&pol;forbids">
+        <rdfs:label>forbids</rdfs:label>
+        <ace_lexicon:TV_pl>forbids</ace_lexicon:TV_pl>
+        <ace_lexicon:TV_vbg>forbidsed</ace_lexicon:TV_vbg>
+        <ace_lexicon:TV_sg>forbidses</ace_lexicon:TV_sg>
+        <rdfs:range rdf:resource="&pol;ForbiddenAction"/>
+        <rdfs:domain rdf:resource="&pol;Policy"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://pervasive.semanticweb.org/ont/2004/06/policy#permits -->
+
+    <owl:ObjectProperty rdf:about="&pol;permits">
+        <rdfs:label>permits</rdfs:label>
+        <ace_lexicon:TV_sg>permitses</ace_lexicon:TV_sg>
+        <ace_lexicon:TV_pl>permits</ace_lexicon:TV_pl>
+        <ace_lexicon:TV_vbg>permitsed</ace_lexicon:TV_vbg>
+        <rdfs:range rdf:resource="&pol;PermittedAction"/>
+        <rdfs:domain rdf:resource="&pol;Policy"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://pervasive.semanticweb.org/ont/2004/06/policy#policyOf -->
+
+    <owl:ObjectProperty rdf:about="&pol;policyOf">
+        <rdfs:label>policyOf</rdfs:label>
+        <ace_lexicon:TV_pl>policyOf</ace_lexicon:TV_pl>
+        <ace_lexicon:TV_sg>policyOfs</ace_lexicon:TV_sg>
+        <ace_lexicon:TV_vbg>policyOfed</ace_lexicon:TV_vbg>
+        <rdfs:domain rdf:resource="&pol;Policy"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Classes
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://pervasive.semanticweb.org/ont/2004/06/action#Action -->
+
+    <rdf:Description rdf:about="&act;Action">
+        <ace_lexicon:CN_pl>Actions</ace_lexicon:CN_pl>
+        <ace_lexicon:CN_sg>Action</ace_lexicon:CN_sg>
+    </rdf:Description>
+    
+
+
+    <!-- http://pervasive.semanticweb.org/ont/2004/06/policy#ForbiddenAction -->
+
+    <owl:Class rdf:about="&pol;ForbiddenAction">
+        <rdfs:label>ForbiddenAction</rdfs:label>
+        <rdfs:subClassOf rdf:resource="&act;Action"/>
+        <owl:disjointWith rdf:resource="&pol;PermittedAction"/>
+        <ace_lexicon:CN_sg>ForbiddenAction</ace_lexicon:CN_sg>
+        <ace_lexicon:CN_pl>ForbiddenActions</ace_lexicon:CN_pl>
+    </owl:Class>
+    
+
+
+    <!-- http://pervasive.semanticweb.org/ont/2004/06/policy#Mode -->
+
+    <owl:Class rdf:about="&pol;Mode">
+        <rdfs:label>Mode</rdfs:label>
+        <owl:equivalentClass>
+            <owl:Class>
+                <owl:oneOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="&pol;RequiresNoExplicitPermission"/>
+                    <rdf:Description rdf:about="&pol;RequiresExplicitPermission"/>
+                </owl:oneOf>
+            </owl:Class>
+        </owl:equivalentClass>
+        <ace_lexicon:CN_pl>Modes</ace_lexicon:CN_pl>
+        <ace_lexicon:CN_sg>Mode</ace_lexicon:CN_sg>
+    </owl:Class>
+    
+
+
+    <!-- http://pervasive.semanticweb.org/ont/2004/06/policy#PermittedAction -->
+
+    <owl:Class rdf:about="&pol;PermittedAction">
+        <rdfs:label>PermittedAction</rdfs:label>
+        <rdfs:subClassOf rdf:resource="&act;Action"/>
+        <ace_lexicon:CN_pl>PermittedActions</ace_lexicon:CN_pl>
+        <ace_lexicon:CN_sg>PermittedAction</ace_lexicon:CN_sg>
+    </owl:Class>
+    
+
+
+    <!-- http://pervasive.semanticweb.org/ont/2004/06/policy#Policy -->
+
+    <owl:Class rdf:about="&pol;Policy">
+        <rdfs:label>Policy</rdfs:label>
+        <ace_lexicon:CN_pl>Policies</ace_lexicon:CN_pl>
+        <ace_lexicon:CN_sg>Policy</ace_lexicon:CN_sg>
+    </owl:Class>
+    
+
+
+    <!-- http://pervasive.semanticweb.org/ont/2004/06/time#InstantThing -->
+
+    <rdf:Description rdf:about="&tme;InstantThing">
+        <ace_lexicon:CN_pl>InstantThings</ace_lexicon:CN_pl>
+        <ace_lexicon:CN_sg>InstantThing</ace_lexicon:CN_sg>
+    </rdf:Description>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Individuals
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://pervasive.semanticweb.org/ont/2004/06/policy#Conservative -->
+
+    <owl:NamedIndividual rdf:about="&pol;Conservative">
+        <rdf:type rdf:resource="&pol;Mode"/>
+        <ace_lexicon:PN_sg>Conservative</ace_lexicon:PN_sg>
+        <owl:sameAs rdf:resource="&pol;RequiresExplicitPermission"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://pervasive.semanticweb.org/ont/2004/06/policy#Liberal -->
+
+    <owl:NamedIndividual rdf:about="&pol;Liberal">
+        <rdf:type rdf:resource="&pol;Mode"/>
+        <ace_lexicon:PN_sg>Liberal</ace_lexicon:PN_sg>
+        <owl:sameAs rdf:resource="&pol;RequiresExplicitPermission"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://pervasive.semanticweb.org/ont/2004/06/policy#RequiresExplicitPermission -->
+
+    <owl:NamedIndividual rdf:about="&pol;RequiresExplicitPermission">
+        <rdf:type rdf:resource="&pol;Mode"/>
+        <ace_lexicon:PN_sg>RequiresExplicitPermission</ace_lexicon:PN_sg>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://pervasive.semanticweb.org/ont/2004/06/policy#RequiresNoExplicitPermission -->
+
+    <owl:NamedIndividual rdf:about="&pol;RequiresNoExplicitPermission">
+        <rdf:type rdf:resource="&pol;Mode"/>
+        <ace_lexicon:PN_sg>RequiresNoExplicitPermission</ace_lexicon:PN_sg>
+    </owl:NamedIndividual>
+</rdf:RDF>
+
+
+
+<!-- Generated by the OWL API (version 3.4.2) http://owlapi.sourceforge.net -->
+

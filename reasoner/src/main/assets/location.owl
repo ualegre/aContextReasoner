@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<!DOCTYPE rdf:RDF [
+   <!ENTITY soupa  "http://pervasive.semanticweb.org/ont/2004/06/">
+   <!ENTITY rdf    "http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <!ENTITY rdfs   "http://www.w3.org/2000/01/rdf-schema#">
+   <!ENTITY owl    "http://www.w3.org/2002/07/owl#"> 
+   <!ENTITY xsd    "http://www.w3.org/2001/XMLSchema#"> 
+   <!ENTITY loc    "http://pervasive.semanticweb.org/ont/2004/06/location#">
+   <!ENTITY tme    "http://pervasive.semanticweb.org/ont/2004/06/time#">
+   <!ENTITY spc    "http://pervasive.semanticweb.org/ont/2004/06/space#">
+   <!ENTITY know   "http://pervasive.semanticweb.org/ont/2004/06/knowledge#">
+   ]>
+<!--
+    This ontology document is licensed under the Creative Commons
+    Attribution License. To view a copy of this license, visit 
+    http://creativecommons.org/licenses/by/1.0/ or send a letter to
+    Creative Commons, 559 Nathan Abbott Way, Stanford, California
+    94305, USA. 
+-->
+<rdf:RDF
+   xmlns:rdf  = "&rdf;"
+   xmlns:rdfs = "&rdfs;"
+   xmlns:owl  = "&owl;"
+   xmlns:xsd  = "&xsd;"
+   xmlns:tme  = "&tme;"
+   xmlns:spc  = "&spc;"
+   xmlns:know = "&know;"
+   xmlns      = "&loc;"
+   xml:base   = "http://pervasive.semanticweb.org/ont/2004/06/location">
+  <owl:Ontology rdf:about="&soupa;location">
+    <owl:versionInfo>$Revision: 1.2 $, $Date: 2004/05/15 18:55:09 $</owl:versionInfo>
+    <rdfs:label>SOUPA Location Context Ontology</rdfs:label>
+    <rdfs:comment></rdfs:comment>     
+    <owl:imports rdf:resource="&soupa;time"/>
+    <owl:imports rdf:resource="&soupa;space"/>
+    <owl:imports rdf:resource="&soupa;knowledge"/>
+  </owl:Ontology>
+
+  <owl:Class rdf:ID="LocationContext">
+    <rdfs:label>LocationContext</rdfs:label>
+    <rdfs:subClassOf rdf:resource="&tme;TemporalEvent"/>
+    <rdfs:subClassOf rdf:resource="&spc;SpatialThing"/>
+    <rdfs:subClassOf rdf:resource="&know;Knowledge"/>
+  </owl:Class>
+
+  <owl:ObjectProperty rdf:ID="locationContextOf">
+    <rdfs:label>locationContextOf</rdfs:label>
+    <rdfs:domain rdf:resource="#LocationContext"/>
+  </owl:ObjectProperty>
+
+  <owl:ObjectProperty rdf:ID="boundedWithin">
+    <rdfs:label>boundedWithin</rdfs:label>
+    <rdfs:domain rdf:resource="#LocationContext"/>
+    <rdfs:range rdf:resource="&spc;SpatialThing"/>
+  </owl:ObjectProperty>
+
+
+</rdf:RDF>

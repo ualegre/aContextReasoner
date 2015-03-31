@@ -75,6 +75,7 @@ public class OntologyManager implements IOntologyManager{
 
                 FileOperations.deleteDirectory(existingDir);
 
+
                 InputStream in = mContext.getAssets().open("ontologyMap.json");
 
                 OntologyFileMapParser parser = new OntologyFileMapParser(in);
@@ -101,9 +102,7 @@ public class OntologyManager implements IOntologyManager{
     public boolean copyOntologyFile(String filepath) {
 
         try {
-            filepath = filepath.replace("$SD$",
-                    Environment.getExternalStorageDirectory().getAbsolutePath());
-            String filename = filepath.substring(filepath.lastIndexOf("/"));
+            String filename = filepath.substring(filepath.lastIndexOf("/") + 1);
 
             InputStream in = mContext.getAssets().open(filename);
 

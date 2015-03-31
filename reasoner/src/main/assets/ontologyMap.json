@@ -15,7 +15,7 @@
 		{
 			"file_location" : "$SD$/ontologies/SOUPA/device.owl",
 			"url" : "http://pervasive.semanticweb.org/ont/2004/06/device"
-		},;
+		},
 		{
 			"file_location" : "$SD$/ontologies/SOUPA/digital-doc.owl",
 			"url" : "http://pervasive.semanticweb.org/ont/2004/06/digital-doc"
@@ -73,7 +73,7 @@
 			"url" : "http://pervasive.semanticweb.org/ont/2004/06/time"
 		},
 		{
-		    "file_location" : "$SD/ontologies/POSEIDON/envir.owl",
+		    "file_location" : "$SD$/ontologies/POSEIDON/envir.owl",
 		    "url" : "http://ie.cs.mdx.ac.uk/POSEIDON/envir"
 		}
 	]

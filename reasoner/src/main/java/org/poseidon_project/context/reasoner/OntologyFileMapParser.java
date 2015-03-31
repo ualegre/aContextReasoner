@@ -52,7 +52,7 @@ public class OntologyFileMapParser {
         try {
             final JSONObject json = new JSONObject(jsonText);
 
-            final JSONArray ontologies = json.getJSONArray("ontologies").getJSONArray(0);
+            final JSONArray ontologies = json.getJSONArray("ontologies");
 
             parseOntologies(ontologies, result);
 

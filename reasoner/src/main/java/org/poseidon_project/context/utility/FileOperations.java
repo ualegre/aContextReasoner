@@ -70,6 +70,9 @@ public class FileOperations {
     public static boolean copyFile(InputStream in, String outputPath) throws IOException {
 
         File output = new File(outputPath);
+
+        ensureTargetDirectoryExists(output.getParentFile());
+
         OutputStream out = new FileOutputStream(output);
 
         byte[] buffer = new byte[8192];
@@ -108,5 +111,11 @@ public class FileOperations {
             }
         }
         return sBuf.toString();
+    }
+
+    public static void ensureTargetDirectoryExists(File aTargetDir){
+        if(!aTargetDir.exists()){
+            aTargetDir.mkdirs();
+        }
     }
 }

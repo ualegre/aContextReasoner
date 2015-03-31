@@ -61,6 +61,33 @@ public class OntologyManager implements IOntologyManager{
         mContext = context;
         mReasonerCore = core;
         runFirstTime();
+        loadMappingFiles();
+        loadOntologies();
+
+        //Not a completely bad idea to do a GC after loading everything
+        System.gc();
+    }
+
+    private void loadMappingFiles() {
+
+        try {
+            //Lets open POSEIDONs first, then deal with others.
+            parseURLtoFileMappingFile(mContext.getAssets().open("ontologyMap.json"));
+
+
+
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private void loadOntologies() {
+        //Read and Open all POSEIDON Related Ontologies
+        for (String uri : POSEIDONOntologies.ONTOLOGIES_ARRAY) {
+            mModel.read(uri);
+        }
     }
 
     private void runFirstTime() {
@@ -90,7 +117,7 @@ public class OntologyManager implements IOntologyManager{
                 }
 
                 SharedPreferences.Editor editor = settings.edit();
-                editor.putBoolean("ranfirst", true);
+                editor.putBoolean("ranFirst", true);
 
             } catch (IOException e) {
                 Log.e(LOGTAG, e.getStackTrace().toString());

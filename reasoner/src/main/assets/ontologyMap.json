@@ -1,77 +1,81 @@
 {
 	"ontologies" : [
 		{
-			"file_location" : "$SD$/ontologies/action.owl",
+			"file_location" : "$SD$/ontologies/SOUPA/action.owl",
 			"url" : "http://pervasive.semanticweb.org/ont/2004/06/action"
 		},
 		{
-			"file_location" : "$SD$/ontologies/agent.owl",
+			"file_location" : "$SD$/ontologies/SOUPA/agent.owl",
 			"url" : "http://pervasive.semanticweb.org/ont/2004/06/agent"
 		},
 		{
-			"file_location" : "$SD$/ontologies/bdi.owl",
+			"file_location" : "$SD$/ontologies/SOUPA/bdi.owl",
 			"url" : "http://pervasive.semanticweb.org/ont/2004/06/bdi"
 		},
 		{
-			"file_location" : "$SD$/ontologies/device.owl",
+			"file_location" : "$SD$/ontologies/SOUPAAdevice.owl",
 			"url" : "http://pervasive.semanticweb.org/ont/2004/06/device"
-		},
+		},;
 		{
-			"file_location" : "$SD$/ontologies/digital-doc.owl",
+			"file_location" : "$SD$/ontologies/SOUPA/digital-doc.owl",
 			"url" : "http://pervasive.semanticweb.org/ont/2004/06/digital-doc"
 		},
 		{
-			"file_location" : "$SD$/ontologies/document.owl",
+			"file_location" : "$SD$/ontologies/SOUPA/document.owl",
 			"url" : "http://pervasive.semanticweb.org/ont/2004/06/document"
 		},
 		{
-			"file_location" : "$SD$/ontologies/event.owl",
+			"file_location" : "$SD$/ontologies/SOUPA/event.owl",
 			"url" : "http://pervasive.semanticweb.org/ont/2004/06/event"
 		},
 		{
-			"file_location" : "$SD$/ontologies/geo-measurement.owl",
+			"file_location" : "$SD$/ontologies/SOUPA/geo-measurement.owl",
 			"url" : "http://pervasive.semanticweb.org/ont/2004/06/geo-measurement"
 		},
 		{
-			"file_location" : "$SD$/ontologies/img-capture.owl",
+			"file_location" : "$SD$/ontologies/SOUPA/img-capture.owl",
 			"url" : "http://pervasive.semanticweb.org/ont/2004/06/img-capture"
 		},
 		{
-			"file_location" : "$SD$/ontologies/knowledge.owl",
+			"file_location" : "$SD$/ontologies/SOUPA/knowledge.owl",
 			"url" : "http://pervasive.semanticweb.org/ont/2004/06/knowledge"
 		},
 		{
-			"file_location" : "$SD$/ontologies/location.owl",
+			"file_location" : "$SD$/ontologies/SOUPA/location.owl",
 			"url" : "http://pervasive.semanticweb.org/ont/2004/06/location"
 		},
 		{
-			"file_location" : "$SD$/ontologies/meeting.owl",
+			"file_location" : "$SD$/ontologies/SOUPA/meeting.owl",
 			"url" : "http://pervasive.semanticweb.org/ont/2004/06/meeting"
 		},
 		{
-			"file_location" : "$SD$/ontologies/person.owl",
+			"file_location" : "$SD$/ontologies/SOUPA/person.owl",
 			"url" : "http://pervasive.semanticweb.org/ont/2004/06/person"
 		},
 		{
-			"file_location" : "$SD$/ontologies/policy.owl",
+			"file_location" : "$SD$/ontologies/SOUPA/policy.owl",
 			"url" : "http://pervasive.semanticweb.org/ont/2004/06/policy"
 		},
 		{
-			"file_location" : "$SD$/ontologies/rcc.owl",
+			"file_location" : "$SD$/ontologies/SOUPA/rcc.owl",
 			"url" : "http://pervasive.semanticweb.org/ont/2004/06/rcc"
 		},
 		{
-			"file_location" : "$SD$/ontologies/schedule.owl",
+			"file_location" : "$SD$/ontologies/SOUPA/schedule.owl",
 			"url" : "http://pervasive.semanticweb.org/ont/2004/06/schedule"
 		},
 		{
-			"file_location" : "$SD$/ontologies/space.owl",
+			"file_location" : "$SD$/ontologies/SOUPA/space.owl",
 			"url" : "http://pervasive.semanticweb.org/ont/2004/06/space"
 		},
 		{
-			"file_location" : "$SD$/ontologies/time.owl",
+			"file_location" : "$SD$/ontologies/SOUPA/time.owl",
 			"url" : "http://pervasive.semanticweb.org/ont/2004/06/time"
 		},
+		{
+		    "file_location" : "$SD/ontologies/POSEIDON/envir.owl",
+		    "url" : "http://ie.cs.mdx.ac.uk/POSEIDON/envir"
+		}
 	]
 	
 }

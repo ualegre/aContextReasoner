@@ -23,9 +23,6 @@
  ******************************************************************************/
 package eu.larkc.csparql.core;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-
 import eu.larkc.csparql.cep.api.CepEngine;
 import eu.larkc.csparql.cep.api.CepQuery;
 import eu.larkc.csparql.core.engine.CsparqlEngine;
@@ -38,13 +35,15 @@ public class Configuration {
 
    // Singleton pattern implementation
    private static Configuration instance;
-   
+
+   /*
    private final String cepEngineName = "eu.larkc.csparql.cep.esper.EsperEngine";
    private final String reasonerName = "eu.larkc.csparql.core.engine.TransparentReasoner";
    private final String sparqlEngineName = "eu.larkc.csparql.sparql.jena.JenaEngine";
    private final String cepQueryName = "eu.larkc.csparql.cep.esper.EsperQuery";
    private final String sparqlQueryName = "eu.larkc.csparql.sparql.sesame.SesameQuery";
    private final String translatorName = "eu.larkc.csparql.core.new_parser.utility_files.CSparqlTranslator";
+*/
 
    public static Configuration getCurrentConfiguration() {
       if (Configuration.instance == null) {
@@ -56,7 +55,7 @@ public class Configuration {
 
    public Reasoner createReasoner() {
 
-      Class< ? > c = null;
+    /*  Class< ? > c = null;
 
       try {
          c = Class.forName(this.reasonerName);
@@ -78,11 +77,13 @@ public class Configuration {
       }
 
       return null;
+      */
+      return new eu.larkc.csparql.core.engine.TransparentReasoner();
    }
 
    public Translator createTranslator(final CsparqlEngine engine) {
 
-      Class< ? > c = null;
+     /* Class< ? > c = null;
 
       try {
          c = Class.forName(this.translatorName);
@@ -105,12 +106,16 @@ public class Configuration {
          ex.printStackTrace();
       }
 
-      return null;
+      return null; */
+
+      final Translator t = new eu.larkc.csparql.core.new_parser.utility_files.CSparqlTranslator();
+      t.setEngine(engine);
+      return t;
    }
 
    public CepQuery createCepQuery(final String command) {
       // TODO: Correct it, it should NEVER return null!
-      Class< ? > c = null;
+   /*   Class< ? > c = null;
       CepQuery e = null;
 
       try {
@@ -137,12 +142,14 @@ public class Configuration {
          ex.printStackTrace();
       }
 
-      return null;
+      return null; */
+
+      return new eu.larkc.csparql.cep.esper.EsperQuery(command);
    }
 
    public SparqlQuery createSparqlQuery(final String command) {
       // TODO: Correct it, it should NEVER return null!
-      Class< ? > c = null;
+     /* Class< ? > c = null;
       SparqlQuery e = null;
 
       try {
@@ -175,12 +182,14 @@ public class Configuration {
          ex.printStackTrace();
       }
 
-      return null;
+      return null; */
+
+      return new eu.larkc.csparql.sparql.sesame.SesameQuery(command);
    }
 
    public CepEngine createCepEngine() {
       // TODO: Correct it, it should NEVER return null!
-      Class< ? > c = null;
+      /*Class< ? > c = null;
       CepEngine e = null;
 
       try {
@@ -196,12 +205,14 @@ public class Configuration {
       } catch (final InstantiationException ex) {
          ex.printStackTrace();
          return null;
-      }
+      } */
+
+      return new eu.larkc.csparql.cep.esper.EsperEngine();
    }
 
    public SparqlEngine createSparqlEngine() {
       // TODO: Correct it, it should NEVER return null!
-      Class< ? > c = null;
+      /*Class< ? > c = null;
       SparqlEngine e = null;
 
       try {
@@ -218,6 +229,10 @@ public class Configuration {
          ex.printStackTrace();
          return null;
       }
+
+      */
+
+      return new eu.larkc.csparql.sparql.jena.JenaEngine();
    }
 
 }

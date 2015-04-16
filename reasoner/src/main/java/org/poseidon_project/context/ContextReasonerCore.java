@@ -23,6 +23,7 @@ import android.util.Log;
 import org.poseidon_project.context.management.ContextManager;
 import org.poseidon_project.context.reasoner.OntologyManager;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -39,6 +40,7 @@ public class ContextReasonerCore {
     private ContextManager mContextManager;
     private OntologyManager mOntologyManager;
     private Context mContext;
+    private HashMap<String, String> mContextValues = new HashMap<>();
 
 
     public ContextReasonerCore(Context c) {
@@ -89,13 +91,28 @@ public class ContextReasonerCore {
 
     }
 
-
     public void onDestroy() {
         mContextManager.stop();
+        mOntologyManager.stop();
     }
 
     public boolean addContextRequirementWithParameters
             (String appkey, String observerName, Map parameters) {
         return mContextManager.addObserverRequirementWithParameters(appkey, observerName, parameters);
+    }
+
+    public void updateContextValue(String contextName, String value) {
+
+        String previous = mContextValues.put(contextName, value);
+
+        if (previous==null) {
+            //sendBroadcast
+            sendContextResult(contextName, value);
+        } else {
+            if(! value.equals(previous)) {
+                //sendBroadcast
+                sendContextResult(contextName, value);
+            }
+        }
     }
 }

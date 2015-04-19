@@ -116,9 +116,9 @@ public class AIDLTest extends ActionBarActivity {
     public void finishTest(View v){
         try {
             //mTestService.removeContextRequirement("test", "BatteryContext");
-            mTestService.removeContextRequirement("test", "LightContext");
-            mTestService.removeContextRequirement("test", "GPSIndoorOutdoorContext");
-            mTestService.removeContextRequirement("test", "BadWeatherContext");
+            mTestService.removeContextRequirement("test", "light");
+            //mTestService.removeContextRequirement("test", "GPSIndoorOutdoorContext");
+            //mTestService.removeContextRequirement("test", "BadWeatherContext");
         } catch (RemoteException e) {
             e.printStackTrace();
         }
@@ -150,15 +150,15 @@ public class AIDLTest extends ActionBarActivity {
 
     public void testStartContexts(View v) {
         try {
-            HashMap<String, Object> paras = new HashMap<>();
+           /* HashMap<String, Object> paras = new HashMap<>();
             ArrayList<String> locations = new ArrayList<String>();
             locations.add("London,UK");
             locations.add("Southend,UK");
             paras.put("stringPlaces", locations);
-            //mTestService.addContextRequirement("test", "BatteryContext");
-            mTestService.addContextRequirement("test", "LightContext");
-            mTestService.addContextRequirement("test", "GPSIndoorOutdoorContext");
-            mTestService.addContextRequirementWithParameters("test", "BadWeatherContext", paras);
+            //mTestService.addContextRequirement("test", "BatteryContext");*/
+            mTestService.addContextRequirement("test", "light");
+            //mTestService.addContextRequirement("test", "GPSIndoorOutdoorContext");
+            //mTestService.addContextRequirementWithParameters("test", "BadWeatherContext", paras);
         } catch (RemoteException e) {
             e.printStackTrace();
         }

@@ -30,7 +30,7 @@ public class POSEIDONOntologies {
 
         public static final String[] ONTOLOGIES_ARRAY = {
                 //SOUPA Related Ontologies
-                "http://pervasive.semanticweb.org/ont/2004/06/action",
+                /*"http://pervasive.semanticweb.org/ont/2004/06/action",
                 "http://pervasive.semanticweb.org/ont/2004/06/agent",
                 "http://pervasive.semanticweb.org/ont/2004/06/bdi",
                 "http://pervasive.semanticweb.org/ont/2004/06/device",
@@ -47,7 +47,7 @@ public class POSEIDONOntologies {
                 "http://pervasive.semanticweb.org/ont/2004/06/rcc",
                 "http://pervasive.semanticweb.org/ont/2004/06/schedule",
                 "http://pervasive.semanticweb.org/ont/2004/06/space",
-                "http://pervasive.semanticweb.org/ont/2004/06/time",
+                "http://pervasive.semanticweb.org/ont/2004/06/time",*/
                 //POSEIDON Ontologies
                 "http://ie.cs.mdx.ac.uk/POSEIDON/envir"
         };

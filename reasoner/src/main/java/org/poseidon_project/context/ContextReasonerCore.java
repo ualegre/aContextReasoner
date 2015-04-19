@@ -66,11 +66,13 @@ public class ContextReasonerCore {
     }
 
     public boolean addContextRequirement(String appkey, String observerName) {
-        return mContextManager.addObserverRequirement(appkey, observerName);
+        //return mContextManager.addObserverRequirement(appkey, observerName);
+        return mOntologyManager.pilotMapper.registerContext(observerName, null);
     }
 
     public boolean removeContextRequirement(String appkey, String observerName) {
-        return mContextManager.removeObserverRequirement(appkey, observerName);
+        //return mContextManager.removeObserverRequirement(appkey, observerName);
+        return mOntologyManager.pilotMapper.unregisterContext(observerName, null);
     }
 
     public boolean setContextParameters(String appkey, String observerName, Map parameters) {

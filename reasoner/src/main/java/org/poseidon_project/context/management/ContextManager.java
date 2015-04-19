@@ -27,6 +27,7 @@ import org.poseidon_project.context.database.ContextDBImpl;
 import org.poseidon_project.contexts.ContextObserver;
 import org.poseidon_project.contexts.ContextReceiver;
 import org.poseidon_project.contexts.IContextManager;
+import org.poseidon_project.contexts.IOntologyManager;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;

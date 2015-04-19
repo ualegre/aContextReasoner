@@ -41,8 +41,14 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
+
+import eu.larkc.csparql.core.engine.CsparqlEngine;
+import eu.larkc.csparql.core.engine.CsparqlEngineImpl;
+import eu.larkc.csparql.core.engine.CsparqlQueryResultProxy;
 
 /**
  * Class to manage the extensible POSEIDON ontology
@@ -56,6 +62,12 @@ public class OntologyManager implements IOntologyManager{
     private static final String LOGTAG  = "OntologyManager";
     private static final String ONTOLOGY_PREFS = "OntologyPrefs";
     private ContextReasonerCore mReasonerCore;
+    private CsparqlEngine mCsparqlEngine;
+    private CsparqlQueryResultProxy mCsparqlQRP;
+    private ContextStream mContextStream;
+    private ContextRuleObserver mContextRuleObserver;
+    //Only required for the pilot until the main infrastructure is done.
+    public ContextMapper pilotMapper;
 
     public OntologyManager(Context context, ContextReasonerCore core){
         mContext = context;
@@ -64,8 +76,41 @@ public class OntologyManager implements IOntologyManager{
         loadMappingFiles();
         loadOntologies();
 
+        startCSPARQL();
+
         //Not a completely bad idea to do a GC after loading everything
         System.gc();
+
+        pilotMapper = new ContextMapper(mReasonerCore, this);
+    }
+
+    private void startCSPARQL() {
+
+        mCsparqlEngine = new CsparqlEngineImpl();
+
+        mCsparqlEngine.initialize(true);
+        mContextStream = new ContextStream("http://poseidon-project.org/context-stream");
+
+        mCsparqlEngine.registerStream(mContextStream);
+        mContextRuleObserver = new ContextRuleObserver(mReasonerCore);
+    }
+
+    public CsparqlQueryResultProxy registerCSPARQLQuery(String query) {
+
+        CsparqlQueryResultProxy queryResultProxy = null;
+        try {
+            queryResultProxy = mCsparqlEngine.registerQuery(query, true);
+            queryResultProxy.addObserver(mContextRuleObserver);
+
+        } catch (final ParseException e) {
+            Log.e(LOGTAG, "Error Parsing: " + e.getMessage());
+        }
+
+        return queryResultProxy;
+    }
+
+    public void unregisterCSPARQLQuery(String id) {
+        mCsparqlEngine.unregisterQuery(id);
     }
 
     private void loadMappingFiles() {
@@ -97,8 +142,11 @@ public class OntologyManager implements IOntologyManager{
 
         if (! beenRun ) {
             try {
-                File existingDir = new File(
-                        Environment.getExternalStorageDirectory().getAbsolutePath() + "/ontologies");
+
+                String existingDirString = Environment.
+                        getExternalStorageDirectory().getAbsolutePath() + "/ontologies";
+
+                File existingDir = new File(existingDirString);
 
                 FileOperations.deleteDirectory(existingDir);
 
@@ -126,7 +174,7 @@ public class OntologyManager implements IOntologyManager{
 
     }
 
-    public boolean copyOntologyFile(String filepath) {
+    private boolean copyOntologyFile(String filepath) {
 
         try {
             String filename = filepath.substring(filepath.lastIndexOf("/") + 1);
@@ -204,5 +252,14 @@ public class OntologyManager implements IOntologyManager{
 
     public void updatePropertyValue(String property, String value) {
 
+    }
+
+    @Override
+    public void updateValues(String subject, String predicate, String value) {
+        mContextStream.sendStream(subject, predicate, value);
+    }
+
+    public void stop() {
+        mCsparqlEngine.destroy();
     }
 }

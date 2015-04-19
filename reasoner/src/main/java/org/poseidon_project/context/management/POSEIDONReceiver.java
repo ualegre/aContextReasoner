@@ -43,6 +43,7 @@ public class POSEIDONReceiver extends ContextReceiver{
                Log.d("receiver", "battery Context value: " + String.valueOf(value));
            } else if (name.equals("sensor.light_lumens")) {
                Log.d("receiver", "Light Context value: " + String.valueOf(value));
+               getOntologyManager().updateValues("device", "hasLightLevel", String.valueOf(value) + "^^http://www.w3.org/2001/XMLSchema#integer");
            }
     }
 

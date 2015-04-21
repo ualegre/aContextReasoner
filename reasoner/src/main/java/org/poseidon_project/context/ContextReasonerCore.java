@@ -100,7 +100,8 @@ public class ContextReasonerCore {
 
     public boolean addContextRequirementWithParameters
             (String appkey, String observerName, Map parameters) {
-        return mContextManager.addObserverRequirementWithParameters(appkey, observerName, parameters);
+        return mOntologyManager.pilotMapper.registerContext(observerName, parameters);
+        //return mContextManager.addObserverRequirementWithParameters(appkey, observerName, parameters);
     }
 
     public void updateContextValue(String contextName, String value) {

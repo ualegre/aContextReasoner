@@ -46,17 +46,14 @@ public class ContextRuleObserver extends ResultFormatter {
         RDFTable q = (RDFTable) data;
 
         for (final RDFTuple t: q) {
-            Log.e("Rule Observer", data.toString());
 
-            /*String context = t.get(2);
+            String context = t.get(2);
             context = context.substring(context.indexOf("\""), context.lastIndexOf("\""));
             String contextName = context.substring(0, context.indexOf("_"));
             String contextValue = context.replace(contextName + "_", "");
             mEngineCore.updateContextValue(contextName, contextValue);
-            */
+
         }
 
-
-        //mEngineCore.updateContextValue("context", "value");
     }
 }

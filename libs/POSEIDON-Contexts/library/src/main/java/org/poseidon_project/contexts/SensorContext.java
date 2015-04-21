@@ -89,6 +89,7 @@ public abstract class SensorContext extends ContextObserver implements SensorEve
 
         if (mSensorType != -2) {
             mSensorManager.registerListener(this, mSensor, mInterval);
+			mIsRunning = true;
             return true;
         } else {
             Log.e(mName, "Sensor Type not set!");
@@ -104,6 +105,7 @@ public abstract class SensorContext extends ContextObserver implements SensorEve
 	@Override
 	public boolean stop() {
 		mSensorManager.unregisterListener(this, mSensor);
+		mIsRunning = false;
 		return true;
 	}
 

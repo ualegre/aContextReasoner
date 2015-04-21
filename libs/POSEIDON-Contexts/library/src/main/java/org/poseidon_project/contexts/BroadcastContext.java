@@ -81,12 +81,15 @@ public abstract class BroadcastContext extends ContextObserver{
 			checkContext(currentValue.getExtras());
 		}
 
+		mIsRunning = true;
+
 		return true;
 	}
 
 	@Override
 	public boolean stop() {
 		mContext.unregisterReceiver(mContextMonitor);
+		mIsRunning = false;
 		return true;
 	}
 

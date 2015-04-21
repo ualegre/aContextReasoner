@@ -75,6 +75,8 @@ public abstract class TimerContext extends ContextObserver{
 			}
 		}, mInterval);
 
+		mIsRunning = true;
+
 		return true;
 
 	}
@@ -84,6 +86,7 @@ public abstract class TimerContext extends ContextObserver{
 	@Override
 	public boolean stop() {
 		mTimer.cancel();
+		mIsRunning = false;
 		return true;
 	}
 

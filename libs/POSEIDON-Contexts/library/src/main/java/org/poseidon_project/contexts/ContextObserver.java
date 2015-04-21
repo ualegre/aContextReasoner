@@ -37,6 +37,7 @@ public abstract class ContextObserver {
     protected final Context mContext;
     protected ContextReceiver mReceiver;
     protected LinkedHashSet<String> mRequiringApps = new LinkedHashSet<>();
+    protected boolean mIsRunning = false;
 
     public ContextObserver(Context context) {
         mContext = context;
@@ -116,5 +117,9 @@ public abstract class ContextObserver {
     public int numberOfRequiringApps() { return mRequiringApps.size(); }
 
     public void removeAllRequiringApps() { mRequiringApps.clear(); }
+
+    public boolean isARequiringApp(String appid) { return mRequiringApps.contains(appid); }
+
+    public boolean isRunning() { return mIsRunning; }
 
 }

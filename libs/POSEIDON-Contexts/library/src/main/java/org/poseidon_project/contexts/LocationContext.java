@@ -65,6 +65,7 @@ public abstract class LocationContext extends ContextObserver implements Locatio
 	@Override
 	public boolean start() {
 		mLocationManager.requestLocationUpdates(mProvider, mMinTime, mMinDistance, this);
+		mIsRunning = true;
 		return true;
 	}
 
@@ -83,6 +84,7 @@ public abstract class LocationContext extends ContextObserver implements Locatio
 	@Override
 	public boolean stop() {
 		mLocationManager.removeUpdates(this);
+		mIsRunning = false;
 		return true;
 	}
 

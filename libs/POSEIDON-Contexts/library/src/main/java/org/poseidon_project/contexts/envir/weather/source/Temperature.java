@@ -74,8 +74,8 @@ public class Temperature {
 			mHighTemp = convertTemperature(mHighTemp, mTemperatureUnit, newUnit);
 		}
 
-		if (mHighTemp != Integer.MIN_VALUE) {
-			mCurrentTemp = convertTemperature(mCurrentTemp, mTemperatureUnit, newUnit);
+		if (mLowTemp != Integer.MIN_VALUE) {
+			mLowTemp = convertTemperature(mLowTemp, mTemperatureUnit, newUnit);
 		}
 
 		mTemperatureUnit = newUnit;

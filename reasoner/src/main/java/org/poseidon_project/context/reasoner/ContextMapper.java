@@ -38,21 +38,68 @@ public class ContextMapper {
     private OntologyManager mOntologyManager;
     private HashMap<String, CsparqlQueryResultProxy> rules = new HashMap<>();
 
-    private static final String batteryHighQuery =
-              "REGISTER STREAM batteryContextIsHigh AS "
-            + "CONSTRUCT {?s ?p \"BATTERY_HIGH\"} "
-            + "FROM STREAM <http://poseidon-project.org/context-stream> [RANGE 1s STEP 5s] "
-            + "WHERE { ?s ?p ?o "
-            + "FILTER (?o > 10) "
-            + "}";
+    private static final String batteryLOWQuery =
+            "REGISTER STREAM batteryContextIsLOW AS "
+                    + "PREFIX ex: <http://ie.cs.mdx.ac.uk/POSEIDON/system#> "
+                    + "CONSTRUCT { ?s <http://poseidon-project.org/context/is> \"BATTERY_OKAY\"} "
+                    + "FROM STREAM <http://poseidon-project.org/context-stream> [RANGE TRIPLES 1] "
+                    + "WHERE { ?s ex:batteryRemaining ?o "
+                    + "FILTER ( ?o < 25) }";
+
+    private static final String batteryOkQuery =
+            "REGISTER STREAM batteryContextIsOkay AS "
+            + "PREFIX ex: <http://ie.cs.mdx.ac.uk/POSEIDON/system#> "
+            + "CONSTRUCT { ?s <http://poseidon-project.org/context/is> \"BATTERY_OKAY\"} "
+            + "FROM STREAM <http://poseidon-project.org/context-stream> [RANGE TRIPLES 1] "
+            + "WHERE { ?s ex:batteryRemaining ?o "
+            + "FILTER ( ?o > 25) }";
 
     private static final String lightingLowQuery =
-            "REGISTER STREAM lightContextIsLow AS "
-            + "CONSTRUCT {?s ?p \"LIGHT_LOW\"} "
-            + "FROM STREAM <http://poseidon-project.org/context-stream> [RANGE TRIPLES 1] "
-            + "WHERE { ?s ?p ?o "
-            + "FILTER (?o < 50) "
-            + "}";
+            "REGISTER QUERY batteryContextIsLow AS "
+                    + "PREFIX ex: <http://ie.cs.mdx.ac.uk/POSEIDON/system#> "
+                    + "CONSTRUCT {?s <http://ie.cs.mdx.ac.uk/POSEIDON/context/is> \"LIGHT_LOW\"} "
+                    + "FROM STREAM <http://poseidon-project.org/context-stream> [RANGE TRIPLES 1] "
+                    + " WHERE { ?s ex:hasLightLevel ?o "
+                    + " FILTER (?o < 20) }";
+
+    private static final String weatherRainingAndColdQuery =
+            "REGISTER QUERY weatherContextIsRainingAndCold AS "
+                    + "PREFIX ex: <http://ie.cs.mdx.ac.uk/POSEIDON/envir#> "
+                    + "CONSTRUCT {ex:weather <http://ie/mdc.ac.uk/POSEIDON/context/is> \"WEATHER_RAININGANDCOLD\" } "
+                    + "FROM STREAM <http://poseidon-project.org/context-stream> [RANGE 4s STEP 4s] "
+                    + "WHERE { ?m ex:hasTemperatureValue ?tempValueIRI ."
+                    + " ?m ex:hasPrecipitationValue ?precipValueIRI . "
+                    + " ?precipValueIRI ex:percipitationValue ?precipValue . "
+                    + " ?tempValueIRI ex:temperatureValue ?tempValue . "
+                    + " FILTER (?precipValue > 0) "
+                    + " FILTER (?tempValue < 15) "
+                    +"}";
+
+    private static final String weatherRainingQuery =
+            "REGISTER QUERY weatherContextIsRainingAndCold AS "
+                    + "PREFIX ex: <http://ie.cs.mdx.ac.uk/POSEIDON/envir#> "
+                    + "CONSTRUCT {ex:weather <http://ie/mdc.ac.uk/POSEIDON/context/is> \"WEATHER_RAININGANDCOLD\" } "
+                    + "FROM STREAM <http://poseidon-project.org/context-stream> [RANGE 4s STEP 4s] "
+                    + "WHERE { ?m ex:hasTemperatureValue ?tempValueIRI ."
+                    + " ?m ex:hasPrecipitationValue ?precipValueIRI . "
+                    + " ?precipValueIRI ex:percipitationValue ?precipValue . "
+                    + " ?tempValueIRI ex:temperatureValue ?tempValue . "
+                    + " FILTER (?precipValue > 0) "
+                    + " FILTER (?tempValue > 15) "
+                    +"}";
+
+    private static final String weatherColdQuery =
+            "REGISTER QUERY weatherContextIsRainingAndCold AS "
+                    + "PREFIX ex: <http://ie.cs.mdx.ac.uk/POSEIDON/envir#> "
+                    + "CONSTRUCT {ex:weather <http://ie/mdc.ac.uk/POSEIDON/context/is> \"WEATHER_RAININGANDCOLD\" } "
+                    + "FROM STREAM <http://poseidon-project.org/context-stream> [RANGE 4s STEP 4s] "
+                    + "WHERE { ?m ex:hasTemperatureValue ?tempValueIRI ."
+                    + " ?m ex:hasPrecipitationValue ?precipValueIRI . "
+                    + " ?precipValueIRI ex:percipitationValue ?precipValue . "
+                    + " ?tempValueIRI ex:temperatureValue ?tempValue . "
+                    + " FILTER (?precipValue < 0) "
+                    + " FILTER (?tempValue < 15) "
+                    +"}";
 
     public ContextMapper(ContextReasonerCore crc, OntologyManager on) {
 
@@ -73,9 +120,29 @@ public class ContextMapper {
             registerBatteryContext();
         } else if (context.equals("light")) {
             registerLightContext();
+        } else if (context.equals("weather")) {
+            registerWeatherContext(parameters);
         }
 
         return true;
+    }
+
+    private void registerWeatherContext(Map parameters) {
+        mContextManager.addObserverRequirementWithParameters("engine", "BadWeatherContext", parameters);
+        CsparqlQueryResultProxy c1 = mOntologyManager.registerCSPARQLQuery(weatherRainingAndColdQuery);
+        CsparqlQueryResultProxy c2 = mOntologyManager.registerCSPARQLQuery(weatherColdQuery);
+        CsparqlQueryResultProxy c3 = mOntologyManager.registerCSPARQLQuery(weatherRainingQuery);
+        rules.put(weatherRainingAndColdQuery, c1);
+        rules.put(weatherColdQuery, c2);
+        rules.put(weatherRainingQuery, c3);
+
+    }
+
+    private void unRegisterWeatherContext() {
+        mContextManager.removeObserverRequirement("engine", "BadWeatherContext");
+        mOntologyManager.unregisterCSPARQLQuery(rules.remove(weatherRainingAndColdQuery).getId());
+        mOntologyManager.unregisterCSPARQLQuery(rules.remove(weatherColdQuery).getId());
+        mOntologyManager.unregisterCSPARQLQuery(rules.remove(weatherRainingQuery).getId());
     }
 
     public boolean unregisterContext(String context, Map parameters) {
@@ -84,6 +151,8 @@ public class ContextMapper {
             unRegisterBatteryContext();
         } else if (context.equals("light")) {
             unRegisterLightContext();
+        } else if (context.equals("weather")) {
+            unRegisterWeatherContext();
         }
 
         return true;
@@ -92,14 +161,17 @@ public class ContextMapper {
     public void registerBatteryContext() {
 
         mContextManager.addObserverRequirement("engine", "BatteryContext");
-        CsparqlQueryResultProxy c1 = mOntologyManager.registerCSPARQLQuery(batteryHighQuery);
-        rules.put("battery", c1);
+        CsparqlQueryResultProxy c1 = mOntologyManager.registerCSPARQLQuery(batteryLOWQuery);
+        CsparqlQueryResultProxy c2 = mOntologyManager.registerCSPARQLQuery(batteryOkQuery);
+        rules.put(batteryLOWQuery, c1);
+        rules.put(batteryOkQuery, c2);
 
     }
 
     public void unRegisterBatteryContext() {
         mContextManager.removeObserverRequirement("engine", "BatteryContext");
-        mOntologyManager.unregisterCSPARQLQuery(rules.get("battery").getId());
+        mOntologyManager.unregisterCSPARQLQuery(rules.remove(batteryLOWQuery).getId());
+        mOntologyManager.unregisterCSPARQLQuery(rules.remove(batteryOkQuery).getId());
     }
 
     public void registerLightContext() {
@@ -110,7 +182,7 @@ public class ContextMapper {
 
     public void unRegisterLightContext() {
         mContextManager.removeObserverRequirement("engine", "LightContext");
-        mOntologyManager.unregisterCSPARQLQuery(rules.get("light").getId());
+        mOntologyManager.unregisterCSPARQLQuery(rules.remove("light").getId());
     }
 
 

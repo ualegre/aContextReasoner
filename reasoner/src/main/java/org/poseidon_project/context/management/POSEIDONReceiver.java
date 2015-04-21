@@ -23,6 +23,8 @@ import org.poseidon_project.contexts.ContextReceiver;
 import org.poseidon_project.contexts.IContextManager;
 import org.poseidon_project.contexts.IOntologyManager;
 import org.poseidon_project.contexts.UIEvent;
+import org.poseidon_project.contexts.envir.weather.source.Weather;
+import org.poseidon_project.contexts.envir.weather.source.WeatherPeriod;
 
 import java.util.Map;
 
@@ -39,11 +41,15 @@ public class POSEIDONReceiver extends ContextReceiver{
 
     @Override
     public void newContextValue(String name, long value) {
+
+        String strValue = String.valueOf(value) + "^^http://www.w3.org/2001/XMLSchema#integer";
+
            if(name.equals("sensor.battery_level")) {
                Log.d("receiver", "battery Context value: " + String.valueOf(value));
+               getOntologyManager().updateValues("system#device", "batteryRemaining", strValue);
            } else if (name.equals("sensor.light_lumens")) {
                Log.d("receiver", "Light Context value: " + String.valueOf(value));
-               getOntologyManager().updateValues("device", "hasLightLevel", String.valueOf(value) + "^^http://www.w3.org/2001/XMLSchema#integer");
+               getOntologyManager().updateValues("system#device", "hasLightLevel", strValue);
            }
     }
 
@@ -99,6 +105,31 @@ public class POSEIDONReceiver extends ContextReceiver{
     @Override
     public void newContextValue(String name, Object value) {
 
+        IOntologyManager ontologyManager = getOntologyManager();
+
+
+        if (name.equals("weather")) {
+            Weather current = (Weather) value;
+
+            WeatherPeriod period = current.getWeatherPeriods().get(0);
+
+            if (period != null ){
+                long time = System.currentTimeMillis();
+
+                //WeatherPeriod
+                ontologyManager.updateValues("envir#w1", "envir#hasTemperatureValue", "envir#t1", time);
+                ontologyManager.updateValues("envir#w1", "envir#hasPrecipitationValue", "envir#p1", time);
+
+                //Temperature
+                ontologyManager.updateValues("envir#t1", "envir#temperatureValue", period.getTemperature().getCurrentValue() + "^^http://www.w3.org/2001/XMLSchema#integer", time);
+
+                //Rain
+                ontologyManager.updateValues("envir#p1", "envir#precipitationValue", period.getPrecipitation().getValue() + "^^http://www.w3.org/2001/XMLSchema#integer", time);
+            }
+
+
+
+        }
     }
 
     @Override

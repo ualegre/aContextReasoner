@@ -34,14 +34,15 @@ public class ContextStream extends RdfStream {
     protected final Logger mLogger = LoggerFactory.getLogger(ContextStream.class);
 
     private  boolean keepRunning = false;
+    private String streamiri = "http://ie.cs.mdx.ac.uk/POSEIDON/";
 
 
     public ContextStream(String iri) {
         super(iri);
     }
 
-    public void sendStream(String subject, String predicate, String value) {
-        final RdfQuadruple q = new RdfQuadruple(getIRI() + "/" + subject, getIRI() + "/" + predicate, value, System.currentTimeMillis());
+    public void sendStream(String subject, String predicate, String value, long time) {
+        final RdfQuadruple q = new RdfQuadruple(streamiri + subject, streamiri + predicate, value, time);
         this.put(q);
     }
 

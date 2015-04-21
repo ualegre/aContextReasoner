@@ -51,6 +51,19 @@ public class Precipitation {
 		mPrecipitationValue = convertPrecipitation(value, valueUnit, mPrecipitationUnit);
 	}
 
+	public void setPrecipitationUnit(Unit newUnit) {
+		if (newUnit == mPrecipitationUnit) {
+			return;
+		}
+
+		if (mPrecipitationValue != 0) {
+			mPrecipitationValue =
+					convertPrecipitation(mPrecipitationValue, mPrecipitationUnit, newUnit);
+		}
+
+		mPrecipitationUnit = newUnit;
+	}
+
 	public float getValue() {
 		return mPrecipitationValue;
 	}

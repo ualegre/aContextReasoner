@@ -44,6 +44,7 @@ import java.io.OutputStream;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.logging.Logger;
 
 import eu.larkc.csparql.core.engine.CsparqlEngine;
@@ -68,6 +69,7 @@ public class OntologyManager implements IOntologyManager{
     private ContextRuleObserver mContextRuleObserver;
     //Only required for the pilot until the main infrastructure is done.
     public ContextMapper pilotMapper;
+    private HashMap<String, Object> mOntIndividuals;
 
     public OntologyManager(Context context, ContextReasonerCore core){
         mContext = context;
@@ -256,7 +258,11 @@ public class OntologyManager implements IOntologyManager{
 
     @Override
     public void updateValues(String subject, String predicate, String value) {
-        mContextStream.sendStream(subject, predicate, value);
+        mContextStream.sendStream(subject, predicate, value, System.currentTimeMillis());
+    }
+
+    public void updateValues(String subject, String predicate, String value, long time) {
+        mContextStream.sendStream(subject, predicate, value, time);
     }
 
     public void stop() {

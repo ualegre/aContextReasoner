@@ -22,4 +22,7 @@ package org.poseidon_project.contexts;
  * @author Dean Kramer <d.kramer@mdx.ac.uk>
  */
 public interface IOntologyManager {
+
+    public void updateValues(String subject, String predicate, String value);
+    public void updateValues(String subject, String predicate, String value, long time);
 }

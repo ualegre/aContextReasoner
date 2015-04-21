@@ -99,6 +99,29 @@ public class ContextManager implements IContextManager{
         }
     }
 
+    public boolean startObserver(String appkey, String observerName) {
+
+        ContextObserver observer = mActiveContexts.get(observerName);
+
+        if (observer != null) {
+            if (! observer.isARequiringApp(observerName) ) {
+                Log.e(LOGTAG, "Observer is not needed by app");
+                return false;
+            } else {
+                if (! observer.isRunning()) {
+                    Log.v(LOGTAG, "Observer is running already");
+                    return false;
+                } else {
+                    observer.start();
+                    return true;
+                }
+            }
+        } else {
+            Log.e(LOGTAG, "Observer needs to be loaded first");
+            return false;
+        }
+    }
+
     public boolean removeObserverRequirement(String appkey, String observerName) {
         ContextObserver observer = mActiveContexts.get(observerName);
 
@@ -107,7 +130,9 @@ public class ContextManager implements IContextManager{
 
             if (observer.numberOfRequiringApps()<1) {
                 Log.v(LOGTAG, "Observer no longer needed, shutting down");
-                observer.stop();
+                if (observer.isRunning()) {
+                    observer.stop();
+                }
                 mActiveContexts.remove(observerName);
                 long cID = mContextUseIds.remove(observerName);
                 mContextDatabase.

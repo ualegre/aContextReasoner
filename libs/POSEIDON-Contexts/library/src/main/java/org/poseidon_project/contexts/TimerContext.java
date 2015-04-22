@@ -51,6 +51,11 @@ public abstract class TimerContext extends ContextObserver{
 
 	public void setInterval(int interval) {
 		mInterval = interval;
+
+		if (mIsRunning) {
+			stop();
+			start();
+		}
 	}
 
 	@Override

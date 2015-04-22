@@ -105,7 +105,7 @@ public class OntologyManager implements IOntologyManager{
 
         CsparqlQueryResultProxy queryResultProxy = null;
         try {
-            queryResultProxy = mCsparqlEngine.registerQuery(query, false);
+            queryResultProxy = mCsparqlEngine.registerQuery(query, true);
             queryResultProxy.addObserver(mContextRuleObserver);
 
         } catch (final ParseException e) {

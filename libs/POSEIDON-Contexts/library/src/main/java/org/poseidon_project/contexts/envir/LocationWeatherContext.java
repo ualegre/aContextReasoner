@@ -35,14 +35,15 @@ public class LocationWeatherContext extends TimerContext{
 	private OpenWeatherMapSource mWeatherSource;
 	private Weather mCurrentWeather;
 	private String mPlace;
+	private boolean mFirstTime = true;
 
 	public LocationWeatherContext(Context c, ContextReceiver cr) {
-		super(c, cr, 5000, "LocationWeatherContext");
+		super(c, cr, 2000, "LocationWeatherContext");
 		mWeatherSource = new OpenWeatherMapSource();
 	}
 
 	public LocationWeatherContext(Context c, ContextReceiver cr, String place) {
-		super(c, cr, 5000, "LocationWeatherContext");
+		super(c, cr, 2000, "LocationWeatherContext");
 		mPlace = place;
 		mWeatherSource = new OpenWeatherMapSource();
 	}
@@ -64,6 +65,12 @@ public class LocationWeatherContext extends TimerContext{
 		try {
 			mCurrentWeather = mWeatherSource.query(mPlace,0);
 			mReceiver.newContextValue("weather", mCurrentWeather);
+
+			if (mFirstTime) {
+				mFirstTime = false;
+				//Check every 30 mins from now.
+				setInterval(1800000);
+			}
 		} catch (ContextException e) {
 			Log.e("LocationWeatherContext", e.toString());
 		}

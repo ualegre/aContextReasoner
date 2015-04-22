@@ -65,41 +65,54 @@ public class ContextMapper {
     private static final String weatherRainingAndColdQuery =
             "REGISTER QUERY weatherContextIsRainingAndCold AS "
                     + "PREFIX ex: <http://ie.cs.mdx.ac.uk/POSEIDON/envir#> "
-                    + "CONSTRUCT {ex:weather <http://ie/mdc.ac.uk/POSEIDON/context/is> \"WEATHER_RAININGANDCOLD\" } "
-                    + "FROM STREAM <http://poseidon-project.org/context-stream> [RANGE 4s STEP 4s] "
-                    + "WHERE { ?m ex:hasTemperatureValue ?tempValueIRI ."
-                    + " ?m ex:hasPrecipitationValue ?precipValueIRI . "
-                    + " ?precipValueIRI ex:percipitationValue ?precipValue . "
-                    + " ?tempValueIRI ex:temperatureValue ?tempValue . "
-                    + " FILTER (?precipValue > 0) "
-                    + " FILTER (?tempValue < 15) "
-                    +"}";
+                    + "CONSTRUCT { ex:weather <http://ie.cs.mdx.ac.uk/POSEIDON/context/is> \"WEATHER_RAININGANDCOLD\" } "
+                    + "FROM STREAM <http://poseidon-project.org/context-stream> [RANGE 10s STEP 4s] "
+                    + "WHERE { ?m ex:hasTemperatureValue ?tempValueIRI . "
+                    + "?m ex:hasPrecipitationValue ?precipValueIRI . "
+                    + "?precipValueIRI ex:precipitationValue ?precipValue . "
+                    + "?tempValueIRI ex:temperatureValue ?tempValue . "
+                    + "FILTER (?precipValue > 0) "
+                    + "FILTER (?tempValue < 15) "
+                    + "}";
 
     private static final String weatherRainingQuery =
-            "REGISTER QUERY weatherContextIsRainingAndCold AS "
+            "REGISTER QUERY weatherContextIsRaining AS "
                     + "PREFIX ex: <http://ie.cs.mdx.ac.uk/POSEIDON/envir#> "
-                    + "CONSTRUCT {ex:weather <http://ie/mdc.ac.uk/POSEIDON/context/is> \"WEATHER_RAININGANDCOLD\" } "
-                    + "FROM STREAM <http://poseidon-project.org/context-stream> [RANGE 4s STEP 4s] "
-                    + "WHERE { ?m ex:hasTemperatureValue ?tempValueIRI ."
-                    + " ?m ex:hasPrecipitationValue ?precipValueIRI . "
-                    + " ?precipValueIRI ex:percipitationValue ?precipValue . "
-                    + " ?tempValueIRI ex:temperatureValue ?tempValue . "
-                    + " FILTER (?precipValue > 0) "
-                    + " FILTER (?tempValue > 15) "
-                    +"}";
+                    + "CONSTRUCT { ex:weather <http://ie.cs.mdx.ac.uk/POSEIDON/context/is> \"WEATHER_RAINING\" } "
+                    + "FROM STREAM <http://poseidon-project.org/context-stream> [RANGE 10s STEP 4s] "
+                    + "WHERE { ?m ex:hasTemperatureValue ?tempValueIRI . "
+                    + "?m ex:hasPrecipitationValue ?precipValueIRI . "
+                    + "?precipValueIRI ex:precipitationValue ?precipValue . "
+                    + "?tempValueIRI ex:temperatureValue ?tempValue . "
+                    + "FILTER (?precipValue > 0) "
+                    + "FILTER (?tempValue > 15) "
+                    + "}";
 
     private static final String weatherColdQuery =
-            "REGISTER QUERY weatherContextIsRainingAndCold AS "
+            "REGISTER QUERY weatherContextIsCold AS "
                     + "PREFIX ex: <http://ie.cs.mdx.ac.uk/POSEIDON/envir#> "
-                    + "CONSTRUCT {ex:weather <http://ie/mdc.ac.uk/POSEIDON/context/is> \"WEATHER_RAININGANDCOLD\" } "
-                    + "FROM STREAM <http://poseidon-project.org/context-stream> [RANGE 4s STEP 4s] "
-                    + "WHERE { ?m ex:hasTemperatureValue ?tempValueIRI ."
-                    + " ?m ex:hasPrecipitationValue ?precipValueIRI . "
-                    + " ?precipValueIRI ex:percipitationValue ?precipValue . "
-                    + " ?tempValueIRI ex:temperatureValue ?tempValue . "
-                    + " FILTER (?precipValue < 0) "
+                    + "CONSTRUCT { ex:weather <http://ie.cs.mdx.ac.uk/POSEIDON/context/is> \"WEATHER_COLD\" } "
+                    + "FROM STREAM <http://poseidon-project.org/context-stream> [RANGE 10s STEP 4s] "
+                    + "WHERE { ?m ex:hasTemperatureValue ?tempValueIRI . "
+                    + "?m ex:hasPrecipitationValue ?precipValueIRI . "
+                    + "?precipValueIRI ex:precipitationValue ?precipValue . "
+                    + "?tempValueIRI ex:temperatureValue ?tempValue . "
+                    + " FILTER (?precipValue < 0.1) "
                     + " FILTER (?tempValue < 15) "
-                    +"}";
+                    + "}";
+
+    private static final String weatherHotQuery =
+            "REGISTER QUERY weatherContextIsCold AS "
+                    + "PREFIX ex: <http://ie.cs.mdx.ac.uk/POSEIDON/envir#> "
+                    + "CONSTRUCT { ex:weather <http://ie.cs.mdx.ac.uk/POSEIDON/context/is> \"WEATHER_COLD\" } "
+                    + "FROM STREAM <http://poseidon-project.org/context-stream> [RANGE 10s STEP 4s] "
+                    + "WHERE { ?m ex:hasTemperatureValue ?tempValueIRI . "
+                    + "?m ex:hasPrecipitationValue ?precipValueIRI . "
+                    + "?precipValueIRI ex:precipitationValue ?precipValue . "
+                    + "?tempValueIRI ex:temperatureValue ?tempValue . "
+                    + " FILTER (?precipValue < 0.1) "
+                    + " FILTER (?tempValue > 25) "
+                    + "}";
 
     public ContextMapper(ContextReasonerCore crc, OntologyManager on) {
 
@@ -122,27 +135,39 @@ public class ContextMapper {
             registerLightContext();
         } else if (context.equals("weather")) {
             registerWeatherContext(parameters);
+        } else if (context.equals("indoors/outdoors")) {
+            registerIndoorOutdoorsContext();
         }
 
         return true;
     }
 
+    private void registerIndoorOutdoorsContext() {
+        mContextManager.addObserverRequirement("engine", "GPSIndoorOutdoorContext");
+    }
+
+    private void unRegisterIndoorOutdoorsContext() {
+        mContextManager.removeObserverRequirement("engine", "GPSIndoorOutdoorContext");
+    }
+
     private void registerWeatherContext(Map parameters) {
-        mContextManager.addObserverRequirementWithParameters("engine", "BadWeatherContext", parameters);
         CsparqlQueryResultProxy c1 = mOntologyManager.registerCSPARQLQuery(weatherRainingAndColdQuery);
         CsparqlQueryResultProxy c2 = mOntologyManager.registerCSPARQLQuery(weatherColdQuery);
         CsparqlQueryResultProxy c3 = mOntologyManager.registerCSPARQLQuery(weatherRainingQuery);
+        CsparqlQueryResultProxy c4 = mOntologyManager.registerCSPARQLQuery(weatherHotQuery);
         rules.put(weatherRainingAndColdQuery, c1);
         rules.put(weatherColdQuery, c2);
         rules.put(weatherRainingQuery, c3);
-
+        rules.put(weatherHotQuery, c4);
+        mContextManager.addObserverRequirementWithParameters("engine", "LocationWeatherContext", parameters);
     }
 
     private void unRegisterWeatherContext() {
-        mContextManager.removeObserverRequirement("engine", "BadWeatherContext");
+        mContextManager.removeObserverRequirement("engine", "LocationWeatherContext");
         mOntologyManager.unregisterCSPARQLQuery(rules.remove(weatherRainingAndColdQuery).getId());
         mOntologyManager.unregisterCSPARQLQuery(rules.remove(weatherColdQuery).getId());
         mOntologyManager.unregisterCSPARQLQuery(rules.remove(weatherRainingQuery).getId());
+        mOntologyManager.unregisterCSPARQLQuery(rules.remove(weatherHotQuery).getId());
     }
 
     public boolean unregisterContext(String context, Map parameters) {
@@ -153,6 +178,8 @@ public class ContextMapper {
             unRegisterLightContext();
         } else if (context.equals("weather")) {
             unRegisterWeatherContext();
+        } else if (context.equals("indoor/outdoor")) {
+            unRegisterIndoorOutdoorsContext();
         }
 
         return true;

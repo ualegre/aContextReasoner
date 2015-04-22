@@ -23,6 +23,8 @@ import org.poseidon_project.contexts.ContextReceiver;
 import org.poseidon_project.contexts.IContextManager;
 import org.poseidon_project.contexts.IOntologyManager;
 import org.poseidon_project.contexts.UIEvent;
+import org.poseidon_project.contexts.envir.weather.source.Precipitation;
+import org.poseidon_project.contexts.envir.weather.source.Temperature;
 import org.poseidon_project.contexts.envir.weather.source.Weather;
 import org.poseidon_project.contexts.envir.weather.source.WeatherPeriod;
 
@@ -116,18 +118,26 @@ public class POSEIDONReceiver extends ContextReceiver{
             if (period != null ){
                 long time = System.currentTimeMillis();
 
+                String iri = "http://ie.cs.mdx.ac.uk/POSEIDON/";
+
                 //WeatherPeriod
-                ontologyManager.updateValues("envir#w1", "envir#hasTemperatureValue", "envir#t1", time);
-                ontologyManager.updateValues("envir#w1", "envir#hasPrecipitationValue", "envir#p1", time);
+                ontologyManager.updateValues("envir#w1", "envir#hasTemperatureValue", iri + "envir#t1", time);
+                ontologyManager.updateValues("envir#w1", "envir#hasPrecipitationValue", iri + "envir#p1", time);
 
-                //Temperature
-                ontologyManager.updateValues("envir#t1", "envir#temperatureValue", period.getTemperature().getCurrentValue() + "^^http://www.w3.org/2001/XMLSchema#integer", time);
+                //Temperature - First lets be sure it is in the units we need!
+                Temperature temp = period.getTemperature();
+                temp.setTemperatureUnit(Temperature.Unit.C);
+                ontologyManager.updateValues("envir#t1", "envir#temperatureValue", temp.getCurrentValue() + "^^http://www.w3.org/2001/XMLSchema#integer", time);
+                //ontologyManager.updateValues("envir#t1", "envir#temperatureUnit", iri + "envir#C", time);
 
-                //Rain
-                ontologyManager.updateValues("envir#p1", "envir#precipitationValue", period.getPrecipitation().getValue() + "^^http://www.w3.org/2001/XMLSchema#integer", time);
+                //Rain - First lets be sure it is in the units we need!
+                Precipitation precip = period.getPrecipitation();
+                precip.setPrecipitationUnit(Precipitation.Unit.MM);
+                ontologyManager.updateValues("envir#p1", "envir#precipitationValue", precip.getValue() + "^^http://www.w3.org/2001/XMLSchema#float", time);
+                //ontologyManager.updateValues("envir#p1", "envir#precipitationUnit", iri + "envir#MilliMeter", time);
+                //ontologyManager.updateValues("envir#p1", "envir#precipitationHoursValue", precip.getHours() + "^^http://www.w3.org/2001/XMLSchema#integer", time);
+                //Log.e("test", "temp= " + temp.getCurrentValue() + " precip= " + precip.getValue() + " hours= " + precip.getHours());
             }
-
-
 
         }
     }

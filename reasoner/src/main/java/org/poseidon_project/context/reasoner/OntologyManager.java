@@ -59,7 +59,7 @@ import eu.larkc.csparql.core.engine.CsparqlQueryResultProxy;
 public class OntologyManager implements IOntologyManager{
 
     private Context mContext;
-    private OntModel mModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
+    private OntModel mModel;
     private static final String LOGTAG  = "OntologyManager";
     private static final String ONTOLOGY_PREFS = "OntologyPrefs";
     private ContextReasonerCore mReasonerCore;
@@ -75,8 +75,12 @@ public class OntologyManager implements IOntologyManager{
         mContext = context;
         mReasonerCore = core;
         runFirstTime();
+
+        /* Not currently used, pointless loading unless we use this.
+        mModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
         loadMappingFiles();
         loadOntologies();
+        */
 
         startCSPARQL();
 
@@ -101,7 +105,7 @@ public class OntologyManager implements IOntologyManager{
 
         CsparqlQueryResultProxy queryResultProxy = null;
         try {
-            queryResultProxy = mCsparqlEngine.registerQuery(query, true);
+            queryResultProxy = mCsparqlEngine.registerQuery(query, false);
             queryResultProxy.addObserver(mContextRuleObserver);
 
         } catch (final ParseException e) {
@@ -130,11 +134,19 @@ public class OntologyManager implements IOntologyManager{
 
     }
 
-    private void loadOntologies() {
+    private boolean loadOntologies() {
+
         //Read and Open all POSEIDON Related Ontologies
-        for (String uri : POSEIDONOntologies.ONTOLOGIES_ARRAY) {
-            mModel.read(uri);
+        if (mModel == null) {
+            Log.e(LOGTAG, "Model not initialised, ignoring");
+            return false;
+        } else {
+            for (String uri : POSEIDONOntologies.ONTOLOGIES_ARRAY) {
+                mModel.read(uri);
+            }
+            return true;
         }
+
     }
 
     private void runFirstTime() {
@@ -219,26 +231,46 @@ public class OntologyManager implements IOntologyManager{
 
     }
 
-    public void parseURLtoFileMappingFile(InputStream in) {
+    public boolean parseURLtoFileMappingFile(InputStream in) {
 
+        boolean result = true;
         OntologyFileMapParser parser = new OntologyFileMapParser(in);
         HashMap<String, String> toBeMapped = parser.parse();
 
         for(Map.Entry<String, String> entry : toBeMapped.entrySet()) {
-            mapOntologyURLtoFile(entry.getKey(), entry.getValue());
+            if (! mapOntologyURLtoFile(entry.getKey(), entry.getValue()) ) {
+                result = false;
+            }
+        }
+
+        return result;
+
+    }
+
+    public boolean mapOntologyURLtoFile(String url, String fileLocation) {
+
+        if (mModel == null) {
+            Log.e(LOGTAG, "Model not initialised, ignoring");
+            return false;
+        } else {
+            OntDocumentManager dm = mModel.getDocumentManager();
+            dm.addAltEntry(url, "file:" + fileLocation);
+            return true;
         }
 
     }
 
-    public void mapOntologyURLtoFile(String url, String fileLocation) {
-        OntDocumentManager dm = mModel.getDocumentManager();
-        dm.addAltEntry(url, "file:" + fileLocation);
 
-    }
+    public boolean runSPARQLQuery(String queryText) {
 
+        if (mModel == null) {
+            Log.e(LOGTAG, "Model not initialised, ignoring");
+            return false;
+        } else {
+            runSPARQLQuery(queryText, mModel);
+            return true;
+        }
 
-    public void runSPARQLQuery(String queryText) {
-        runSPARQLQuery(queryText, mModel);
     }
 
     public void runSPARQLQuery(String queryText, OntModel model) {

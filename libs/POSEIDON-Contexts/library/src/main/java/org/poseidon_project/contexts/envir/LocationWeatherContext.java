@@ -21,6 +21,7 @@ import org.poseidon_project.contexts.envir.weather.openweathermap.OpenWeatherMap
 import org.poseidon_project.contexts.envir.weather.source.Weather;
 
 import android.content.Context;
+import android.location.Location;
 import android.util.Log;
 
 import java.util.HashMap;
@@ -35,7 +36,9 @@ public class LocationWeatherContext extends TimerContext{
 	private OpenWeatherMapSource mWeatherSource;
 	private Weather mCurrentWeather;
 	private String mPlace;
+	private Location mLocationPlace;
 	private boolean mFirstTime = true;
+	private boolean mIsStrings = true;
 
 	public LocationWeatherContext(Context c, ContextReceiver cr) {
 		super(c, cr, 2000, "LocationWeatherContext");
@@ -48,12 +51,28 @@ public class LocationWeatherContext extends TimerContext{
 		mWeatherSource = new OpenWeatherMapSource();
 	}
 
+	public LocationWeatherContext(Context c, ContextReceiver cr, Location place) {
+		super(c, cr, 2000, "LocationWeatherContext");
+		mLocationPlace = place;
+		mIsStrings = false;
+		mWeatherSource = new OpenWeatherMapSource();
+	}
+
     @Override
     public boolean setContextParameters(HashMap<String, Object> parameters) {
         if (super.setContextParameters(parameters)) {
-            String place = (String) parameters.get("place");
-            mPlace = place;
-            return true;
+            String stringPlace = (String) parameters.get("place");
+			Location locationPlace = (Location) parameters.get("location");
+			if ( stringPlace != null && locationPlace == null ) {
+				setPlace(stringPlace);
+				return true;
+			} else if ( stringPlace == null && locationPlace != null) {
+				setPlace(locationPlace);
+				return true;
+			} else {
+				Log.e(mName, "You shouldn't send both Location and String places!");
+				return false;
+			}
         } else {
             return false;
         }
@@ -63,7 +82,13 @@ public class LocationWeatherContext extends TimerContext{
     @Override
 	protected void checkContext() {
 		try {
-			mCurrentWeather = mWeatherSource.query(mPlace,0);
+
+			if (mIsStrings) {
+				mCurrentWeather = mWeatherSource.query(mPlace,0);
+			} else {
+				mCurrentWeather = mWeatherSource.query(mLocationPlace, 0);
+			}
+
 			mReceiver.newContextValue("weather", mCurrentWeather);
 
 			if (mFirstTime) {
@@ -72,7 +97,7 @@ public class LocationWeatherContext extends TimerContext{
 				setInterval(1800000);
 			}
 		} catch (ContextException e) {
-			Log.e("LocationWeatherContext", e.toString());
+			Log.e(mName, e.toString());
 		}
 
 	}
@@ -80,7 +105,7 @@ public class LocationWeatherContext extends TimerContext{
     @Override
     public boolean start() {
         if (mPlace == null) {
-            Log.e("LocationWeatherContext", "No locations to monitor!");
+            Log.e(mName, "No locations to monitor!");
             return false;
         } else {
             return super.start();
@@ -93,6 +118,14 @@ public class LocationWeatherContext extends TimerContext{
 
 	public void setPlace(String place) {
 		mPlace = place;
+		mLocationPlace = null;
+		mIsStrings = true;
+	}
+
+	public void setPlace(Location place) {
+		mLocationPlace = place;
+		mPlace = null;
+		mIsStrings = false;
 	}
 
 }

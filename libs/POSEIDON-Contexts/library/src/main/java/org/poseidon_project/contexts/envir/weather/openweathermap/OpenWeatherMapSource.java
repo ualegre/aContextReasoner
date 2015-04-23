@@ -16,6 +16,9 @@ package org.poseidon_project.contexts.envir.weather.openweathermap;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import org.apache.http.client.methods.HttpGet;
 import org.json.JSONException;
@@ -70,6 +73,8 @@ public class OpenWeatherMapSource extends HttpWeatherSource implements WeatherSo
 		if (place == null) {
 			throw new ContextException("Null location object");
 		}
+		
+		place = sanitizeString(place);
 
 		JSONObject json;
 		Weather weather = new Weather();
@@ -88,6 +93,23 @@ public class OpenWeatherMapSource extends HttpWeatherSource implements WeatherSo
 			return parser.parseData();
 		}
 
+	}
+
+	private static String sanitizeString(String place) {
+
+		String[] placeSections = place.split(",");
+
+		StringBuilder sanitizedString = new StringBuilder();
+
+		for (String section : placeSections) {
+			if (sanitizedString.length() > 0) {
+				sanitizedString.append(",");
+			}
+
+			sanitizedString.append(section.trim());
+		}
+
+		return sanitizedString.toString();
 	}
 
 	public JSONObject queryCurrentWeather(String place) throws ContextException {

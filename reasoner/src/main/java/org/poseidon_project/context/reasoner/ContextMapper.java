@@ -17,6 +17,7 @@
 package org.poseidon_project.context.reasoner;
 
 import android.os.storage.OnObbStateChangeListener;
+import android.util.Log;
 
 import org.poseidon_project.context.ContextReasonerCore;
 import org.poseidon_project.context.management.ContextManager;
@@ -37,6 +38,7 @@ public class ContextMapper {
     private ContextManager mContextManager;
     private OntologyManager mOntologyManager;
     private HashMap<String, CsparqlQueryResultProxy> rules = new HashMap<>();
+    private static final String LOGTAG = "ContextMapper";
 
     private static final String batteryLOWQuery =
             "REGISTER STREAM batteryContextIsLOW AS "
@@ -130,27 +132,48 @@ public class ContextMapper {
         }
 
         if (context.equals("battery")) {
-            registerBatteryContext();
+            return registerBatteryContext();
         } else if (context.equals("light")) {
-            registerLightContext();
+            return registerLightContext();
         } else if (context.equals("weather")) {
-            registerWeatherContext(parameters);
-        } else if (context.equals("indoors/outdoors")) {
-            registerIndoorOutdoorsContext();
+            return registerWeatherContext(parameters);
+        } else if (context.equals("indoor/outdoor")) {
+            return registerIndoorOutdoorsContext();
         }
 
+        Log.e(LOGTAG, "Context: " + context + " not found!");
+
+        return false;
+    }
+
+    public boolean unregisterContext(String context, Map parameters) {
+
+        if (context.equals("battery")) {
+            return unRegisterBatteryContext();
+        } else if (context.equals("light")) {
+            return unRegisterLightContext();
+        } else if (context.equals("weather")) {
+            return unRegisterWeatherContext();
+        } else if (context.equals("indoor/outdoor")) {
+            return unRegisterIndoorOutdoorsContext();
+        }
+
+        Log.e(LOGTAG, "Context: " + context + " not found!");
+
+        return false;
+    }
+
+    private boolean registerIndoorOutdoorsContext() {
+        mContextManager.addObserverRequirement("engine", "GPSIndoorOutdoorContext");
         return true;
     }
 
-    private void registerIndoorOutdoorsContext() {
-        mContextManager.addObserverRequirement("engine", "GPSIndoorOutdoorContext");
-    }
-
-    private void unRegisterIndoorOutdoorsContext() {
+    private boolean unRegisterIndoorOutdoorsContext() {
         mContextManager.removeObserverRequirement("engine", "GPSIndoorOutdoorContext");
+        return true;
     }
 
-    private void registerWeatherContext(Map parameters) {
+    private boolean registerWeatherContext(Map parameters) {
         CsparqlQueryResultProxy c1 = mOntologyManager.registerCSPARQLQuery(weatherRainingAndColdQuery);
         CsparqlQueryResultProxy c2 = mOntologyManager.registerCSPARQLQuery(weatherColdQuery);
         CsparqlQueryResultProxy c3 = mOntologyManager.registerCSPARQLQuery(weatherRainingQuery);
@@ -160,56 +183,46 @@ public class ContextMapper {
         rules.put(weatherRainingQuery, c3);
         rules.put(weatherHotQuery, c4);
         mContextManager.addObserverRequirementWithParameters("engine", "LocationWeatherContext", parameters);
+        return true;
     }
 
-    private void unRegisterWeatherContext() {
+    private boolean unRegisterWeatherContext() {
         mContextManager.removeObserverRequirement("engine", "LocationWeatherContext");
         mOntologyManager.unregisterCSPARQLQuery(rules.remove(weatherRainingAndColdQuery).getId());
         mOntologyManager.unregisterCSPARQLQuery(rules.remove(weatherColdQuery).getId());
         mOntologyManager.unregisterCSPARQLQuery(rules.remove(weatherRainingQuery).getId());
         mOntologyManager.unregisterCSPARQLQuery(rules.remove(weatherHotQuery).getId());
-    }
-
-    public boolean unregisterContext(String context, Map parameters) {
-
-        if (context.equals("battery")) {
-            unRegisterBatteryContext();
-        } else if (context.equals("light")) {
-            unRegisterLightContext();
-        } else if (context.equals("weather")) {
-            unRegisterWeatherContext();
-        } else if (context.equals("indoor/outdoor")) {
-            unRegisterIndoorOutdoorsContext();
-        }
-
         return true;
     }
 
-    public void registerBatteryContext() {
+    public boolean registerBatteryContext() {
 
         mContextManager.addObserverRequirement("engine", "BatteryContext");
         CsparqlQueryResultProxy c1 = mOntologyManager.registerCSPARQLQuery(batteryLOWQuery);
         CsparqlQueryResultProxy c2 = mOntologyManager.registerCSPARQLQuery(batteryOkQuery);
         rules.put(batteryLOWQuery, c1);
         rules.put(batteryOkQuery, c2);
-
+        return true;
     }
 
-    public void unRegisterBatteryContext() {
+    public boolean unRegisterBatteryContext() {
         mContextManager.removeObserverRequirement("engine", "BatteryContext");
         mOntologyManager.unregisterCSPARQLQuery(rules.remove(batteryLOWQuery).getId());
         mOntologyManager.unregisterCSPARQLQuery(rules.remove(batteryOkQuery).getId());
+        return true;
     }
 
-    public void registerLightContext() {
+    public boolean registerLightContext() {
         mContextManager.addObserverRequirement("engine", "LightContext");
         CsparqlQueryResultProxy c1 = mOntologyManager.registerCSPARQLQuery(lightingLowQuery);
         rules.put("light", c1);
+        return true;
     }
 
-    public void unRegisterLightContext() {
+    public boolean unRegisterLightContext() {
         mContextManager.removeObserverRequirement("engine", "LightContext");
         mOntologyManager.unregisterCSPARQLQuery(rules.remove("light").getId());
+        return true;
     }
 
 

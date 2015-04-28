@@ -37,6 +37,8 @@ import java.util.Map;
  */
 public class POSEIDONReceiver extends ContextReceiver{
 
+    private int mCounter = 1 ;
+
     public POSEIDONReceiver(IContextManager contextManager, IOntologyManager ontologyManager) {
         super(contextManager, ontologyManager);
     }
@@ -52,6 +54,13 @@ public class POSEIDONReceiver extends ContextReceiver{
            } else if (name.equals("sensor.light_lumens")) {
                Log.d("receiver", "Light Context value: " + String.valueOf(value));
                getOntologyManager().updateValues("system#device", "hasLightLevel", strValue);
+           } else if (name.equals("NavState")) {
+               if (mCounter > 999) {
+                   mCounter = 1;
+               }
+
+               getOntologyManager().updateValues("user#pu" + mCounter, "user#hasNavigationStatus", strValue);
+               mCounter++;
            }
     }
 
@@ -66,33 +75,12 @@ public class POSEIDONReceiver extends ContextReceiver{
         String responseString = name;
         String valueString = String.valueOf(value);
 
-           if(name.equals("weather:cold")) {
-               responseString = "badWeather";
+           if (name.equals("sensor.gps_indoor_outdoor")) {
+               responseString = "INDOOR/OUTDOOR";
                if (value) {
-                   valueString = "isCold";
+                   valueString = "ISOUTDOORS";
                } else {
-                   valueString = "isNotCold";
-               }
-           } else if (name.equals("weather:rain")) {
-               responseString = "badWeather";
-               if (value) {
-                   valueString = "isRaining";
-               } else {
-                   valueString = "isNotRaining";
-               }
-           } else if (name.equals("weather:rainAndCold")) {
-               responseString = "badWeather";
-               if (value) {
-                   valueString = "isRainingAndCold";
-               } else {
-                   valueString = "isNotRainingAndCold";
-               }
-           } else if (name.equals("sensor.gps_indoor_outdoor")) {
-               responseString = "indoorOutdoor";
-               if (value) {
-                   valueString = "isOutdoors";
-               } else {
-                   valueString = "isIndoors";
+                   valueString = "ISINDOORS";
                }
            }
 

@@ -39,11 +39,14 @@ public class ContextMapper {
     private OntologyManager mOntologyManager;
     private HashMap<String, CsparqlQueryResultProxy> rules = new HashMap<>();
     private static final String LOGTAG = "ContextMapper";
+    private static final String mColdTemp = "15";
+    private static final String mPrepValue = "0";
+    //private static final String mNumofDev = "3";
 
     private static final String batteryLOWQuery =
             "REGISTER STREAM batteryContextIsLOW AS "
                     + "PREFIX ex: <http://ie.cs.mdx.ac.uk/POSEIDON/system#> "
-                    + "CONSTRUCT { ?s <http://poseidon-project.org/context/is> \"BATTERY_OKAY\"} "
+                    + "CONSTRUCT { ?s <http://poseidon-project.org/context/is> \"BATTERY_LOW\"} "
                     + "FROM STREAM <http://poseidon-project.org/context-stream> [RANGE TRIPLES 1] "
                     + "WHERE { ?s ex:batteryRemaining ?o "
                     + "FILTER ( ?o < 25) }";
@@ -104,9 +107,9 @@ public class ContextMapper {
                     + "}";
 
     private static final String weatherHotQuery =
-            "REGISTER QUERY weatherContextIsCold AS "
+            "REGISTER QUERY weatherContextIsHot AS "
                     + "PREFIX ex: <http://ie.cs.mdx.ac.uk/POSEIDON/envir#> "
-                    + "CONSTRUCT { ex:weather <http://ie.cs.mdx.ac.uk/POSEIDON/context/is> \"WEATHER_COLD\" } "
+                    + "CONSTRUCT { ex:weather <http://ie.cs.mdx.ac.uk/POSEIDON/context/is> \"WEATHER_HOT\" } "
                     + "FROM STREAM <http://poseidon-project.org/context-stream> [RANGE 10s STEP 4s] "
                     + "WHERE { ?m ex:hasTemperatureValue ?tempValueIRI . "
                     + "?m ex:hasPrecipitationValue ?precipValueIRI . "
@@ -115,6 +118,34 @@ public class ContextMapper {
                     + " FILTER (?precipValue < 0.1) "
                     + " FILTER (?tempValue > 25) "
                     + "}";
+
+    private static final String navigationAssistNeededQuery =
+            "REGISTER QUERY needNavigationAssistance AS "
+                    + "PREFIX ex: <http://ie.cs.mdx.ac.uk/POSEIDON/user#> "
+                    + "CONSTRUCT { ex:u1 <http://ie.cs.mdx.ac.uk/POSEIDON/context/is> \"NAV_ASSISTNEEDED\" } "
+                    + "FROM STREAM <http://poseidon-project.org/context-stream> [RANGE 30s Step 10s] "
+                    + " WHERE { ?user ex:hasNavigationStatus ?o . "
+                    + " {"
+                    + " SELECT (COUNT(?user) AS ?num) WHERE { ?user ex:hasNavigationStatus 1 . }"
+                    + " }"
+                    + " FILTER( ?num > 3 || ?o = 2 ) "
+                    + " } ";
+
+    private static final String navigationAssistNotNeededQuery =
+            "REGISTER QUERY needNavigationAssistance AS "
+                    + "PREFIX ex: <http://ie.cs.mdx.ac.uk/POSEIDON/user#> "
+                    + "CONSTRUCT { ex:u1 <http://ie.cs.mdx.ac.uk/POSEIDON/context/is> \"NAV_ASSISTNOTNEEDED\" } "
+                    + "FROM STREAM <http://poseidon-project.org/context-stream> [RANGE 30s Step 10s] "
+                    + " WHERE { ?user ex:hasNavigationStatus ?o . "
+                    + " {"
+                    + " SELECT (COUNT(?user) AS ?numS) WHERE { ?user ex:hasNavigationStatus 1 . }"
+                    + " } . "
+                    + " {"
+                    + " SELECT (COUNT(?user) AS ?numB) WHERE { ?user ex:hasNavigationStatus 2 . }"
+                    + " } . "
+                    + " FILTER( ?numS < 3 && ?numB < 1) "
+                    + " FILTER( ?o = 3) "
+                    + " } ";
 
     public ContextMapper(ContextReasonerCore crc, OntologyManager on) {
 
@@ -139,6 +170,8 @@ public class ContextMapper {
             return registerWeatherContext(parameters);
         } else if (context.equals("indoor/outdoor")) {
             return registerIndoorOutdoorsContext();
+        } else if (context.equals("navassistance")) {
+            return registerNavAssistance();
         }
 
         Log.e(LOGTAG, "Context: " + context + " not found!");
@@ -156,11 +189,27 @@ public class ContextMapper {
             return unRegisterWeatherContext();
         } else if (context.equals("indoor/outdoor")) {
             return unRegisterIndoorOutdoorsContext();
+        } else if (context.equals("navassistance")) {
+            return unRegisterNavAssistance();
         }
 
         Log.e(LOGTAG, "Context: " + context + " not found!");
 
         return false;
+    }
+
+    private boolean registerNavAssistance() {
+        CsparqlQueryResultProxy c1 = mOntologyManager.registerCSPARQLQuery(navigationAssistNeededQuery);
+        CsparqlQueryResultProxy c2 = mOntologyManager.registerCSPARQLQuery(navigationAssistNotNeededQuery);
+        rules.put(navigationAssistNeededQuery, c1);
+        rules.put(navigationAssistNotNeededQuery, c2);
+        return true;
+    }
+
+    private boolean unRegisterNavAssistance() {
+        mOntologyManager.unregisterCSPARQLQuery(rules.remove(navigationAssistNeededQuery).getId());
+        mOntologyManager.unregisterCSPARQLQuery(rules.remove(navigationAssistNotNeededQuery).getId());
+        return true;
     }
 
     private boolean registerIndoorOutdoorsContext() {

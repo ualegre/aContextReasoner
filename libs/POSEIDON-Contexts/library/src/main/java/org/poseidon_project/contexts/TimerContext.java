@@ -31,7 +31,6 @@ public abstract class TimerContext extends ContextObserver{
 	private int mInterval = 2000; //default every 2 seconds
 
 
-
 	public TimerContext(Context c) {
 		super(c);
 	}
@@ -73,12 +72,12 @@ public abstract class TimerContext extends ContextObserver{
 	public boolean start() {
 		mTimer = new Timer();
 
-		mTimer.schedule(new TimerTask() {
+		mTimer.scheduleAtFixedRate(new TimerTask() {
 			@Override
 			public void run() {
 				checkContext();
 			}
-		}, mInterval);
+		}, mInterval, mInterval);
 
 		mIsRunning = true;
 

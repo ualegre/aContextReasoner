@@ -199,9 +199,11 @@ public class ContextManager implements IContextManager{
         List<String> componentInfo = mContextDatabase.getLoadComponentInfo(appId,
                 componentName);
 
-        if (componentInfo.size() > 0) {
-            return loadContextClass(appId, componentName, componentInfo.get(0),
-                    componentInfo.get(1));
+        if (componentInfo != null) {
+            if (componentInfo.size() > 0) {
+                return loadContextClass(appId, componentName, componentInfo.get(0),
+                        componentInfo.get(1));
+            }
         }
 
         return null;

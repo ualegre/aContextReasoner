@@ -118,12 +118,25 @@ public class ContextMapper {
                     + " FILTER (?precipValue < 0.1) "
                     + " FILTER (?tempValue > 25) "
                     + "}";
+    private static final String weatherOkayQuery =
+            "REGISTER QUERY weatherContextIsOkay AS "
+                    + "PREFIX ex: <http://ie.cs.mdx.ac.uk/POSEIDON/envir#> "
+                    + "CONSTRUCT { ex:weather <http://ie.cs.mdx.ac.uk/POSEIDON/context/is> \"WEATHER_OKAY\" } "
+                    + "FROM STREAM <http://poseidon-project.org/context-stream> [RANGE 10s STEP 4s] "
+                    + "WHERE { ?m ex:hasTemperatureValue ?tempValueIRI . "
+                    + "?m ex:hasPrecipitationValue ?precipValueIRI . "
+                    + "?precipValueIRI ex:precipitationValue ?precipValue . "
+                    + "?tempValueIRI ex:temperatureValue ?tempValue . "
+                    + " FILTER (?precipValue < 0.1) "
+                    + " FILTER (?tempValue > 14) "
+                    + " FILTER (?tempValue < 25) "
+                    + "}";
 
     private static final String navigationAssistNeededQuery =
             "REGISTER QUERY needNavigationAssistance AS "
                     + "PREFIX ex: <http://ie.cs.mdx.ac.uk/POSEIDON/user#> "
                     + "CONSTRUCT { ex:u1 <http://ie.cs.mdx.ac.uk/POSEIDON/context/is> \"NAV_ASSISTNEEDED\" } "
-                    + "FROM STREAM <http://poseidon-project.org/context-stream> [RANGE 30s Step 10s] "
+                    + "FROM STREAM <http://poseidon-project.org/context-stream> [RANGE 10m Step 1m] "
                     + " WHERE { ?user ex:hasNavigationStatus ?o . "
                     + " {"
                     + " SELECT (COUNT(?user) AS ?num) WHERE { ?user ex:hasNavigationStatus 1 . }"
@@ -135,7 +148,7 @@ public class ContextMapper {
             "REGISTER QUERY needNavigationAssistance AS "
                     + "PREFIX ex: <http://ie.cs.mdx.ac.uk/POSEIDON/user#> "
                     + "CONSTRUCT { ex:u1 <http://ie.cs.mdx.ac.uk/POSEIDON/context/is> \"NAV_ASSISTNOTNEEDED\" } "
-                    + "FROM STREAM <http://poseidon-project.org/context-stream> [RANGE 30s Step 10s] "
+                    + "FROM STREAM <http://poseidon-project.org/context-stream> [RANGE 10m Step 1m] "
                     + " WHERE { ?user ex:hasNavigationStatus ?o . "
                     + " {"
                     + " SELECT (COUNT(?user) AS ?numS) WHERE { ?user ex:hasNavigationStatus 1 . }"
@@ -146,6 +159,18 @@ public class ContextMapper {
                     + " FILTER( ?numS < 3 && ?numB < 1) "
                     + " FILTER( ?o = 3) "
                     + " } ";
+
+    private static final String isStandstillForLongQuery =
+            "REGISTER QUERY notWalkingFastEnough AS "
+                    + "PREFIX ex: <http://ie.cs.mdx.ac.uk/POSEIDON/user#> "
+                    + "CONSTRUCT { ex:u1 <http://ie.cs.mdx.ac.uk/POSEIDON/context/is> \"isStandStillForLong\" } "
+                    + "FROM STREAM <http://poseidon-project.org/context-stream> [RANGE 5m STEP 20s] "
+                    + "WHERE { ?user ex:hasStepped ?steps . "
+                    + " {"
+                    + " SELECT ( SUM(?steps) AS ?totalSteps ) WHERE { ?user ex:hasStepped ?step . }"
+                    + " }"
+                    + " FILTER( ?totalSteps < 10) "
+                    + " }";
 
     public ContextMapper(ContextReasonerCore crc, OntologyManager on) {
 
@@ -172,6 +197,8 @@ public class ContextMapper {
             return registerIndoorOutdoorsContext();
         } else if (context.equals("navassistance")) {
             return registerNavAssistance();
+        } else if (context.equals("standstill")) {
+            return registerStandstill();
         }
 
         Log.e(LOGTAG, "Context: " + context + " not found!");
@@ -179,7 +206,7 @@ public class ContextMapper {
         return false;
     }
 
-    public boolean unregisterContext(String context, Map parameters) {
+       public boolean unregisterContext(String context, Map parameters) {
 
         if (context.equals("battery")) {
             return unRegisterBatteryContext();
@@ -191,12 +218,29 @@ public class ContextMapper {
             return unRegisterIndoorOutdoorsContext();
         } else if (context.equals("navassistance")) {
             return unRegisterNavAssistance();
+        } else if (context.equals("standstill")) {
+            return unRegisterStandstill();
         }
 
         Log.e(LOGTAG, "Context: " + context + " not found!");
 
         return false;
     }
+
+
+    private boolean registerStandstill() {
+        CsparqlQueryResultProxy c1 = mOntologyManager.registerCSPARQLQuery(isStandstillForLongQuery);
+        rules.put(isStandstillForLongQuery, c1);
+        mContextManager.addObserverRequirement("engine", "StepCounter");
+        return true;
+    }
+
+    private boolean unRegisterStandstill() {
+        mContextManager.removeObserverRequirement("engine", "StepCounter");
+        mOntologyManager.unregisterCSPARQLQuery(rules.remove(isStandstillForLongQuery).getId());
+        return true;
+    }
+
 
     private boolean registerNavAssistance() {
         CsparqlQueryResultProxy c1 = mOntologyManager.registerCSPARQLQuery(navigationAssistNeededQuery);
@@ -227,10 +271,12 @@ public class ContextMapper {
         CsparqlQueryResultProxy c2 = mOntologyManager.registerCSPARQLQuery(weatherColdQuery);
         CsparqlQueryResultProxy c3 = mOntologyManager.registerCSPARQLQuery(weatherRainingQuery);
         CsparqlQueryResultProxy c4 = mOntologyManager.registerCSPARQLQuery(weatherHotQuery);
+        CsparqlQueryResultProxy c5 = mOntologyManager.registerCSPARQLQuery(weatherOkayQuery);
         rules.put(weatherRainingAndColdQuery, c1);
         rules.put(weatherColdQuery, c2);
         rules.put(weatherRainingQuery, c3);
         rules.put(weatherHotQuery, c4);
+        rules.put(weatherOkayQuery, c5);
         mContextManager.addObserverRequirementWithParameters("engine", "LocationWeatherContext", parameters);
         return true;
     }
@@ -241,6 +287,7 @@ public class ContextMapper {
         mOntologyManager.unregisterCSPARQLQuery(rules.remove(weatherColdQuery).getId());
         mOntologyManager.unregisterCSPARQLQuery(rules.remove(weatherRainingQuery).getId());
         mOntologyManager.unregisterCSPARQLQuery(rules.remove(weatherHotQuery).getId());
+        mOntologyManager.unregisterCSPARQLQuery(rules.remove(weatherOkayQuery).getId());
         return true;
     }
 

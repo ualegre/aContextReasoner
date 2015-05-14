@@ -21,6 +21,9 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 
 /**
  * Abstract class for holding everything needed for location based context components
@@ -64,7 +67,8 @@ public abstract class LocationContext extends ContextObserver implements Locatio
 
 	@Override
 	public boolean start() {
-		mLocationManager.requestLocationUpdates(mProvider, mMinTime, mMinDistance, this);
+
+		mLocationManager.requestLocationUpdates(mProvider, mMinTime, mMinDistance,this, Looper.getMainLooper());
 		mIsRunning = true;
 		return true;
 	}

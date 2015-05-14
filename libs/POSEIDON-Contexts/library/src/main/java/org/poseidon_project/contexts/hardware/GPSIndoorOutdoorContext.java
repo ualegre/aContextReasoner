@@ -22,6 +22,8 @@ import android.content.res.Configuration;
 import android.location.GpsSatellite;
 import android.location.GpsStatus;
 import android.location.Location;
+import android.os.Looper;
+import android.util.Log;
 
 /**
  * Calculates if the device is outside comparing the SNR for all visible GPS Satellites.
@@ -32,8 +34,9 @@ public class GPSIndoorOutdoorContext extends LocationContext {
 
 	private final GpsListener gpsListener = new GpsListener();
 	private GpsStatus gpsStatus;
-	private boolean mCurrentValue;
+	private boolean mCurrentValue = false;
     private int signalNeeded;
+    private boolean mFirstTime = true;
 
 	public GPSIndoorOutdoorContext(Context c, ContextReceiver cr) {
 		super(c, cr, 3000, 0, "GPSIndoorOutdoorContext");
@@ -55,7 +58,7 @@ public class GPSIndoorOutdoorContext extends LocationContext {
 	class GpsListener implements GpsStatus.Listener{
 	      @Override
 	      public void onGpsStatusChanged(int event) {
-	        getSatData();
+              getSatData();
 	      }
 	  }
 
@@ -76,9 +79,9 @@ public class GPSIndoorOutdoorContext extends LocationContext {
 
         //Need to make this more accurate
 		if((snr>signalNeeded) && (usedSnrs>4)){
-			if (! mCurrentValue) {
+			if (! mCurrentValue ) {
 				mReceiver.newContextValue("sensor.gps_indoor_outdoor", true);
-				mCurrentValue = !mCurrentValue;
+                mCurrentValue = !mCurrentValue;
 			}
 
 		} else {
@@ -86,6 +89,11 @@ public class GPSIndoorOutdoorContext extends LocationContext {
 				mReceiver.newContextValue("sensor.gps_indoor_outdoor", false);
 				mCurrentValue = !mCurrentValue;
 			}
+
+            if (mFirstTime) {
+                mReceiver.newContextValue("sensor.gps_indoor_outdoor", false);
+                mFirstTime = false;
+            }
 		}
 
 		gpsStatus = mLocationManager.getGpsStatus(gpsStatus);
@@ -93,8 +101,17 @@ public class GPSIndoorOutdoorContext extends LocationContext {
 
 	@Override
 	public boolean start() {
-		super.start();
-		mLocationManager.addGpsStatusListener(gpsListener);
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Looper.prepare();
+                GPSIndoorOutdoorContext.super.start();
+                mLocationManager.addGpsStatusListener(gpsListener);
+                Looper.loop();
+            }
+        }).start();
+
 		return true;
 	}
 

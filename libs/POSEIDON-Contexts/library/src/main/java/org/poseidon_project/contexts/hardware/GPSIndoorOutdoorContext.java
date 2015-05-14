@@ -14,16 +14,15 @@ limitations under the License.
 */
 package org.poseidon_project.contexts.hardware;
 
-import org.poseidon_project.contexts.ContextReceiver;
-import org.poseidon_project.contexts.LocationContext;
-
 import android.content.Context;
 import android.content.res.Configuration;
 import android.location.GpsSatellite;
 import android.location.GpsStatus;
 import android.location.Location;
 import android.os.Looper;
-import android.util.Log;
+
+import org.poseidon_project.contexts.ContextReceiver;
+import org.poseidon_project.contexts.LocationContext;
 
 /**
  * Calculates if the device is outside comparing the SNR for all visible GPS Satellites.

@@ -24,5 +24,6 @@ package org.poseidon_project.contexts;
 public interface IContextManager {
 
     public void sendContextUpdate(String contextName, String contextValue);
+    public void updateContextValue(String contextName, String value);
 
 }

@@ -79,7 +79,8 @@ public class OpenDbHelper extends SQLiteOpenHelper{
         db.execSQL("insert into usable_contexts values (7, 'org.poseidon_project.contexts.hardware', 'LightContext', 'contextengine', 0, 'classes.dex')");
         db.execSQL("insert into usable_contexts values (8, 'org.poseidon_project.contexts.hardware', 'TelephonyContext', 'contextengine', 0, 'classes.dex')");
         db.execSQL("insert into usable_contexts values (9, 'org.poseidon_project.contexts.hardware', 'WifiContext', 'contextengine', 0, 'classes.dex')");
-
+        db.execSQL("insert into usable_contexts values (10, 'org.poseidon_project.contexts.hardware', 'StepCounter', 'contextengine', 0, 'classes.dex')");
+        db.execSQL("insert into usable_contexts values (11, 'org.poseidon_project.contexts.hardware', 'DistanceTravelledContext', 'contextengine', 0, 'classes.dex')");
         //Context Receiver DB
         //Example
         //db.execSQL("insert into usable_receivers values (1, 'org.poseidon_project.context.management', 'POSEIDONReceiver', 'contextengine', 'classes.dex')");

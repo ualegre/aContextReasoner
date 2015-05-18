@@ -23,13 +23,11 @@ import android.util.Log;
 
 import com.hp.hpl.jena.ontology.OntDocumentManager;
 import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
 import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.ResultSet;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
 
 import org.poseidon_project.context.ContextReasonerCore;
 import org.poseidon_project.context.utility.FileOperations;
@@ -37,15 +35,11 @@ import org.poseidon_project.contexts.IOntologyManager;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
-import java.util.logging.Logger;
 
 import eu.larkc.csparql.core.engine.CsparqlEngine;
 import eu.larkc.csparql.core.engine.CsparqlEngineImpl;
@@ -74,9 +68,10 @@ public class OntologyManager implements IOntologyManager{
     public OntologyManager(Context context, ContextReasonerCore core){
         mContext = context;
         mReasonerCore = core;
-        runFirstTime();
 
         /* Not currently used, pointless loading unless we use this.
+        runFirstTime();
+
         mModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
         loadMappingFiles();
         loadOntologies();

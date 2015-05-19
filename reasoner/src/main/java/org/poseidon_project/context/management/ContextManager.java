@@ -27,7 +27,6 @@ import org.poseidon_project.context.database.ContextDBImpl;
 import org.poseidon_project.contexts.ContextObserver;
 import org.poseidon_project.contexts.ContextReceiver;
 import org.poseidon_project.contexts.IContextManager;
-import org.poseidon_project.contexts.IOntologyManager;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -411,5 +410,10 @@ public class ContextManager implements IContextManager{
     public void sendContextUpdate(String contextName, String contextValue) {
 
         mReasonerCore.sendContextResult(contextName, contextValue);
+    }
+
+    @Override
+    public void updateContextValue(String contextName, String value) {
+        mReasonerCore.updateContextValue(contextName, value);
     }
 }

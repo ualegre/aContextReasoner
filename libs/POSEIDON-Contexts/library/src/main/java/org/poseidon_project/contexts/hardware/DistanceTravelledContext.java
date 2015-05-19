@@ -44,8 +44,14 @@ public class DistanceTravelledContext extends LocationContext {
     @Override
     protected void checkContext(Location newLocation) {
 
-        float distance = mLastLocation.distanceTo(newLocation);
-        mTotalDistance += distance;
+        if (mLastLocation != null) {
+            float distance = mLastLocation.distanceTo(newLocation);
+            synchronized (this) {
+                mTotalDistance += distance;
+            }
+        }
+
+        mLastLocation = newLocation;
 
     }
 
@@ -64,9 +70,10 @@ public class DistanceTravelledContext extends LocationContext {
         return super.start();
     }
 
-    private void sendUpdate() {
+    private synchronized void sendUpdate() {
         long distance = Math.round(mTotalDistance);
         mReceiver.newContextValue("device.distancetravelled", distance);
+        mTotalDistance = 0;
     }
 
     @Override

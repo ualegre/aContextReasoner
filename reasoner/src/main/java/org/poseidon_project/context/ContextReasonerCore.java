@@ -118,4 +118,8 @@ public class ContextReasonerCore {
             }
         }
     }
+
+    public void removeContextValue(String contextName) {
+        mContextValues.remove(contextName);
+    }
 }

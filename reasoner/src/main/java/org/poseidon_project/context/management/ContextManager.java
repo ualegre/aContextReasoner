@@ -84,7 +84,7 @@ public class ContextManager implements IContextManager{
         ContextObserver observer = mActiveContexts.get(observerName);
 
         if (observer != null) {
-            Log.v(LOGTAG, "Observer already running, adding requirement");
+            Log.v(LOGTAG, "Observer " + observerName + " already running, adding requirement");
             observer.addRequiringApp(appkey);
             return true;
         } else {
@@ -104,11 +104,11 @@ public class ContextManager implements IContextManager{
 
         if (observer != null) {
             if (! observer.isARequiringApp(observerName) ) {
-                Log.e(LOGTAG, "Observer is not needed by app");
+                Log.e(LOGTAG, "Observer " + observerName + " is not needed by app");
                 return false;
             } else {
                 if (! observer.isRunning()) {
-                    Log.v(LOGTAG, "Observer is running already");
+                    Log.v(LOGTAG, "Observer " + observerName + " is running already");
                     return false;
                 } else {
                     observer.start();
@@ -116,7 +116,7 @@ public class ContextManager implements IContextManager{
                 }
             }
         } else {
-            Log.e(LOGTAG, "Observer needs to be loaded first");
+            Log.e(LOGTAG, "Observer " + observerName + " needs to be loaded first");
             return false;
         }
     }
@@ -128,7 +128,7 @@ public class ContextManager implements IContextManager{
             observer.removeRequiringApp(appkey);
 
             if (observer.numberOfRequiringApps()<1) {
-                Log.v(LOGTAG, "Observer no longer needed, shutting down");
+                Log.v(LOGTAG, "Observer " + observerName + " no longer needed, shutting down");
                 if (observer.isRunning()) {
                     observer.stop();
                 }
@@ -141,7 +141,7 @@ public class ContextManager implements IContextManager{
 
             return true;
         } else {
-            Log.v(LOGTAG, "Observer not running! Ignoring");
+            Log.v(LOGTAG, "Observer " + observerName + " not running! Ignoring");
             return false;
         }
     }
@@ -392,7 +392,7 @@ public class ContextManager implements IContextManager{
         ContextObserver observer = mActiveContexts.get(observerName);
 
         if (observer != null) {
-            Log.v(LOGTAG, "Observer already running, adding requirement");
+            Log.v(LOGTAG, "Observer " + observerName + " already running, adding requirement");
             observer.addRequiringApp(appkey);
             return true;
         } else {

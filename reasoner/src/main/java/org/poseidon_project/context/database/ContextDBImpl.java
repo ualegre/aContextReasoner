@@ -250,7 +250,7 @@ public class ContextDBImpl implements ContextDB{
     @Override
     public long endContextComponentUse(long id, String name, String date) {
 
-        String where = "id=?";
+        String where = "_id=?";
         String[] whereargs = new String[] { String.valueOf(id) };
 
         try {

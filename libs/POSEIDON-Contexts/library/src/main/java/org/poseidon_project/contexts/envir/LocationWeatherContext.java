@@ -14,15 +14,15 @@ limitations under the License.
 */
 package org.poseidon_project.contexts.envir;
 
+import android.content.Context;
+import android.location.Location;
+import android.util.Log;
+
 import org.poseidon_project.contexts.ContextException;
 import org.poseidon_project.contexts.ContextReceiver;
 import org.poseidon_project.contexts.TimerContext;
 import org.poseidon_project.contexts.envir.weather.openweathermap.OpenWeatherMapSource;
 import org.poseidon_project.contexts.envir.weather.source.Weather;
-
-import android.content.Context;
-import android.location.Location;
-import android.util.Log;
 
 import java.util.HashMap;
 
@@ -65,9 +65,11 @@ public class LocationWeatherContext extends TimerContext{
 			Location locationPlace = (Location) parameters.get("location");
 			if ( stringPlace != null && locationPlace == null ) {
 				setPlace(stringPlace);
+				Log.e(mName, "setting place para with: " + stringPlace);
 				return true;
 			} else if ( stringPlace == null && locationPlace != null) {
 				setPlace(locationPlace);
+				Log.e(mName, "setting location para with: " + locationPlace.toString());
 				return true;
 			} else {
 				Log.e(mName, "You shouldn't send both Location and String places!");
@@ -104,8 +106,8 @@ public class LocationWeatherContext extends TimerContext{
 
     @Override
     public boolean start() {
-        if (mPlace == null) {
-            Log.e(mName, "No locations to monitor!");
+        if (mPlace == null && mLocationPlace == null) {
+            Log.e(mName, "No location/place to monitor!");
             return false;
         } else {
             return super.start();

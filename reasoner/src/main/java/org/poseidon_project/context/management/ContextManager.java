@@ -372,6 +372,7 @@ public class ContextManager implements IContextManager{
             co = null;
         }
 
+        mContext.unregisterReceiver(mExternalContextReceiver);
         return true;
     }
 

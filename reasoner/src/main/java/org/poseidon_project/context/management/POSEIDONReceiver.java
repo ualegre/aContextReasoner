@@ -18,7 +18,6 @@ package org.poseidon_project.context.management;
 
 import android.util.Log;
 
-import org.openrdf.query.algebra.Str;
 import org.poseidon_project.contexts.ContextReceiver;
 import org.poseidon_project.contexts.IContextManager;
 import org.poseidon_project.contexts.IOntologyManager;
@@ -61,6 +60,12 @@ public class POSEIDONReceiver extends ContextReceiver{
 
                getOntologyManager().updateValues("user#pu" + mCounter, "user#hasNavigationStatus", strValue);
                mCounter++;
+           } else if (name.equals("device.stepcounter")) {
+               getOntologyManager().updateValues("user#pu", "user#hasStepped", strValue);
+               Log.d("Steps", strValue);
+           } else if (name.equals("device.distancetravelled")) {
+               getOntologyManager().updateValues("user#pu", "user#hasMoved", strValue);
+               Log.d("Moved", strValue);
            }
     }
 
@@ -82,9 +87,11 @@ public class POSEIDONReceiver extends ContextReceiver{
                } else {
                    valueString = "ISINDOORS";
                }
+
+               getContextManager().updateContextValue(responseString, valueString);
            }
 
-           getContextManager().sendContextUpdate(responseString, valueString);
+
     }
 
     @Override

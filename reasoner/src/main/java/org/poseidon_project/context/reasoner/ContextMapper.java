@@ -16,7 +16,6 @@
 
 package org.poseidon_project.context.reasoner;
 
-import android.os.storage.OnObbStateChangeListener;
 import android.util.Log;
 
 import org.poseidon_project.context.ContextReasonerCore;
@@ -163,13 +162,35 @@ public class ContextMapper {
     private static final String isStandstillForLongQuery =
             "REGISTER QUERY notWalkingFastEnough AS "
                     + "PREFIX ex: <http://ie.cs.mdx.ac.uk/POSEIDON/user#> "
-                    + "CONSTRUCT { ex:u1 <http://ie.cs.mdx.ac.uk/POSEIDON/context/is> \"isStandStillForLong\" } "
-                    + "FROM STREAM <http://poseidon-project.org/context-stream> [RANGE 5m STEP 20s] "
-                    + "WHERE { ?user ex:hasStepped ?steps . "
-                    + " {"
-                    + " SELECT ( SUM(?steps) AS ?totalSteps ) WHERE { ?user ex:hasStepped ?step . }"
-                    + " }"
-                    + " FILTER( ?totalSteps < 10) "
+                    + "CONSTRUCT { ex:u1 <http://ie.cs.mdx.ac.uk/POSEIDON/context/is> \"STANDSTILL_LONG\" } "
+                    + "FROM STREAM <http://poseidon-project.org/context-stream> [RANGE 5m STEP 1m] "
+                    + " WHERE { ?user ex:hasMoved ?distance . "
+                    //+ " ?user ex:hasStepped ?step . "
+                    + " { "
+                    + " SELECT ( SUM(?distance) AS ?totalDistance ) WHERE { ?user ex:hasMoved ?distance . } "
+                    + " } . "
+                    //+ " { "
+                    //+ " SELECT ( SUM(?step) AS ?totalSteps ) WHERE { ?user ex:hasStepped ?step . } "
+                    //+ " } . "
+                    + " FILTER ( ?totalDistance < 15) "
+                    //+ " FILTER ( ?totalSteps < 10) "
+                    + " }";
+
+    private static final String isStandstillForShortQuery =
+            "REGISTER QUERY isWalkingFastEnough AS "
+                    + "PREFIX ex: <http://ie.cs.mdx.ac.uk/POSEIDON/user#> "
+                    + "CONSTRUCT { ex:u1 <http://ie.cs.mdx.ac.uk/POSEIDON/context/is> \"STANDSTILL_SHORT\" } "
+                    + "FROM STREAM <http://poseidon-project.org/context-stream> [RANGE 5m STEP 1m] "
+                    + " WHERE { ?user ex:hasMoved ?distance . "
+                    //+ " ?user ex:hasStepped ?step . "
+                    + " { "
+                    + " SELECT ( SUM(?distance) AS ?totalDistance ) WHERE { ?user ex:hasMoved ?distance . } "
+                    + " } . "
+                    //+ " { "
+                    //+ " SELECT ( SUM(?steps) AS ?totalSteps ) WHERE { ?user ex:hasStepped ?step . } "
+                    //+ " } . "
+                    + " FILTER( ?totalDistance > 14) "
+                    //+ " FILTER( ?totalSteps > 20) "
                     + " }";
 
     public ContextMapper(ContextReasonerCore crc, OntologyManager on) {
@@ -230,82 +251,261 @@ public class ContextMapper {
 
     private boolean registerStandstill() {
         CsparqlQueryResultProxy c1 = mOntologyManager.registerCSPARQLQuery(isStandstillForLongQuery);
+        CsparqlQueryResultProxy c2 = mOntologyManager.registerCSPARQLQuery(isStandstillForShortQuery);
         rules.put(isStandstillForLongQuery, c1);
-        mContextManager.addObserverRequirement("engine", "StepCounter");
+        rules.put(isStandstillForShortQuery,c2);
+        //mContextManager.addObserverRequirement("engine", "StepCounter");
+        mContextManager.addObserverRequirement("engine", "DistanceTravelledContext");
         return true;
     }
 
     private boolean unRegisterStandstill() {
-        mContextManager.removeObserverRequirement("engine", "StepCounter");
-        mOntologyManager.unregisterCSPARQLQuery(rules.remove(isStandstillForLongQuery).getId());
-        return true;
+        boolean okExit = true;
+
+        //mContextManager.removeObserverRequirement("engine", "StepCounter");
+        mContextManager.removeObserverRequirement("engine", "DistanceTravelledContext");
+
+        CsparqlQueryResultProxy c1 = rules.remove(isStandstillForLongQuery);
+        CsparqlQueryResultProxy c2 = rules.remove(isStandstillForShortQuery);
+
+        if (c1 != null) {
+            mOntologyManager.unregisterCSPARQLQuery(c1.getId());
+        } else {
+            okExit = false;
+            Log.e(LOGTAG, "isStandstillForLongQuery was not registered");
+        }
+
+
+        if (c2 != null) {
+            mOntologyManager.unregisterCSPARQLQuery(c2.getId());
+        } else {
+            okExit = false;
+            Log.e(LOGTAG, "isStandstillForShortQuery was not registered");
+        }
+
+        mReasonerCore.removeContextValue("STANDSTILL");
+
+        return okExit;
     }
 
 
     private boolean registerNavAssistance() {
+        boolean okExit = true;
+
         CsparqlQueryResultProxy c1 = mOntologyManager.registerCSPARQLQuery(navigationAssistNeededQuery);
         CsparqlQueryResultProxy c2 = mOntologyManager.registerCSPARQLQuery(navigationAssistNotNeededQuery);
-        rules.put(navigationAssistNeededQuery, c1);
-        rules.put(navigationAssistNotNeededQuery, c2);
-        return true;
+
+        if (c1 != null) {
+            rules.put(navigationAssistNeededQuery, c1);
+        } else {
+            okExit = false;
+            Log.e(LOGTAG, "navigationAssistNeededQuery couldn't register");
+        }
+
+        if (c2 != null) {
+            rules.put(navigationAssistNotNeededQuery, c2);
+        } else {
+            okExit = false;
+            Log.e(LOGTAG, "navigationAssistNotNeededQuery couldn't register");
+        }
+
+        return okExit;
     }
 
     private boolean unRegisterNavAssistance() {
-        mOntologyManager.unregisterCSPARQLQuery(rules.remove(navigationAssistNeededQuery).getId());
-        mOntologyManager.unregisterCSPARQLQuery(rules.remove(navigationAssistNotNeededQuery).getId());
-        return true;
+
+        boolean okExit = true;
+
+        CsparqlQueryResultProxy c1 = rules.remove(navigationAssistNeededQuery);
+        CsparqlQueryResultProxy c2 = rules.remove(navigationAssistNotNeededQuery);
+
+        if(c1 != null) {
+            mOntologyManager.unregisterCSPARQLQuery(c1.getId());
+        } else {
+            okExit = false;
+            Log.e(LOGTAG, "navigationAssistNeededQuery was not registered");
+        }
+
+        if (c2 != null) {
+            mOntologyManager.unregisterCSPARQLQuery(c2.getId());
+        } else {
+            okExit = false;
+            Log.e(LOGTAG, "navigationAssistNotNeededQuery was not registered");
+        }
+
+        mReasonerCore.removeContextValue("NAV");
+
+        return okExit;
     }
 
     private boolean registerIndoorOutdoorsContext() {
-        mContextManager.addObserverRequirement("engine", "GPSIndoorOutdoorContext");
-        return true;
+
+        return mContextManager.addObserverRequirement("engine", "GPSIndoorOutdoorContext");
     }
 
     private boolean unRegisterIndoorOutdoorsContext() {
-        mContextManager.removeObserverRequirement("engine", "GPSIndoorOutdoorContext");
-        return true;
+
+        boolean okExit = mContextManager.removeObserverRequirement("engine", "GPSIndoorOutdoorContext");
+        mReasonerCore.removeContextValue("INDOOR/OUTDOOR");
+
+        return okExit;
     }
 
     private boolean registerWeatherContext(Map parameters) {
+
+        boolean okExit = true;
+
         CsparqlQueryResultProxy c1 = mOntologyManager.registerCSPARQLQuery(weatherRainingAndColdQuery);
         CsparqlQueryResultProxy c2 = mOntologyManager.registerCSPARQLQuery(weatherColdQuery);
         CsparqlQueryResultProxy c3 = mOntologyManager.registerCSPARQLQuery(weatherRainingQuery);
         CsparqlQueryResultProxy c4 = mOntologyManager.registerCSPARQLQuery(weatherHotQuery);
         CsparqlQueryResultProxy c5 = mOntologyManager.registerCSPARQLQuery(weatherOkayQuery);
-        rules.put(weatherRainingAndColdQuery, c1);
-        rules.put(weatherColdQuery, c2);
-        rules.put(weatherRainingQuery, c3);
-        rules.put(weatherHotQuery, c4);
-        rules.put(weatherOkayQuery, c5);
-        mContextManager.addObserverRequirementWithParameters("engine", "LocationWeatherContext", parameters);
-        return true;
+
+        if (c1 != null) {
+            rules.put(weatherRainingAndColdQuery, c1);
+        } else {
+            okExit = false;
+            Log.e(LOGTAG, "weatherRainingAndColdQuery couldn't register");
+        }
+
+        if (c2 != null) {
+            rules.put(weatherColdQuery, c2);
+        } else {
+            okExit = false;
+            Log.e(LOGTAG, "weatherColdQuery couldn't register");
+        }
+
+        if (c3 != null) {
+            rules.put(weatherRainingQuery, c3);
+        } else {
+            okExit = false;
+            Log.e(LOGTAG, "weatherRainingQuery couldn't register");
+        }
+
+        if (c4 != null) {
+            rules.put(weatherHotQuery, c4);
+        } else {
+            okExit = false;
+            Log.e(LOGTAG, "weatherHotQuery couldn't register");
+        }
+
+        if (c5 != null) {
+            rules.put(weatherOkayQuery, c5);
+        } else {
+            okExit = false;
+            Log.e(LOGTAG, "weatherOkayQuery couldn't register");
+        }
+
+        if (okExit) {
+            return mContextManager.addObserverRequirementWithParameters("engine", "LocationWeatherContext", parameters);
+        } else {
+            return false;
+        }
+
     }
 
     private boolean unRegisterWeatherContext() {
-        mContextManager.removeObserverRequirement("engine", "LocationWeatherContext");
-        mOntologyManager.unregisterCSPARQLQuery(rules.remove(weatherRainingAndColdQuery).getId());
-        mOntologyManager.unregisterCSPARQLQuery(rules.remove(weatherColdQuery).getId());
-        mOntologyManager.unregisterCSPARQLQuery(rules.remove(weatherRainingQuery).getId());
-        mOntologyManager.unregisterCSPARQLQuery(rules.remove(weatherHotQuery).getId());
-        mOntologyManager.unregisterCSPARQLQuery(rules.remove(weatherOkayQuery).getId());
-        return true;
+
+        boolean okExit = mContextManager.removeObserverRequirement("engine", "LocationWeatherContext");
+
+        CsparqlQueryResultProxy c1 = rules.remove(weatherRainingAndColdQuery);
+        CsparqlQueryResultProxy c2 = rules.remove(weatherColdQuery);
+        CsparqlQueryResultProxy c3 = rules.remove(weatherRainingQuery);
+        CsparqlQueryResultProxy c4 = rules.remove(weatherHotQuery);
+        CsparqlQueryResultProxy c5 = rules.remove(weatherOkayQuery);
+
+        if (c1 != null) {
+            mOntologyManager.unregisterCSPARQLQuery(c1.getId());
+        } else {
+            okExit = false;
+            Log.e(LOGTAG, "weaterRainingAndColdQuery was not registered");
+        }
+
+        if (c2 != null) {
+            mOntologyManager.unregisterCSPARQLQuery(c2.getId());
+        } else {
+            okExit = false;
+            Log.e(LOGTAG, "weatherColdQuery was not registered");
+        }
+
+        if (c3 != null) {
+            mOntologyManager.unregisterCSPARQLQuery(c3.getId());
+        } else {
+            okExit = false;
+            Log.e(LOGTAG, "weatherRainingQuery was not registered");
+        }
+
+        if (c4 != null) {
+            mOntologyManager.unregisterCSPARQLQuery(c4.getId());
+        } else {
+            okExit = false;
+            Log.e(LOGTAG, "weatherHotQuery was not registered");
+        }
+
+        if (c5 != null) {
+            mOntologyManager.unregisterCSPARQLQuery(c5.getId());
+        } else {
+            okExit = false;
+            Log.e(LOGTAG, "weatherOkayQuery was not registered");
+        }
+
+        mReasonerCore.removeContextValue("WEATHER");
+
+        return okExit;
     }
 
     public boolean registerBatteryContext() {
 
-        mContextManager.addObserverRequirement("engine", "BatteryContext");
+        boolean okExit = true;
+
         CsparqlQueryResultProxy c1 = mOntologyManager.registerCSPARQLQuery(batteryLOWQuery);
         CsparqlQueryResultProxy c2 = mOntologyManager.registerCSPARQLQuery(batteryOkQuery);
-        rules.put(batteryLOWQuery, c1);
-        rules.put(batteryOkQuery, c2);
-        return true;
+
+        if (c1 != null) {
+            rules.put(batteryLOWQuery, c1);
+        } else {
+            okExit = false;
+            Log.e(LOGTAG, "batteryLOWQuery could't register");
+        }
+
+        if (c2 != null) {
+            rules.put(batteryOkQuery, c2);
+        } else  {
+            okExit = false;
+            Log.e(LOGTAG, "batteryOkQuery couldn't register");
+        }
+
+        if (okExit) {
+            return mContextManager.addObserverRequirement("engine", "BatteryContext");
+        } else {
+            return false;
+        }
     }
 
     public boolean unRegisterBatteryContext() {
-        mContextManager.removeObserverRequirement("engine", "BatteryContext");
-        mOntologyManager.unregisterCSPARQLQuery(rules.remove(batteryLOWQuery).getId());
-        mOntologyManager.unregisterCSPARQLQuery(rules.remove(batteryOkQuery).getId());
-        return true;
+
+        boolean okExit = mContextManager.removeObserverRequirement("engine", "BatteryContext");
+
+        CsparqlQueryResultProxy c1 = rules.remove(batteryLOWQuery);
+        CsparqlQueryResultProxy c2 = rules.remove(batteryOkQuery);
+
+        if (c1 != null) {
+            mOntologyManager.unregisterCSPARQLQuery(c1.getId());
+        } else {
+            okExit = false;
+            Log.e(LOGTAG, "batteryLOWQuery was not registered");
+        }
+
+        if (c2 != null) {
+            mOntologyManager.unregisterCSPARQLQuery(c2.getId());
+        } else {
+            okExit = false;
+            Log.e(LOGTAG, "batteryOkQuery was not registered");
+        }
+
+        mReasonerCore.removeContextValue("BATTERY");
+
+        return okExit;
     }
 
     public boolean registerLightContext() {

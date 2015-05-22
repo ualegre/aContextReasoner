@@ -20,6 +20,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 
 /**
  * Listens for context values being broadcasted from other applications.
@@ -64,6 +65,8 @@ public class ExternalContextReceiver extends BroadcastReceiver {
         } else if (contextType.equalsIgnoreCase("Map")) {
             mContextManager.newExternalContextValue(contextName, bundle.getSerializable(CONTEXT_VALUE));
 
+        } else {
+            Log.e("ExternalContextReceiver", "context type: " + contextType + " is not recongised");
         }
 
     }

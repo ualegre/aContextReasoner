@@ -34,11 +34,11 @@ import java.util.TimerTask;
 public class StepCounter extends SensorContext{
 
     private Timer mTimer;
-    private int mInterval = 5000;
+    private int mInterval = 20000;
 
     private float   mLimit = 10;
     private float   mLastValues[] = new float[3*2];
-    private float   mScale[] = new float[2];
+    private float   mScale;
     private float   mYOffset;
 
     private float   mLastDirections[] = new float[3*2];
@@ -53,22 +53,21 @@ public class StepCounter extends SensorContext{
     }
 
     public StepCounter(Context c, ContextReceiver cr) {
-        super(c, cr, Sensor.TYPE_ACCELEROMETER, SensorManager.SENSOR_DELAY_NORMAL, "StepCounter");
+        super(c, cr, Sensor.TYPE_ACCELEROMETER, SensorManager.SENSOR_DELAY_FASTEST, "StepCounter");
         setupContext();
     }
 
     private void setupContext() {
         int h = 480;
         mYOffset = h * 0.5f;
-        mScale[0] = - (h * 0.5f * (1.0f / (SensorManager.STANDARD_GRAVITY * 2)));
-        mScale[1] = - (h * 0.5f * (1.0f / (SensorManager.MAGNETIC_FIELD_EARTH_MAX)));
+        mScale = - (h * 0.5f * (1.0f / (SensorManager.MAGNETIC_FIELD_EARTH_MAX)));
     }
 
     @Override
     protected void checkContext(float[] values) {
         float vSum = 0;
         for (int i=0 ; i<3 ; i++) {
-            final float v = mYOffset + values[i] * mScale[1];
+            final float v = mYOffset + values[i] * mScale;
             vSum += v;
         }
         int k = 0;

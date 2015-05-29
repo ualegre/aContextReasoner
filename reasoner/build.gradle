@@ -2,14 +2,14 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 21
-    buildToolsVersion "21.1.2"
+    buildToolsVersion "22.0.1"
 
     defaultConfig {
         applicationId "org.poseidon_project.context"
-        minSdkVersion 17
+        minSdkVersion 19
         targetSdkVersion 21
-        versionCode 1
-        versionName "1.0"
+        versionCode 8
+        versionName "0.4.5"
         multiDexEnabled true
     }
 
@@ -45,7 +45,6 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:appcompat-v7:21.0.3'
     compile 'com.android.support:multidex:1.0.0'
     compile project(':libs:POSEIDON-Contexts:library')
 }

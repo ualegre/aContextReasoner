@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.poseidon_project.context.test;
+package org.poseidon_project.context.utility;
 
 
 import android.content.ComponentName;

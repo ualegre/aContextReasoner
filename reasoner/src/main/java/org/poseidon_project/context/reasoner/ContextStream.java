@@ -16,10 +16,6 @@
 
 package org.poseidon_project.context.reasoner;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-
 import eu.larkc.csparql.cep.api.RdfQuadruple;
 import eu.larkc.csparql.cep.api.RdfStream;
 
@@ -29,9 +25,6 @@ import eu.larkc.csparql.cep.api.RdfStream;
  * @author Dean Kramer <d.kramer@mdx.ac.uk>
  */
 public class ContextStream extends RdfStream {
-
-    //For testing
-    protected final Logger mLogger = LoggerFactory.getLogger(ContextStream.class);
 
     private  boolean keepRunning = false;
     private String streamiri = "http://ie.cs.mdx.ac.uk/POSEIDON/";

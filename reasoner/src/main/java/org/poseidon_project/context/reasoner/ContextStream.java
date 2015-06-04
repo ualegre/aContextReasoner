@@ -26,9 +26,7 @@ import eu.larkc.csparql.cep.api.RdfStream;
  */
 public class ContextStream extends RdfStream {
 
-    private  boolean keepRunning = false;
     private String streamiri = "http://ie.cs.mdx.ac.uk/POSEIDON/";
-
 
     public ContextStream(String iri) {
         super(iri);

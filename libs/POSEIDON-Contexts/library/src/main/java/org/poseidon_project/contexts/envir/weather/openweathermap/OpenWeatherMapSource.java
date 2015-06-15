@@ -14,11 +14,7 @@ limitations under the License.
 */
 package org.poseidon_project.contexts.envir.weather.openweathermap;
 
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import android.location.Location;
 
 import org.apache.http.client.methods.HttpGet;
 import org.json.JSONException;
@@ -29,7 +25,8 @@ import org.poseidon_project.contexts.envir.weather.source.HttpWeatherSource;
 import org.poseidon_project.contexts.envir.weather.source.Weather;
 import org.poseidon_project.contexts.envir.weather.source.WeatherSource;
 
-import android.location.Location;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
 /**
  * Class to handle downloading of weather data before getting it parsed.
@@ -106,7 +103,10 @@ public class OpenWeatherMapSource extends HttpWeatherSource implements WeatherSo
 				sanitizedString.append(",");
 			}
 
-			sanitizedString.append(section.trim());
+			section = section.trim();
+			section = section.replace(" ", "%20");
+
+			sanitizedString.append(section);
 		}
 
 		return sanitizedString.toString();

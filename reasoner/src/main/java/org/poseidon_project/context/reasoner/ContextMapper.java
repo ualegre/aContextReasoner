@@ -74,7 +74,7 @@ public class ContextMapper {
                     + "?m ex:hasPrecipitationValue ?precipValueIRI . "
                     + "?precipValueIRI ex:precipitationValue ?precipValue . "
                     + "?tempValueIRI ex:temperatureValue ?tempValue . "
-                    + "FILTER (?precipValue > 0) "
+                    + "FILTER (?precipValue >= 0.1) "
                     + "FILTER (?tempValue < 15) "
                     + "}";
 
@@ -90,7 +90,7 @@ public class ContextMapper {
                     + "?m ex:hasPrecipitationValue ?precipValueIRI . "
                     + "?precipValueIRI ex:precipitationValue ?precipValue . "
                     + "?tempValueIRI ex:temperatureValue ?tempValue . "
-                    + "FILTER (?precipValue > 0) "
+                    + "FILTER (?precipValue >= 0.1) "
                     + "FILTER (?tempValue >= 15) "
                     + "}";
 
@@ -123,7 +123,7 @@ public class ContextMapper {
                     + "?precipValueIRI ex:precipitationValue ?precipValue . "
                     + "?tempValueIRI ex:temperatureValue ?tempValue . "
                     + " FILTER (?precipValue < 0.1) "
-                    + " FILTER (?tempValue > 25) "
+                    + " FILTER (?tempValue >= 25) "
                     + "}";
 
     /*
@@ -167,7 +167,7 @@ public class ContextMapper {
                     + " {"
                     + " SELECT (COUNT(?user) AS ?smallDevNum) WHERE { ?user ex:hasNavigationStatus 2 . }"
                     + " }"
-                    + " FILTER( ?smallDevNum >= 3 || ?o = 2 ) "
+                    + " FILTER( ?smallDevNum >= 3 || ?o = 1 ) "
                     + " } ";
 
     /*

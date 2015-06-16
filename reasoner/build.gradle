@@ -8,8 +8,8 @@ android {
         applicationId "org.poseidon_project.context"
         minSdkVersion 19
         targetSdkVersion 21
-        versionCode 8
-        versionName "0.4.5"
+        versionCode 10
+        versionName "0.5.0"
         multiDexEnabled true
     }
 

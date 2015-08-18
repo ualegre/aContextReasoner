@@ -16,7 +16,6 @@ package org.poseidon_project.contexts.envir.weather.openweathermap;
 
 import android.location.Location;
 
-import org.apache.http.client.methods.HttpGet;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
@@ -27,6 +26,7 @@ import org.poseidon_project.contexts.envir.weather.source.WeatherSource;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 
 /**
  * Class to handle downloading of weather data before getting it parsed.
@@ -190,8 +190,8 @@ public class OpenWeatherMapSource extends HttpWeatherSource implements WeatherSo
 	}
 
 	@Override
-    protected void prepareRequest(HttpGet request) {
-        request.addHeader("X-API-Key", API_KEY);
+    protected void prepareRequest(HttpURLConnection request) {
+		request.addRequestProperty("X-API-Key", API_KEY);
     }
 
 }

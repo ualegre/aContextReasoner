@@ -14,19 +14,15 @@ limitations under the License.
 */
 package org.poseidon_project.contexts.envir.weather.source;
 
+import android.util.Log;
+
+import org.poseidon_project.contexts.ContextException;
+
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
-
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.StatusLine;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.poseidon_project.contexts.ContextException;
-
-import android.util.Log;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 
 public class HttpWeatherSource {
@@ -39,58 +35,45 @@ public class HttpWeatherSource {
 
     static final String USER_AGENT = "POSEIDON-Contexts (Weather)";
 
-    private HttpClient client;
+    private HttpURLConnection client;
 
     private static final String mTag = "POSEIDON-Contexts";
 
 
-    protected InputStreamReader getReaderForURL(String url) throws ContextException {
-        Log.d(mTag, "requesting " + url);
-        HttpGet request;
+    protected InputStreamReader getReaderForURL(String urlString) throws ContextException {
+        Log.d(mTag, "requesting " + urlString);
         try {
-            request = new HttpGet(url);
-            request.setHeader("User-Agent", USER_AGENT);
-            prepareRequest(request);
+            URL url = new URL(urlString);
+            client = (HttpURLConnection) url.openConnection();
+            client.addRequestProperty("User-Agent", USER_AGENT);
+            prepareRequest(client);
         } catch (Exception e) {
         	throw new ContextException("Having difficulty preparing HTTP Request", e);
         }
 
         String charset = ENCODING;
         try {
-            HttpResponse response = getClient().execute(request);
+            client.connect();
 
-            StatusLine status = response.getStatusLine();
-            if (status.getStatusCode() != HTTP_STATUS_OK) {
-                throw new ContextException("Invalid response from server: " +
-                        status.toString());
+            int status = client.getResponseCode();
+            if (status != HTTP_STATUS_OK) {
+                throw  new ContextException("Invalid response from server: " +
+                        String.valueOf(status));
             }
 
-            HttpEntity entity = response.getEntity();
-            charset = HttpUtils.getCharset(entity);
-            InputStreamReader inputStream = new InputStreamReader(entity.getContent(), charset);
+            charset = HttpUtils.getCharset(client);
+
+            InputStreamReader inputStream = new InputStreamReader(client.getInputStream(), charset);
 
             return inputStream;
         } catch (UnsupportedEncodingException uee) {
-            throw new ContextException("unsupported charset: " + charset, uee);
+            throw new ContextException("Unsupported charset: " + charset, uee);
         } catch (IOException e) {
             throw new ContextException("Problem communicating with API", e);
         }
     }
 
 
-    protected void prepareRequest(HttpGet request) {
-    }
-
-
-    HttpClient getClient(){
-        if (this.client == null) {
-            try {
-                this.client = new DefaultHttpClient();
-            } catch (Exception e) {
-                Log.e(mTag, e.toString());
-            }
-        }
-        return this.client;
-    }
+    protected void prepareRequest(HttpURLConnection request) {}
 
 }

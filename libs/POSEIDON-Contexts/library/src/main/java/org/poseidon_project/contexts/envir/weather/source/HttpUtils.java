@@ -14,7 +14,7 @@ limitations under the License.
 */
 package org.poseidon_project.contexts.envir.weather.source;
 
-import org.apache.http.HttpEntity;
+import java.net.HttpURLConnection;
 
 public class HttpUtils {
 
@@ -22,8 +22,8 @@ public class HttpUtils {
 
     }
 
-    public static String getCharset(HttpEntity entity) {
-        return getCharset(entity.getContentType().toString());
+    public static String getCharset(HttpURLConnection conn) {
+        return getCharset(conn.getContentType().toString());
     }
 
     static String getCharset(String contentType) {

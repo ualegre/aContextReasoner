@@ -45,7 +45,10 @@ public class HttpWeatherSource {
         try {
             URL url = new URL(urlString);
             client = (HttpURLConnection) url.openConnection();
+
+            client.setRequestProperty("Accept-Encoding", "identity");
             client.addRequestProperty("User-Agent", USER_AGENT);
+
             prepareRequest(client);
         } catch (Exception e) {
         	throw new ContextException("Having difficulty preparing HTTP Request", e);

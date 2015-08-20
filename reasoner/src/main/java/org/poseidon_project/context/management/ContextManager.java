@@ -91,9 +91,18 @@ public class ContextManager implements IContextManager{
             observer = loadContextClass(appkey, observerName);
 
             if (observer == null) {
+                Log.e(LOGTAG, "Observer " + observerName + " could not be loaded");
                 return false;
             } else {
-                return observer.start();
+
+                if (! observer.start()) {
+                    observer.removeAllRequiringApps();
+                    mActiveContexts.remove(observerName);
+                    observer = null;
+                    return false;
+                } else {
+                    return true;
+                }
             }
         }
     }
@@ -111,8 +120,14 @@ public class ContextManager implements IContextManager{
                     Log.v(LOGTAG, "Observer " + observerName + " is running already");
                     return false;
                 } else {
-                    observer.start();
-                    return true;
+                    if (! observer.start()) {
+                        observer.removeAllRequiringApps();
+                        observer = null;
+                        return false;
+                    } else {
+                        return true;
+                    }
+
                 }
             }
         } else {
@@ -333,6 +348,8 @@ public class ContextManager implements IContextManager{
 
     public void houseClearing() {
 
+
+
         SharedPreferences settings = mContext.getSharedPreferences(CONTEXT_PREFS, 0);
         SharedPreferences.Editor editor = settings.edit();
         editor.putString("lastclearing", mDateFormater.format(mCalendar.getTime()));
@@ -400,10 +417,19 @@ public class ContextManager implements IContextManager{
             observer = loadContextClass(appkey, observerName);
 
             if (observer == null) {
+                Log.e(LOGTAG, "Observer " + observerName + " could not be loaded");
                 return false;
             } else {
                 observer.setContextParameters((HashMap<String, Object>) parameters);
-                return observer.start();
+
+                if (! observer.start()) {
+                    observer.removeAllRequiringApps();
+                    mActiveContexts.remove(observerName);
+                    observer = null;
+                    return false;
+                } else {
+                    return true;
+                }
             }
         }
     }

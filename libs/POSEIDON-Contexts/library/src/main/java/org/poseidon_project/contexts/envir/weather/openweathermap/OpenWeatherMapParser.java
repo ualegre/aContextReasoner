@@ -14,7 +14,7 @@ limitations under the License.
 */
 package org.poseidon_project.contexts.envir.weather.openweathermap;
 
-import java.util.Date;
+import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -27,7 +27,8 @@ import org.poseidon_project.contexts.envir.weather.source.Weather;
 import org.poseidon_project.contexts.envir.weather.source.WeatherPeriod;
 import org.poseidon_project.contexts.envir.weather.source.Wind;
 
-import android.util.Log;
+import java.util.Date;
+import java.util.Iterator;
 
 /**
  * The JSON parser which parses all OpenWeatherMap.org data into our data structures
@@ -138,11 +139,25 @@ public class OpenWeatherMapParser {
 	private Precipitation parsePrecipitation() {
 		Precipitation rain = new Precipitation(Precipitation.Unit.MM);
 		try {
-			float value = (float) mJson.getJSONObject("rain").getDouble("3h");
-			rain.setHours(3);
-			rain.setValue(value);
-		} catch (Exception e) {
+			JSONObject rainObject = mJson.optJSONObject("rain");
 
+			if (rainObject != null) {
+				Iterator<String> keys = rainObject.keys();
+
+				while (keys.hasNext()) {
+					String strHours = keys.next();
+					float value = (float) rainObject.getDouble(strHours);
+					strHours = strHours.substring(0,1);
+					int hours = Integer.valueOf(strHours);
+
+					rain.setHours(hours);
+					rain.setValue(value);
+
+				}
+			}
+
+		} catch (Exception e) {
+			Log.e(LOG_TAG, e.getMessage());
 		}
 		return rain;
 	}

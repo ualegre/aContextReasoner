@@ -15,6 +15,7 @@ limitations under the License.
 
 package org.poseidon_project.context.database;
 
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -41,14 +42,14 @@ public interface ContextDB {
 
     List<String> getLoadComponentInfo(String applicationId, String componentName);
 
-    long startContextComponentUse(String name, String date);
-
-    long endContextComponentUse(long id, String name, String date);
+    boolean newEvents(String[][] events);
 
     int getNumberOfReceivers();
 
     List<String> getContextReceiver(long id);
 
     void closeDB();
+
+    HashMap<Integer, String> getContextAllOwners();
 
 }

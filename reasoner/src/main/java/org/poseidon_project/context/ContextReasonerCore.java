@@ -18,8 +18,10 @@ package org.poseidon_project.context;
 
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 
+import org.poseidon_project.context.database.ContextDB;
+import org.poseidon_project.context.database.ContextDBImpl;
+import org.poseidon_project.context.logging.DebugLogger;
 import org.poseidon_project.context.management.ContextManager;
 import org.poseidon_project.context.reasoner.OntologyManager;
 
@@ -37,19 +39,24 @@ public class ContextReasonerCore {
     private static final String LOGTAG = "ContextService";
     private static final String CONTEXT_NAME = "context_name";
     private static final String CONTEXT_VALUE = "context_value";
+    private ContextDB mContextDatabase;
     private ContextManager mContextManager;
     private OntologyManager mOntologyManager;
     private Context mContext;
     private HashMap<String, String> mContextValues = new HashMap<>();
+    private DebugLogger mLogger;
 
 
     public ContextReasonerCore(Context c) {
-
         mContext = c;
+        mContextDatabase = new ContextDBImpl(mContext);
+        mLogger = new DebugLogger(mContextDatabase);
         mOntologyManager = new OntologyManager(c, this);
-        mContextManager = new ContextManager(c, this);
+        mContextManager = new ContextManager(c, this, mContextDatabase);
 
     }
+
+    public DebugLogger getLogger() { return mLogger;}
 
     public OntologyManager getOntologyManager() {return mOntologyManager;}
 
@@ -88,7 +95,7 @@ public class ContextReasonerCore {
             intent.putExtra(CONTEXT_VALUE, contextValue);
             mContext.sendBroadcast(intent);
         } catch (Exception e) {
-            Log.e(LOGTAG, "Cannot Broadcast Context Change");
+            mLogger.logError(LOGTAG, "Cannot Broadcast Context: " + contextName + " Change");
         }
 
     }
@@ -96,6 +103,9 @@ public class ContextReasonerCore {
     public void onDestroy() {
         mContextManager.stop();
         mOntologyManager.stop();
+        if ( mLogger != null ) {
+            mLogger.stop();
+        }
     }
 
     public boolean addContextRequirementWithParameters
@@ -111,10 +121,12 @@ public class ContextReasonerCore {
         if (previous==null) {
             //sendBroadcast
             sendContextResult(contextName, value);
+            mLogger.logVerbose(LOGTAG, "Context: " + contextName + " set to " + value);
         } else {
             if(! value.equals(previous)) {
                 //sendBroadcast
                 sendContextResult(contextName, value);
+                mLogger.logVerbose(LOGTAG, "Context: " + contextName + " set to " + value);
             }
         }
     }

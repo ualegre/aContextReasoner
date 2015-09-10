@@ -23,7 +23,7 @@ import android.util.Log;
 
 import org.poseidon_project.context.ContextReasonerCore;
 import org.poseidon_project.context.database.ContextDB;
-import org.poseidon_project.context.database.ContextDBImpl;
+import org.poseidon_project.context.logging.DebugLogger;
 import org.poseidon_project.contexts.ContextObserver;
 import org.poseidon_project.contexts.ContextReceiver;
 import org.poseidon_project.contexts.IContextManager;
@@ -58,7 +58,6 @@ public class ContextManager implements IContextManager{
     private Context mContext;
     private static final String LOGTAG = "ContextManager";
     private final HashMap<String, ContextObserver> mActiveContexts = new HashMap<>();
-    private final HashMap<String, Long> mContextUseIds = new HashMap<>();
     private ContextDB mContextDatabase;
     private ContextReceiver mContextReceiver;
     private ExternalContextReceiver mExternalContextReceiver;
@@ -66,13 +65,15 @@ public class ContextManager implements IContextManager{
     private Calendar mCalendar = Calendar.getInstance();
     public static final String CONTEXT_PREFS = "ContextPrefs";
     private ContextReasonerCore mReasonerCore;
+    private DebugLogger mLogger;
 
-    public ContextManager(Context c, ContextReasonerCore reasonerCore) {
+    public ContextManager(Context c, ContextReasonerCore reasonerCore, ContextDB db) {
 
         mContext = c;
         mReasonerCore = reasonerCore;
-        mContextDatabase = new ContextDBImpl(mContext);
-        mContextReceiver = new POSEIDONReceiver(this, mReasonerCore.getOntologyManager());
+        mContextDatabase = db;
+        mLogger = reasonerCore.getLogger();
+        mContextReceiver = new POSEIDONReceiver(this, mReasonerCore.getOntologyManager(), mLogger);
         loadAllOtherReceiverClasses();
         mExternalContextReceiver = new ExternalContextReceiver(this);
         IntentFilter filter = new IntentFilter(mExternalContextReceiver.CONTEXT_INTENT);
@@ -84,14 +85,14 @@ public class ContextManager implements IContextManager{
         ContextObserver observer = mActiveContexts.get(observerName);
 
         if (observer != null) {
-            Log.v(LOGTAG, "Observer " + observerName + " already running, adding requirement");
+            mLogger.logVerbose(LOGTAG, "Observer " + observerName + " already running, adding requirement");
             observer.addRequiringApp(appkey);
             return true;
         } else {
             observer = loadContextClass(appkey, observerName);
 
             if (observer == null) {
-                Log.e(LOGTAG, "Observer " + observerName + " could not be loaded");
+                mLogger.logError(LOGTAG, "Observer " + observerName + " could not be loaded");
                 return false;
             } else {
 
@@ -113,11 +114,11 @@ public class ContextManager implements IContextManager{
 
         if (observer != null) {
             if (! observer.isARequiringApp(observerName) ) {
-                Log.e(LOGTAG, "Observer " + observerName + " is not needed by app");
+                mLogger.logError(LOGTAG, "Observer " + observerName + " is not needed by app");
                 return false;
             } else {
                 if (! observer.isRunning()) {
-                    Log.v(LOGTAG, "Observer " + observerName + " is running already");
+                    mLogger.logError(LOGTAG, "Observer " + observerName + " is running already");
                     return false;
                 } else {
                     if (! observer.start()) {
@@ -131,7 +132,7 @@ public class ContextManager implements IContextManager{
                 }
             }
         } else {
-            Log.e(LOGTAG, "Observer " + observerName + " needs to be loaded first");
+            mLogger.logError(LOGTAG, "Observer " + observerName + " needs to be loaded first");
             return false;
         }
     }
@@ -143,20 +144,17 @@ public class ContextManager implements IContextManager{
             observer.removeRequiringApp(appkey);
 
             if (observer.numberOfRequiringApps()<1) {
-                Log.v(LOGTAG, "Observer " + observerName + " no longer needed, shutting down");
+                mLogger.logVerbose(LOGTAG, "Observer " + observerName + " no longer needed, shutting down");
                 if (observer.isRunning()) {
                     observer.stop();
                 }
                 mActiveContexts.remove(observerName);
-                long cID = mContextUseIds.remove(observerName);
-                mContextDatabase.
-                        endContextComponentUse(cID, observerName, mDateFormater.format(mCalendar.getTime()));
                 observer = null;
             }
 
             return true;
         } else {
-            Log.v(LOGTAG, "Observer " + observerName + " not running! Ignoring");
+            mLogger.logVerbose(LOGTAG, "Observer " + observerName + " not running! Ignoring");
             return false;
         }
     }
@@ -198,10 +196,11 @@ public class ContextManager implements IContextManager{
             }
             dexWriter.close();
             bis.close();
-            Log.v(LOGTAG, "copied dex file: " + newDex);
             for (String c: contexts) {
                 mContextDatabase.insertComponent(packagename, c, appKey, permission, newDex);
             }
+
+            mLogger.logVerbose(LOGTAG, "Added dex file: " + newDex);
 
         } catch (IOException ioe) {
             Log.e(LOGTAG, ioe.getStackTrace().toString());
@@ -251,16 +250,13 @@ public class ContextManager implements IContextManager{
 
             context.addRequiringApp(appId);
 
-            long cId = mContextDatabase.
-                    startContextComponentUse(componentName, mDateFormater.format(mCalendar.getTime()));
-            mContextUseIds.put(componentName, cId);
 
             mActiveContexts.put(componentName, context);
 
             return context;
 
         } catch (ClassNotFoundException cnfe) {
-            Log.e(LOGTAG, "Context Observer Class not found!");
+            mLogger.logError(LOGTAG, "Observer: " + componentName + " class not found!");
             return null;
         } catch (Exception e) {
             Log.e(LOGTAG, e.getStackTrace().toString());
@@ -307,11 +303,12 @@ public class ContextManager implements IContextManager{
 
             mContextReceiver = receiver;
             updateReceiverReference(mContextReceiver);
+            mLogger.logVerbose(LOGTAG, "Loaded Receiver: " + componentName);
 
             return true;
 
         } catch (ClassNotFoundException cnfe) {
-            Log.e(LOGTAG, "Context Receiver Class not found!");
+            mLogger.logError(LOGTAG, "Receiver: " + componentName + " class not found!");
             return false;
         } catch (Exception e) {
             Log.e(LOGTAG, e.getStackTrace().toString());
@@ -410,14 +407,14 @@ public class ContextManager implements IContextManager{
         ContextObserver observer = mActiveContexts.get(observerName);
 
         if (observer != null) {
-            Log.v(LOGTAG, "Observer " + observerName + " already running, adding requirement");
+            mLogger.logVerbose(LOGTAG, "Observer " + observerName + " already running, adding requirement");
             observer.addRequiringApp(appkey);
             return true;
         } else {
             observer = loadContextClass(appkey, observerName);
 
             if (observer == null) {
-                Log.e(LOGTAG, "Observer " + observerName + " could not be loaded");
+                mLogger.logError(LOGTAG, "Observer " + observerName + " could not be loaded");
                 return false;
             } else {
                 observer.setContextParameters((HashMap<String, Object>) parameters);

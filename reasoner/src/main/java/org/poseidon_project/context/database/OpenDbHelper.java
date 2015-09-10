@@ -42,11 +42,10 @@ public class OpenDbHelper extends SQLiteOpenHelper{
             + "name text,"
             + "owner text,"
             + "dex_file text);";
-    public static final String USEDCONTEXTTABLE = "used_contexts";
-    private static final String USEDCONTEXTABLE_CREATE = "create table used_contexts (_id integer primary key autoincrement, "
-            + "contextname text,"
-            + "activationdate text,"
-            + "diactivationdate text);";
+    public static final String DEBUGEVENTSTABLE = "events_data";
+    private static final String DEBUGEVENTSTABLE_CREATE = "create table events_data (_id integer primary key autoincrement, "
+            + "eventDateTime text,"
+            + "event text);";
 
     public OpenDbHelper(Context context) {
         super(context, DB_NAME, null, DATABASE_VERSION);
@@ -56,7 +55,7 @@ public class OpenDbHelper extends SQLiteOpenHelper{
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(CONTEXTTABLE_CREATE);
         db.execSQL(RECEIVERTABLE_CREATE);
-        db.execSQL(USEDCONTEXTABLE_CREATE);
+        db.execSQL(DEBUGEVENTSTABLE_CREATE);
         insertStandardContexts(db);
     }
 

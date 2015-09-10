@@ -21,6 +21,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
 
@@ -33,7 +34,7 @@ public class ContextDBImpl implements ContextDB{
 
     private OpenDbHelper dbHelper;
     public static final String CONTEXTTABLE = "usable_contexts";
-    public static final String USEDCONTEXTTABLE = "used_contexts";
+    public static final String DEBUGEVENTSTABLE = "events_data";
 
     public ContextDBImpl(Context context) {
         dbHelper = new OpenDbHelper(context);
@@ -45,6 +46,26 @@ public class ContextDBImpl implements ContextDB{
 
     public void closeDB() {
         dbHelper.close();
+    }
+
+    @Override
+    public HashMap<Integer, String> getContextAllOwners() {
+
+        HashMap<Integer, String> result = new HashMap<Integer, String>();
+
+        try {
+            SQLiteDatabase sqlite = dbHelper.getReadableDatabase();
+            Cursor crsr = sqlite.rawQuery(
+                    "Select _id, owner from usable_contexts;",
+                    null);
+            crsr.moveToFirst();
+
+            int numRows = crsr.getCount();
+        } catch (Exception sqlerror) {
+            Log.v("Table read error", sqlerror.getMessage());
+        }
+
+        return result;
     }
 
     @Override
@@ -229,43 +250,31 @@ public class ContextDBImpl implements ContextDB{
     }
 
     @Override
-    public long startContextComponentUse(String name, String date) {
+    public boolean newEvents(String[][] events) {
 
+        SQLiteDatabase sqlite = dbHelper.getWritableDatabase();
         try {
-            SQLiteDatabase sqlite = dbHelper.getWritableDatabase();
+            sqlite.beginTransaction();
 
-            ContentValues initialValues = new ContentValues();
-            initialValues.put("contextname", name);
-            initialValues.put("activationdate", date);
-            long rowid = sqlite.insert(USEDCONTEXTTABLE, null, initialValues);
-            sqlite.close();
-            return rowid;
+            int length = events.length;
+            for (int i=0; i<length;i++) {
+                ContentValues initialValues = new ContentValues();
+                initialValues.put("eventDateTime", events[i][0]);
+                initialValues.put("event", events[i][1]);
+                sqlite.insert(DEBUGEVENTSTABLE, null, initialValues);
+            }
+
+            sqlite.setTransactionSuccessful();
 
         } catch (Exception sqlerror) {
             Log.v("Table insert error", sqlerror.getMessage());
-            return -1;
+        } finally {
+            sqlite.endTransaction();
         }
-    }
 
-    @Override
-    public long endContextComponentUse(long id, String name, String date) {
 
-        String where = "_id=?";
-        String[] whereargs = new String[] { String.valueOf(id) };
 
-        try {
-            SQLiteDatabase sqlite = dbHelper.getWritableDatabase();
-
-            ContentValues values = new ContentValues();
-            values.put("diactivationdate", date);
-            long rowid = sqlite.update(USEDCONTEXTTABLE, values, where, whereargs);
-            sqlite.close();
-            return rowid;
-
-        } catch (Exception sqlerror) {
-            Log.v("Table insert error", sqlerror.getMessage());
-            return -1;
-        }
+        return false;
     }
 
     @Override

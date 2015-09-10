@@ -30,6 +30,7 @@ import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.ResultSet;
 
 import org.poseidon_project.context.ContextReasonerCore;
+import org.poseidon_project.context.logging.DebugLogger;
 import org.poseidon_project.context.utility.FileOperations;
 import org.poseidon_project.contexts.IOntologyManager;
 
@@ -61,6 +62,7 @@ public class OntologyManager implements IOntologyManager{
     private CsparqlQueryResultProxy mCsparqlQRP;
     private ContextStream mContextStream;
     private ContextRuleObserver mContextRuleObserver;
+    private DebugLogger mLogger;
     //Only required for the pilot until the main infrastructure is done.
     public ContextMapper pilotMapper;
     private HashMap<String, Object> mOntIndividuals;
@@ -68,6 +70,7 @@ public class OntologyManager implements IOntologyManager{
     public OntologyManager(Context context, ContextReasonerCore core){
         mContext = context;
         mReasonerCore = core;
+        mLogger = core.getLogger();
 
         /* Not currently used, pointless loading unless we use this.
         runFirstTime();
@@ -104,6 +107,7 @@ public class OntologyManager implements IOntologyManager{
             queryResultProxy.addObserver(mContextRuleObserver);
 
         } catch (final ParseException e) {
+            mLogger.logError(LOGTAG, "Cannot parse: " + query);
             Log.e(LOGTAG, "Error Parsing: " + e.getMessage());
         }
 
@@ -133,7 +137,7 @@ public class OntologyManager implements IOntologyManager{
 
         //Read and Open all POSEIDON Related Ontologies
         if (mModel == null) {
-            Log.e(LOGTAG, "Model not initialised, ignoring");
+            mLogger.logError(LOGTAG, "Model not initialised, ignoring");
             return false;
         } else {
             for (String uri : POSEIDONOntologies.ONTOLOGIES_ARRAY) {
@@ -169,7 +173,7 @@ public class OntologyManager implements IOntologyManager{
                     boolean copied = copyOntologyFile(filepath);
 
                     if (! copied ){
-                        Log.e(LOGTAG, "Failed to copy to SD Card: " + filepath);
+                        mLogger.logError(LOGTAG, "Failed to copy to SD Card: " + filepath);
                     }
                 }
 
@@ -245,7 +249,7 @@ public class OntologyManager implements IOntologyManager{
     public boolean mapOntologyURLtoFile(String url, String fileLocation) {
 
         if (mModel == null) {
-            Log.e(LOGTAG, "Model not initialised, ignoring");
+            mLogger.logError(LOGTAG, "Model not initialised, ignoring");
             return false;
         } else {
             OntDocumentManager dm = mModel.getDocumentManager();
@@ -259,7 +263,7 @@ public class OntologyManager implements IOntologyManager{
     public boolean runSPARQLQuery(String queryText) {
 
         if (mModel == null) {
-            Log.e(LOGTAG, "Model not initialised, ignoring");
+            mLogger.logError(LOGTAG, "Model not initialised, ignoring");
             return false;
         } else {
             runSPARQLQuery(queryText, mModel);

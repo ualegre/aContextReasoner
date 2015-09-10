@@ -113,7 +113,7 @@ public class ContextManager implements IContextManager{
         ContextObserver observer = mActiveContexts.get(observerName);
 
         if (observer != null) {
-            if (! observer.isARequiringApp(observerName) ) {
+            if (! observer.isARequiringApp(appkey) ) {
                 mLogger.logError(LOGTAG, "Observer " + observerName + " is not needed by app");
                 return false;
             } else {
@@ -123,6 +123,7 @@ public class ContextManager implements IContextManager{
                 } else {
                     if (! observer.start()) {
                         observer.removeAllRequiringApps();
+                        mActiveContexts.remove(observerName);
                         observer = null;
                         return false;
                     } else {

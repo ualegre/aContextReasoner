@@ -44,6 +44,13 @@ public class ContextReasonerService extends Service{
     }
 
     @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+
+        ContextReasonerBootReceiver.completeWakefulIntent(intent);
+        return START_STICKY;
+    }
+
+    @Override
     public void onDestroy() {
         super.onDestroy();
         mReasonerCore.onDestroy();

@@ -15,6 +15,8 @@ limitations under the License.
 
 package org.poseidon_project.context.database;
 
+import org.poseidon_project.context.logging.LogEvent;
+
 import java.util.HashMap;
 import java.util.List;
 
@@ -42,7 +44,7 @@ public interface ContextDB {
 
     List<String> getLoadComponentInfo(String applicationId, String componentName);
 
-    boolean newEvents(String[][] events);
+    boolean newEvents(LogEvent[] events);
 
     int getNumberOfReceivers();
 

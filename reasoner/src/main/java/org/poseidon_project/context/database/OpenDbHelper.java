@@ -44,8 +44,10 @@ public class OpenDbHelper extends SQLiteOpenHelper{
             + "dex_file text);";
     public static final String DEBUGEVENTSTABLE = "events_data";
     private static final String DEBUGEVENTSTABLE_CREATE = "create table events_data (_id integer primary key autoincrement, "
+            + "eventOrigin smallint,"
+            + "eventLocation text,"
             + "eventDateTime text,"
-            + "event text);";
+            + "eventText text);";
 
     public OpenDbHelper(Context context) {
         super(context, DB_NAME, null, DATABASE_VERSION);

@@ -21,6 +21,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import org.poseidon_project.context.logging.LogEvent;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
@@ -250,7 +252,7 @@ public class ContextDBImpl implements ContextDB{
     }
 
     @Override
-    public boolean newEvents(String[][] events) {
+    public boolean newEvents(LogEvent[] events) {
 
         SQLiteDatabase sqlite = dbHelper.getWritableDatabase();
         try {
@@ -259,8 +261,10 @@ public class ContextDBImpl implements ContextDB{
             int length = events.length;
             for (int i=0; i<length;i++) {
                 ContentValues initialValues = new ContentValues();
-                initialValues.put("eventDateTime", events[i][0]);
-                initialValues.put("event", events[i][1]);
+                initialValues.put("eventOrigin", events[i].getOrigin());
+                initialValues.put("eventLocation", events[i].getLocation());
+                initialValues.put("eventDateTime", events[i].getDate());
+                initialValues.put("eventText", events[i].getText());
                 sqlite.insert(DEBUGEVENTSTABLE, null, initialValues);
             }
 

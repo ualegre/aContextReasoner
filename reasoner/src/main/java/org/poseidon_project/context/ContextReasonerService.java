@@ -21,7 +21,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
 import android.os.RemoteException;
-import android.util.Log;
+
+import org.poseidon_project.context.logging.DebugLogger;
 
 import java.util.Map;
 
@@ -35,12 +36,16 @@ public class ContextReasonerService extends Service{
     private static final String LOGTAG = "ContextService";
     private ContextReasonerCore mReasonerCore;
     private Context mContext;
+    private DebugLogger mLogger;
 
     @Override
     public void onCreate() {
         super.onCreate();
         mContext = getApplicationContext();
         mReasonerCore = new ContextReasonerCore(mContext);
+        mLogger = mReasonerCore.getLogger();
+
+        mLogger.logVerbose(LOGTAG, "Started Service");
     }
 
     @Override
@@ -53,6 +58,7 @@ public class ContextReasonerService extends Service{
     @Override
     public void onDestroy() {
         super.onDestroy();
+        mLogger.logVerbose(LOGTAG, "Stopping Service");
         mReasonerCore.onDestroy();
     }
 
@@ -60,7 +66,7 @@ public class ContextReasonerService extends Service{
     public IBinder onBind(Intent intent) {
 
         if (IContextReasoner.class.getName().equals(intent.getAction())) {
-            Log.d(LOGTAG, "binding");
+            mLogger.logVerbose(LOGTAG, "binding");
             return mContextBinder;
         }
 

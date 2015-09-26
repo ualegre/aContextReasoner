@@ -50,7 +50,7 @@ public class ContextReasonerCore {
     public ContextReasonerCore(Context c) {
         mContext = c;
         mContextDatabase = new ContextDBImpl(mContext);
-        mLogger = new DebugLogger(mContextDatabase);
+        mLogger = new DebugLogger(mContext, mContextDatabase);
         mOntologyManager = new OntologyManager(c, this);
         mContextManager = new ContextManager(c, this, mContextDatabase);
 

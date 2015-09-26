@@ -272,13 +272,12 @@ public class ContextDBImpl implements ContextDB{
 
         } catch (Exception sqlerror) {
             Log.v("Table insert error", sqlerror.getMessage());
+            return false;
         } finally {
             sqlite.endTransaction();
         }
 
-
-
-        return false;
+        return true;
     }
 
     @Override

@@ -309,6 +309,19 @@ public class ContextDBImpl implements ContextDB{
         return events;
     }
 
+    public boolean emptyEvents() {
+
+        try {
+            SQLiteDatabase sqlite = dbHelper.getWritableDatabase();
+            sqlite.delete(OpenDbHelper.DEBUGEVENTSTABLE, null, null);
+        } catch (Exception sqlerror) {
+            Log.v("Table delete error", sqlerror.getMessage());
+            return false;
+        }
+
+        return true;
+    }
+
     @Override
     public int getNumberOfReceivers() {
         return 0;

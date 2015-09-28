@@ -117,6 +117,7 @@ public class DebugLogger {
 
     public void attemptBackup() {
         if (inCorrectBackupConditions()) {
+            persist();
             mUploader.uploadLogToServer(mUserID);
         }
     }
@@ -131,10 +132,12 @@ public class DebugLogger {
     }
 
     public void completedBackup() {
+
         SharedPreferences settings = mContext.getSharedPreferences(CONTEXT_PREFS, 0);
         SharedPreferences.Editor editor = settings.edit();
-
-
+        String date =  mDateFormater.format(Calendar.getInstance().getTime());
+        editor.putString("logLastBackup", date);
+        mContextDB.emptyEvents();
     }
 
     private boolean isConnectedToWifiInternet() {

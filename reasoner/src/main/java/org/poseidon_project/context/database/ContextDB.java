@@ -48,6 +48,8 @@ public interface ContextDB {
 
     List<LogEvent> getAllEvents();
 
+    boolean emptyEvents();
+
     int getNumberOfReceivers();
 
     List<String> getContextReceiver(long id);

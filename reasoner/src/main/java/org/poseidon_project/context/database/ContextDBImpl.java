@@ -23,6 +23,7 @@ import android.util.Log;
 
 import org.poseidon_project.context.logging.LogEvent;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
@@ -183,7 +184,7 @@ public class ContextDBImpl implements ContextDB{
             }
 
         } catch(Exception sqlerror) {
-            Log.e("Error" , sqlerror.getMessage());
+            Log.e("Error", sqlerror.getMessage());
             return false;
         }
 
@@ -278,6 +279,34 @@ public class ContextDBImpl implements ContextDB{
         }
 
         return true;
+    }
+
+    @Override
+    public List<LogEvent> getAllEvents() {
+        List<LogEvent> events = new ArrayList<>();
+
+        try {
+
+            SQLiteDatabase sqlite = dbHelper.getReadableDatabase();
+            Cursor crsr = sqlite
+                    .rawQuery(
+                            "Select _id, eventOrigin, eventLocation, eventDateTime, " +
+                                    "eventText from events_data;", null);
+
+            while (crsr.moveToNext()) {
+                int id = crsr.getInt(0);
+                int origin = crsr.getInt(1);
+                String location = crsr.getString(2);
+                String dateTime = crsr.getString(3);
+                String text = crsr.getString(4);
+                events.add(new LogEvent(id,origin, location, dateTime, text));
+            }
+
+        } catch (Exception sqlerror) {
+            Log.v("Table read error", sqlerror.getMessage());
+        }
+
+        return events;
     }
 
     @Override

@@ -46,6 +46,8 @@ public interface ContextDB {
 
     boolean newEvents(LogEvent[] events);
 
+    List<LogEvent> getAllEvents();
+
     int getNumberOfReceivers();
 
     List<String> getContextReceiver(long id);

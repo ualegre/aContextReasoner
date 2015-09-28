@@ -43,4 +43,7 @@ interface IContextReasoner {
 
     //***Set internal context parameters***
     boolean setContextParameters(in String appkey, in String observerName, in Map parameters);
+
+    //***Register user identifier if unknown
+    void registerUserIdentifier(in String userID);
 }

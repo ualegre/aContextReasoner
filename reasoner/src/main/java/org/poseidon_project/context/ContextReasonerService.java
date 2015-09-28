@@ -68,10 +68,21 @@ public class ContextReasonerService extends Service{
         if (IContextReasoner.class.getName().equals(intent.getAction())) {
             mLogger.logVerbose(LOGTAG, "binding");
             return mContextBinder;
+        } else if (ILogBackup.class.getName().equals(intent.getAction())) {
+            return mLogBackupBinder;
         }
 
         return null;
     }
+
+    public final ILogBackup.Stub mLogBackupBinder = new ILogBackup.Stub() {
+
+        @Override
+        public void runLogBackup() throws RemoteException {
+            mLogger.attemptBackup();
+        }
+
+    };
 
     public final IContextReasoner.Stub mContextBinder = new IContextReasoner.Stub() {
 
@@ -114,5 +125,10 @@ public class ContextReasonerService extends Service{
         public boolean setContextParameters(String appkey, String observerName, Map parameters) throws RemoteException {
             return mReasonerCore.setContextParameters(appkey, observerName, parameters);
         }
+
+        public void registerUserIdentifier(String userIdentifier) throws RemoteException {
+            mLogger.registerUser(userIdentifier);
+        }
+
     };
 }

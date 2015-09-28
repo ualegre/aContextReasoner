@@ -23,6 +23,7 @@ package org.poseidon_project.context.logging;
  */
 public class LogEvent {
 
+    private int event_id;
     private int event_origin;
     private String event_location;
     private String event_date;
@@ -36,6 +37,16 @@ public class LogEvent {
         event_text = text;
     }
 
+    public LogEvent(int id, int origin, String location, String date, String text) {
+
+        event_id = id;
+        event_origin = origin;
+        event_location = location;
+        event_date = date;
+        event_text = text;
+    }
+
+    public int getId() { return event_id; }
 
     public int getOrigin() {
         return event_origin;

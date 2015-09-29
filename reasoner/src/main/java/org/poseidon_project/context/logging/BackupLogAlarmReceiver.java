@@ -17,12 +17,8 @@
 package org.poseidon_project.context.logging;
 
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
-import android.os.IBinder;
-import android.os.RemoteException;
 
 import org.poseidon_project.context.ILogBackup;
 import org.poseidon_project.context.utility.ExplicitIntentGenerator;
@@ -34,24 +30,6 @@ import org.poseidon_project.context.utility.ExplicitIntentGenerator;
  */
 public class BackupLogAlarmReceiver extends BroadcastReceiver {
 
-    private ILogBackup mLogBackupService;
-    private boolean mBound = false;
-
-    public ServiceConnection serviceConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            mLogBackupService = ILogBackup.Stub.asInterface(service);
-            mBound =! mBound;
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            mLogBackupService = null;
-            mBound =! mBound;
-        }
-    };
-
-
     @Override
     public void onReceive(Context context, Intent intent) {
 
@@ -60,14 +38,7 @@ public class BackupLogAlarmReceiver extends BroadcastReceiver {
                 .createExplicitFromImplicitIntent(context, serviceIntent);
 
         if (serviceIntent != null) {
-            context.bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE);
+            context.startService(serviceIntent);
         }
-
-        try {
-            mLogBackupService.runLogBackup();
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
-
     }
 }

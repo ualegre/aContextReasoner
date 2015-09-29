@@ -53,7 +53,6 @@ public class DebugLogger {
     private SimpleDateFormat mDateFormater = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private Calendar mCalendar = Calendar.getInstance();
     private static final String LOG_TAG = "Context Middleware";
-    private BackupLogAlarmReceiver mBackupAlarmReceiver;
     private Context mContext;
     private LogUploader mUploader;
     public static final String CONTEXT_PREFS = "ContextPrefs";
@@ -84,6 +83,8 @@ public class DebugLogger {
         PendingIntent pi = PendingIntent.getBroadcast(mContext, 0, new Intent(mContext, BackupLogAlarmReceiver.class), 0);
         alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, timeToStart.getTimeInMillis(),
                 AlarmManager.INTERVAL_DAY, pi);
+
+        Log.v(LOG_TAG, "Alarm Set");
 
     }
 
@@ -137,7 +138,7 @@ public class DebugLogger {
 
         SharedPreferences settings = mContext.getSharedPreferences(CONTEXT_PREFS, 0);
         SharedPreferences.Editor editor = settings.edit();
-        String date =  mDateFormater.format(Calendar.getInstance().getTime());
+        String date =  mDateFormater.format(mCalendar.getTime());
         editor.putString("logLastBackup", date);
         mContextDB.emptyEvents();
     }
@@ -240,8 +241,7 @@ public class DebugLogger {
 
     public boolean registerUser(String userIdent) {
 
-        //mUploader.registerUser(userIdent);
-        attemptBackup();
+        mUploader.registerUser(userIdent);
         return true;
     }
 

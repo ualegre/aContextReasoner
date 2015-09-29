@@ -44,7 +44,7 @@ public interface ContextDB {
 
     List<String> getLoadComponentInfo(String applicationId, String componentName);
 
-    boolean newEvents(LogEvent[] events);
+    boolean newEvents(List<LogEvent> events);
 
     List<LogEvent> getAllEvents();
 

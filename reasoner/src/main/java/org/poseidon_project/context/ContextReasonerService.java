@@ -126,6 +126,7 @@ public class ContextReasonerService extends Service{
             return mReasonerCore.setContextParameters(appkey, observerName, parameters);
         }
 
+        @Override
         public void registerUserIdentifier(String userIdentifier) throws RemoteException {
             mLogger.registerUser(userIdentifier);
         }

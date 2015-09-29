@@ -73,9 +73,8 @@ public class LogUploader implements XMLRPCCallback{
             @Override
             public void run() {
                 try {
-                    Integer i = 0;
-                    i = (Integer) mRPCClient.call(RPC_REGISTER_FUNCTION, userIdent);
-                    mLogger.newUserID(i);
+                    String i = (String) mRPCClient.call(RPC_REGISTER_FUNCTION, userIdent);
+                    mLogger.newUserID(Integer.valueOf(i));
                 } catch (XMLRPCException e) {
                     Log.e(LOG_TAG, e.getMessage());
                 }

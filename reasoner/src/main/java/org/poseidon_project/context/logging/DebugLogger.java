@@ -26,10 +26,11 @@ import android.os.BatteryManager;
 import android.util.Log;
 
 import org.poseidon_project.context.database.ContextDB;
-import org.poseidon_project.context.utility.ExplicitIntentGenerator;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Random;
 
 
@@ -47,7 +48,7 @@ public class DebugLogger {
     private int mUserID;
 
     private ContextDB mContextDB;
-    private LogEvent[] mEventsArray = new LogEvent[ARRAY_CAPACITY];
+    private List<LogEvent> mEventsArray = new ArrayList<>(ARRAY_CAPACITY);
     private int mEventsArraySize = 0;
     private SimpleDateFormat mDateFormater = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private Calendar mCalendar = Calendar.getInstance();
@@ -63,7 +64,7 @@ public class DebugLogger {
     public DebugLogger (Context context, ContextDB db) {
         mContextDB = db;
         mContext = context;
-
+        mUploader = new LogUploader(mContext, mContextDB, this);
         checkBackupSettings();
         setupBackupAlarm();
 
@@ -77,9 +78,10 @@ public class DebugLogger {
         timeToStart.set(Calendar.SECOND, 0);
 
         AlarmManager alarmManager = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
-        Intent i = ExplicitIntentGenerator.createExplicitFromImplicitIntent
-                (mContext, new Intent(mContext, BackupLogAlarmReceiver.class));
-        PendingIntent pi = PendingIntent.getBroadcast(mContext, 0, i, 0);
+        //Intent i = ExplicitIntentGenerator.createExplicitFromImplicitIntent
+        //        (mContext, new Intent(mContext, BackupLogAlarmReceiver.class));
+
+        PendingIntent pi = PendingIntent.getBroadcast(mContext, 0, new Intent(mContext, BackupLogAlarmReceiver.class), 0);
         alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, timeToStart.getTimeInMillis(),
                 AlarmManager.INTERVAL_DAY, pi);
 
@@ -93,7 +95,7 @@ public class DebugLogger {
         String lastBackupDate = settings.getString("logLastBackup", "");
         mUserID = settings.getInt("userId", -1);
 
-        if (backupHour == -1 || backupMin == -1) {
+        if (backupHour < 0 || backupMin < 0) {
             Random randomGenerator = new Random();
 
             int hourAfterEarliest = randomGenerator.nextInt(8);
@@ -167,8 +169,6 @@ public class DebugLogger {
 
     private void log(String event) {
 
-        attemptBackup();
-
         if (mEventsArraySize == 50)  {
             persist();
         }
@@ -182,7 +182,7 @@ public class DebugLogger {
 
             LogEvent logEvent = new LogEvent(0, "", dateTime, event);
 
-            mEventsArray[mEventsArraySize] = logEvent;
+            mEventsArray.add(logEvent);
             mEventsArraySize++;
         }
 
@@ -222,10 +222,10 @@ public class DebugLogger {
         }
     }
 
-    private synchronized LogEvent[] copyCache() {
-        LogEvent[] temp = mEventsArray;
+    private synchronized List<LogEvent> copyCache() {
+        List<LogEvent> temp = mEventsArray;
 
-        mEventsArray = new LogEvent[ARRAY_CAPACITY];
+        mEventsArray = new ArrayList<>(ARRAY_CAPACITY);
         mEventsArraySize = 0;
 
         return temp;
@@ -233,15 +233,15 @@ public class DebugLogger {
 
     private boolean persist() {
 
-        LogEvent[] temp = copyCache();
+        List<LogEvent> temp = copyCache();
 
         return mContextDB.newEvents(temp);
     }
 
     public boolean registerUser(String userIdent) {
 
-        mUploader.registerUser(userIdent);
-
+        //mUploader.registerUser(userIdent);
+        attemptBackup();
         return true;
     }
 

@@ -253,19 +253,18 @@ public class ContextDBImpl implements ContextDB{
     }
 
     @Override
-    public boolean newEvents(LogEvent[] events) {
+    public boolean newEvents(List<LogEvent> events) {
 
         SQLiteDatabase sqlite = dbHelper.getWritableDatabase();
         try {
             sqlite.beginTransaction();
 
-            int length = events.length;
-            for (int i=0; i<length;i++) {
+            for (LogEvent event : events) {
                 ContentValues initialValues = new ContentValues();
-                initialValues.put("eventOrigin", events[i].getOrigin());
-                initialValues.put("eventLocation", events[i].getLocation());
-                initialValues.put("eventDateTime", events[i].getDate());
-                initialValues.put("eventText", events[i].getText());
+                initialValues.put("eventOrigin", event.getOrigin());
+                initialValues.put("eventLocation", event.getLocation());
+                initialValues.put("eventDateTime", event.getDate());
+                initialValues.put("eventText", event.getText());
                 sqlite.insert(DEBUGEVENTSTABLE, null, initialValues);
             }
 

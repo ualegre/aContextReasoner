@@ -54,7 +54,7 @@ public class ContextReasonerService extends Service{
         if (IContextReasoner.class.getName().equals(intent.getAction())) {
             ContextReasonerBootReceiver.completeWakefulIntent(intent);
         } else if (ILogBackup.class.getName().equals(intent.getAction())){
-            mLogger.attemptBackup();
+            mLogger.attemptBackup(intent);
         }
 
         return START_STICKY;

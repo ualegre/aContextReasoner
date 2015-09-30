@@ -56,6 +56,7 @@ public class DebugLogger {
     private Context mContext;
     private LogUploader mUploader;
     public static final String CONTEXT_PREFS = "ContextPrefs";
+    private Intent mAlarmIntent = null;
 
     //Whether or not verbose events should be sent to Android Log.
     private static final boolean VERBOSE = true;
@@ -125,6 +126,17 @@ public class DebugLogger {
         }
     }
 
+    public void attemptBackup(Intent intent) {
+
+        if (inCorrectBackupConditions()) {
+            mAlarmIntent = intent;
+            persist();
+            mUploader.uploadLogToServer(mUserID);
+        } else {
+            BackupLogAlarmReceiver.completeWakefulIntent(intent);
+        }
+    }
+
     private boolean inCorrectBackupConditions() {
 
         if (phoneIsPluggedIn()) {
@@ -141,6 +153,11 @@ public class DebugLogger {
         String date =  mDateFormater.format(mCalendar.getTime());
         editor.putString("logLastBackup", date);
         mContextDB.emptyEvents();
+
+        if (mAlarmIntent != null) {
+            BackupLogAlarmReceiver.completeWakefulIntent(mAlarmIntent);
+            mAlarmIntent = null;
+        }
     }
 
     private boolean isConnectedToWifiInternet() {

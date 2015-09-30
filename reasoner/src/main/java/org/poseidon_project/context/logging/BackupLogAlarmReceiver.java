@@ -16,9 +16,9 @@
 
 package org.poseidon_project.context.logging;
 
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.support.v4.content.WakefulBroadcastReceiver;
 
 import org.poseidon_project.context.ILogBackup;
 import org.poseidon_project.context.utility.ExplicitIntentGenerator;
@@ -28,17 +28,18 @@ import org.poseidon_project.context.utility.ExplicitIntentGenerator;
  *
  * @author Dean Kramer <d.kramer@mdx.ac.uk>
  */
-public class BackupLogAlarmReceiver extends BroadcastReceiver {
+public class BackupLogAlarmReceiver extends WakefulBroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
 
+
         Intent serviceIntent = new Intent(ILogBackup.class.getName());
+
         serviceIntent = ExplicitIntentGenerator
                 .createExplicitFromImplicitIntent(context, serviceIntent);
 
-        if (serviceIntent != null) {
-            context.startService(serviceIntent);
-        }
+        startWakefulService(context, serviceIntent);
+
     }
 }

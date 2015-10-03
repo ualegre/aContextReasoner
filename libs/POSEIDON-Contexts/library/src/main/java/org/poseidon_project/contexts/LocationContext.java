@@ -146,8 +146,12 @@ public abstract class LocationContext extends ContextObserver implements Locatio
 	}
 
 	public void setIdealProvider(String provider) {
+
 		mIdealProvider = provider;
-		onProviderEnabled(provider);
+
+		if (mIsRunning) {
+			onProviderEnabled(provider);
+		}
 	}
 
 }

@@ -118,7 +118,7 @@ public abstract class LocationContext extends ContextObserver implements Locatio
 		if ((provider.equals(mIdealProvider)) && (! provider.equals(mProvider))) {
 			mLocationManager.removeUpdates(this);
 			mProvider = provider;
-			mLocationManager.requestLocationUpdates(mProvider, mMinTime, mMinDistance, this);
+			mLocationManager.requestLocationUpdates(mProvider, mMinTime, mMinDistance, this, Looper.getMainLooper());
 		}
 	}
 
@@ -143,6 +143,11 @@ public abstract class LocationContext extends ContextObserver implements Locatio
 
 	public void setMinDistance(int mMinDistance) {
 		this.mMinDistance = mMinDistance;
+	}
+
+	public void setIdealProvider(String provider) {
+		mIdealProvider = provider;
+		onProviderEnabled(provider);
 	}
 
 }

@@ -63,4 +63,23 @@ public class LogEvent {
     public String getText() {
         return event_text;
     }
+
+    @Override
+    public String toString() {
+
+        StringBuilder s = new StringBuilder(100);
+        s.append("Event[");
+        s.append(event_id);
+        s.append(",");
+        s.append(event_origin);
+        s.append(",");
+        s.append(event_location);
+        s.append(",");
+        s.append(event_date);
+        s.append(",");
+        s.append(event_text);
+        s.append("]");
+
+        return s.toString();
+    }
 }

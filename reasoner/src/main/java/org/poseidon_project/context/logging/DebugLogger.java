@@ -26,10 +26,12 @@ import android.os.BatteryManager;
 import android.util.Log;
 
 import org.poseidon_project.context.database.ContextDB;
+import org.poseidon_project.contexts.hardware.PluggedInContext;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
@@ -51,12 +53,14 @@ public class DebugLogger {
     private List<LogEvent> mEventsArray = new ArrayList<>(ARRAY_CAPACITY);
     private int mEventsArraySize = 0;
     private SimpleDateFormat mDateFormater = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    private Calendar mCalendar = Calendar.getInstance();
     private static final String LOG_TAG = "Context Middleware";
     private Context mContext;
     private LogUploader mUploader;
     public static final String CONTEXT_PREFS = "ContextPrefs";
     private Intent mAlarmIntent = null;
+    private LogLocationReceiver mLocationReceiver;
+    private PluggedInContext mPluggedInContext;
+
 
     //Whether or not verbose events should be sent to Android Log.
     private static final boolean VERBOSE = true;
@@ -65,10 +69,14 @@ public class DebugLogger {
         mContextDB = db;
         mContext = context;
         mUploader = new LogUploader(mContext, mContextDB, this);
+        mLocationReceiver = new LogLocationReceiver(mContext);
+
         checkBackupSettings();
         setupBackupAlarm();
 
+
     }
+
 
     private void setupBackupAlarm() {
 
@@ -78,8 +86,6 @@ public class DebugLogger {
         timeToStart.set(Calendar.SECOND, 0);
 
         AlarmManager alarmManager = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
-        //Intent i = ExplicitIntentGenerator.createExplicitFromImplicitIntent
-        //        (mContext, new Intent(mContext, BackupLogAlarmReceiver.class));
 
         PendingIntent pi = PendingIntent.getBroadcast(mContext, 0, new Intent(mContext, BackupLogAlarmReceiver.class), 0);
         alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, timeToStart.getTimeInMillis(),
@@ -119,19 +125,16 @@ public class DebugLogger {
         }
     }
 
-    public void attemptBackup() {
-        if (inCorrectBackupConditions()) {
-            persist();
-            mUploader.uploadLogToServer(mUserID);
-        }
+    private void uploadLog() {
+        persist();
+        mUploader.uploadLogToServer(mUserID);
     }
 
     public void attemptBackup(Intent intent) {
 
         if (inCorrectBackupConditions()) {
             mAlarmIntent = intent;
-            persist();
-            mUploader.uploadLogToServer(mUserID);
+            uploadLog();
         } else {
             BackupLogAlarmReceiver.completeWakefulIntent(intent);
         }
@@ -150,7 +153,7 @@ public class DebugLogger {
 
         SharedPreferences settings = mContext.getSharedPreferences(CONTEXT_PREFS, 0);
         SharedPreferences.Editor editor = settings.edit();
-        String date =  mDateFormater.format(mCalendar.getTime());
+        String date =  mDateFormater.format(new Date());
         editor.putString("logLastBackup", date);
         mContextDB.emptyEvents();
 
@@ -193,12 +196,12 @@ public class DebugLogger {
 
         synchronized (this) {
 
-            String dateTime = mDateFormater.format(mCalendar.getTime());
+            String dateTime = mDateFormater.format(new Date());
 
-            //TODO
-            //Need best way of getting location
+            LogEvent logEvent = new LogEvent(0, mLocationReceiver.getLocationString(),
+                    dateTime, event);
 
-            LogEvent logEvent = new LogEvent(0, "", dateTime, event);
+            Log.e("Event", logEvent.toString());
 
             mEventsArray.add(logEvent);
             mEventsArraySize++;
@@ -232,7 +235,18 @@ public class DebugLogger {
         }
     }
 
+    public void inUse() {
+        mLocationReceiver.startListening();
+    }
+
+    public void noLongerInUse() {
+        mLocationReceiver.stopListening();
+    }
+
     public boolean stop() {
+
+        mLocationReceiver.stop();
+
         if (mEventsArraySize != 0) {
             return persist();
         } else {
@@ -271,4 +285,5 @@ public class DebugLogger {
             editor.commit();
         }
     }
+
 }

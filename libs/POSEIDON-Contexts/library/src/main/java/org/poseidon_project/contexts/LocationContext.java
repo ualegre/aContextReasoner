@@ -54,6 +54,13 @@ public abstract class LocationContext extends ContextObserver implements Locatio
 		mLocationManager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
 	}
 
+	public LocationContext (Context c, ContextReceiver cr, String provider, String name) {
+		super (c, cr, name);
+		mProvider = provider;
+		mIdealProvider = provider;
+		mLocationManager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
+	}
+
 	public LocationContext (Context c, ContextReceiver cr, int minTime, int minDistance, String provider, String name) {
 		super(c, cr, name);
 		mMinTime = minTime;

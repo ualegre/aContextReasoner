@@ -116,8 +116,8 @@ public class GPSIndoorOutdoorContext extends LocationContext {
 
 	@Override
 	public boolean stop() {
-		super.stop();
 		mLocationManager.removeGpsStatusListener(gpsListener);
+		super.stop();
 		return true;
 	}
 

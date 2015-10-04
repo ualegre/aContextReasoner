@@ -51,10 +51,13 @@ public class LogLocationReceiver {
 
         mLocationContext = new CurrentLocationContext(context, mContextListener, "passive");
         mLocationContext.addRequiringApp("logger");
-        mLocationContext.start();
     }
 
     public synchronized String getLocationString() {
+
+
+        mCurrentLocation = mLocationContext.getLastKnownLocation("passive");
+        mLastUpdate = mCurrentLocation.getTime();
 
         long timeSinceLast = System.currentTimeMillis() - mLastUpdate;
 
@@ -86,7 +89,7 @@ public class LogLocationReceiver {
 
 
     public boolean stop() {
-        mLocationContext.stop();
+        //mLocationContext.stop();
         return  mPluggedInContext.stop();
     }
 
@@ -95,7 +98,7 @@ public class LogLocationReceiver {
     }
 
     public void stopListening() {
-        mLocationContext.stop();
+        //mLocationContext.stop();
     }
 
 
@@ -132,6 +135,7 @@ public class LogLocationReceiver {
 
             if (Thread.currentThread() == mGetterThread) {
                 Log.v("LocationReceiver", "joined");
+                mLocationContext.stop();
                 Looper.myLooper().quit();
                 return;
             }

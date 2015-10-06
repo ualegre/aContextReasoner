@@ -28,6 +28,7 @@ import android.util.Log;
 import org.poseidon_project.context.database.ContextDB;
 import org.poseidon_project.contexts.hardware.PluggedInContext;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -45,6 +46,8 @@ public class DebugLogger {
 
     private static final int EARLIEST_BACKUP_HOUR = 20;
     private static final int ARRAY_CAPACITY = 50;
+    private static final long FORCE_BACKUP_TIME = 1000 * 60 * 60 * 48;
+    private static final long FORCED_RETRY_TIME = 1000 * 60 * 30;
     private int mBackupHour;
     private int mBackupMin;
     private int mUserID;
@@ -60,6 +63,7 @@ public class DebugLogger {
     private Intent mAlarmIntent = null;
     private LogLocationReceiver mLocationReceiver;
     private PluggedInContext mPluggedInContext;
+    private boolean mForcedBackup = false;
 
 
     //Whether or not verbose events should be sent to Android Log.
@@ -74,6 +78,7 @@ public class DebugLogger {
         checkBackupSettings();
         setupBackupAlarm();
 
+        attemptBackup(null);
 
     }
 
@@ -132,12 +137,20 @@ public class DebugLogger {
 
     public void attemptBackup(Intent intent) {
 
-        if (inCorrectBackupConditions()) {
+        if (needsForcedBackup()) {
             mAlarmIntent = intent;
             uploadLog();
         } else {
-            BackupLogAlarmReceiver.completeWakefulIntent(intent);
+            if (inCorrectBackupConditions()) {
+                mAlarmIntent = intent;
+                uploadLog();
+            } else {
+                if (intent != null) {
+                    BackupLogAlarmReceiver.completeWakefulIntent(intent);
+                }
+            }
         }
+
     }
 
     private boolean inCorrectBackupConditions() {
@@ -151,6 +164,10 @@ public class DebugLogger {
 
     public void completedBackup() {
 
+        if (mForcedBackup) {
+            mForcedBackup = false;
+        }
+
         SharedPreferences settings = mContext.getSharedPreferences(CONTEXT_PREFS, 0);
         SharedPreferences.Editor editor = settings.edit();
         String date =  mDateFormater.format(new Date());
@@ -161,6 +178,19 @@ public class DebugLogger {
             BackupLogAlarmReceiver.completeWakefulIntent(mAlarmIntent);
             mAlarmIntent = null;
         }
+    }
+
+    public void incompleteBackup() {
+
+        if (mForcedBackup) {
+            AlarmManager alarmManager = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
+            long timeToRetry = System.currentTimeMillis() + FORCED_RETRY_TIME;
+
+            PendingIntent pi = PendingIntent.getBroadcast(mContext, 0, new Intent(mContext, BackupLogAlarmReceiver.class), 0);
+
+            alarmManager.set(AlarmManager.RTC_WAKEUP, timeToRetry, pi);
+        }
+
     }
 
     private boolean isConnectedToWifiInternet() {
@@ -284,6 +314,32 @@ public class DebugLogger {
             editor.putInt("userId", userID);
             editor.commit();
         }
+    }
+
+    private boolean needsForcedBackup () {
+
+        SharedPreferences settings = mContext.getSharedPreferences(CONTEXT_PREFS, 0);
+        String lastBackupString = settings.getString("logLastBackup", "");
+
+        try {
+            Date lastBackupDate = mDateFormater.parse(lastBackupString);
+            long laskBackupMS = lastBackupDate.getTime();
+            long diffMS = System.currentTimeMillis() - laskBackupMS;
+
+            if (diffMS > FORCE_BACKUP_TIME) {
+                mForcedBackup = true;
+                return true;
+            } else {
+                mForcedBackup = false;
+                return false;
+            }
+
+        } catch (ParseException e) {
+
+        }
+
+        return false;
+
     }
 
 }

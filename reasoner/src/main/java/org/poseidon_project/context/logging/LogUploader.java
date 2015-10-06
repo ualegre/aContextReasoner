@@ -124,11 +124,13 @@ public class LogUploader implements XMLRPCCallback{
 
     @Override
     public void onError(long id, XMLRPCException error) {
-
+        Log.e(LOG_TAG, error.getMessage().toString());
+        mLogger.incompleteBackup();
     }
 
     @Override
     public void onServerError(long id, XMLRPCServerException error) {
-
+        Log.e(LOG_TAG, error.getMessage().toString());
+        mLogger.incompleteBackup();
     }
 }

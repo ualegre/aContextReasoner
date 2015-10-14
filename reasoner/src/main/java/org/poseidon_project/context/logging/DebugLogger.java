@@ -22,19 +22,23 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.BatteryManager;
+import android.os.Build;
+import android.os.PowerManager;
+import android.provider.Settings;
 import android.util.Log;
 
 import org.poseidon_project.context.database.ContextDB;
 import org.poseidon_project.contexts.hardware.PluggedInContext;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 
 
 /**
@@ -48,6 +52,7 @@ public class DebugLogger {
     private static final int ARRAY_CAPACITY = 50;
     private static final long FORCE_BACKUP_TIME = 1000 * 60 * 60 * 48;
     private static final long FORCED_RETRY_TIME = 1000 * 60 * 30;
+    private long mBackupTime;
     private int mBackupHour;
     private int mBackupMin;
     private int mUserID;
@@ -78,10 +83,10 @@ public class DebugLogger {
         checkBackupSettings();
         setupBackupAlarm();
 
+
         attemptBackup(null);
 
     }
-
 
     private void setupBackupAlarm() {
 
@@ -89,12 +94,28 @@ public class DebugLogger {
         timeToStart.set(Calendar.HOUR_OF_DAY, mBackupHour);
         timeToStart.set(Calendar.MINUTE, mBackupMin);
         timeToStart.set(Calendar.SECOND, 0);
+        mBackupTime = timeToStart.getTimeInMillis();
 
         AlarmManager alarmManager = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
 
         PendingIntent pi = PendingIntent.getBroadcast(mContext, 0, new Intent(mContext, BackupLogAlarmReceiver.class), 0);
-        alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, timeToStart.getTimeInMillis(),
-                AlarmManager.INTERVAL_DAY, pi);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            PowerManager powerManager = (PowerManager) mContext.getSystemService(Context.POWER_SERVICE);
+            String packageName = mContext.getPackageName();
+            if(powerManager.isIgnoringBatteryOptimizations(packageName)) {
+                alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, mBackupTime, pi);
+            } else {
+                Intent intent = new Intent();
+                intent.setAction(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS);
+                intent.setData(Uri.parse("package:" + packageName));
+                mContext.startActivity(intent);
+            }
+
+        } else {
+            alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, timeToStart.getTimeInMillis(),
+                    AlarmManager.INTERVAL_DAY, pi);
+        }
 
         Log.v(LOG_TAG, "Alarm Set");
 
@@ -105,7 +126,6 @@ public class DebugLogger {
         SharedPreferences settings = mContext.getSharedPreferences(CONTEXT_PREFS, 0);
         int backupHour = settings.getInt("logBackupHour", -1);
         int backupMin = settings.getInt("logBackupMin", -1);
-        String lastBackupDate = settings.getString("logLastBackup", "");
         mUserID = settings.getInt("userId", -1);
 
         if (backupHour < 0 || backupMin < 0) {
@@ -131,6 +151,12 @@ public class DebugLogger {
     }
 
     private void uploadLog() {
+
+        if (mUserID < 0) {
+            String uuid = UUID.randomUUID().toString();
+            registerUser(uuid);
+        }
+
         persist();
         mUploader.uploadLogToServer(mUserID);
     }
@@ -155,11 +181,8 @@ public class DebugLogger {
 
     private boolean inCorrectBackupConditions() {
 
-        if (phoneIsPluggedIn()) {
-            return true;
-        }
+        return phoneIsPluggedIn();
 
-        return false;
     }
 
     public void completedBackup() {
@@ -170,9 +193,16 @@ public class DebugLogger {
 
         SharedPreferences settings = mContext.getSharedPreferences(CONTEXT_PREFS, 0);
         SharedPreferences.Editor editor = settings.edit();
-        String date =  mDateFormater.format(new Date());
-        editor.putString("logLastBackup", date);
+        editor.putLong("logLastBackup", System.currentTimeMillis());
         mContextDB.emptyEvents();
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            AlarmManager alarmManager = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
+
+            PendingIntent pi = PendingIntent.getBroadcast(mContext, 0, new Intent(mContext, BackupLogAlarmReceiver.class), 0);
+            alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, mBackupTime, pi);
+
+        }
 
         if (mAlarmIntent != null) {
             BackupLogAlarmReceiver.completeWakefulIntent(mAlarmIntent);
@@ -188,7 +218,12 @@ public class DebugLogger {
 
             PendingIntent pi = PendingIntent.getBroadcast(mContext, 0, new Intent(mContext, BackupLogAlarmReceiver.class), 0);
 
-            alarmManager.set(AlarmManager.RTC_WAKEUP, timeToRetry, pi);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, timeToRetry, pi);
+            } else {
+                alarmManager.set(AlarmManager.RTC_WAKEUP, timeToRetry, pi);
+            }
+
         }
 
     }
@@ -302,13 +337,14 @@ public class DebugLogger {
 
     public boolean registerUser(String userIdent) {
 
-        mUploader.registerUser(userIdent);
+        mUploader.registerUser(new Integer(mUserID), userIdent);
         return true;
     }
 
     public void newUserID(int userID) {
 
         if (userID > 0) {
+            mUserID = userID;
             SharedPreferences settings = mContext.getSharedPreferences(CONTEXT_PREFS, 0);
             SharedPreferences.Editor editor = settings.edit();
             editor.putInt("userId", userID);
@@ -319,27 +355,17 @@ public class DebugLogger {
     private boolean needsForcedBackup () {
 
         SharedPreferences settings = mContext.getSharedPreferences(CONTEXT_PREFS, 0);
-        String lastBackupString = settings.getString("logLastBackup", "");
 
-        try {
-            Date lastBackupDate = mDateFormater.parse(lastBackupString);
-            long laskBackupMS = lastBackupDate.getTime();
-            long diffMS = System.currentTimeMillis() - laskBackupMS;
+        long lastBackupMS = settings.getLong("logLastBackup", -1);
+        long diffMS = System.currentTimeMillis() - lastBackupMS;
 
-            if (diffMS > FORCE_BACKUP_TIME) {
-                mForcedBackup = true;
-                return true;
-            } else {
-                mForcedBackup = false;
-                return false;
-            }
-
-        } catch (ParseException e) {
-
+        if (diffMS > FORCE_BACKUP_TIME) {
+            mForcedBackup = true;
+            return true;
+        } else {
+            mForcedBackup = false;
+            return false;
         }
-
-        return false;
-
     }
 
 }

@@ -67,13 +67,17 @@ public class LogUploader implements XMLRPCCallback{
 
     }
 
-    protected void registerUser(final String userIdent) {
+    protected void registerUser(final Integer userNumber, final String userIdent) {
 
         new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
-                    String i = (String) mRPCClient.call(RPC_REGISTER_FUNCTION, userIdent);
+                    ArrayList params = new ArrayList();
+                    params.add(userNumber);
+                    params.add(userIdent);
+
+                    String i = (String) mRPCClient.call(RPC_REGISTER_FUNCTION, params);
                     mLogger.newUserID(Integer.valueOf(i));
                 } catch (XMLRPCException e) {
                     Log.e(LOG_TAG, e.getMessage());
@@ -82,8 +86,7 @@ public class LogUploader implements XMLRPCCallback{
         }).start();
     }
 
-
-    public void uploadLogToServer(int userID) {
+    protected void uploadLogToServer(int userID) {
 
         List<LogEvent> events = mContextDB.getAllEvents();
 

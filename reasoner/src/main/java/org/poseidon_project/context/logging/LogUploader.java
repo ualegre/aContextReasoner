@@ -48,12 +48,12 @@ public class LogUploader implements XMLRPCCallback{
     private XMLRPCClient mRPCClient;
     private ContextDB mContextDB;
     private Context mContext;
-    private DebugLogger mLogger;
+    private DataLogger mLogger;
     private long registerID;
     private long uploadID;
 
 
-    public LogUploader(Context context, ContextDB db, DebugLogger logger) {
+    public LogUploader(Context context, ContextDB db, DataLogger logger) {
 
         mContext = context;
         mContextDB = db;

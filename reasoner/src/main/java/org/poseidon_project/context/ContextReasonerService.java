@@ -22,7 +22,7 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.os.RemoteException;
 
-import org.poseidon_project.context.logging.DebugLogger;
+import org.poseidon_project.context.logging.DataLogger;
 
 import java.util.Map;
 
@@ -36,7 +36,7 @@ public class ContextReasonerService extends Service{
     private static final String LOGTAG = "ContextService";
     private ContextReasonerCore mReasonerCore;
     private Context mContext;
-    private DebugLogger mLogger;
+    private DataLogger mLogger;
 
     @Override
     public void onCreate() {
@@ -71,7 +71,8 @@ public class ContextReasonerService extends Service{
     public IBinder onBind(Intent intent) {
 
         if (IContextReasoner.class.getName().equals(intent.getAction())) {
-            mLogger.logVerbose(LOGTAG, "binding");
+            mLogger.logVerbose(LOGTAG, "Service in use");
+            mLogger.inUse();
             return mContextBinder;
         } else if (ILogBackup.class.getName().equals(intent.getAction())) {
             return mLogBackupBinder;
@@ -80,11 +81,22 @@ public class ContextReasonerService extends Service{
         return null;
     }
 
+    public boolean onUnbind(Intent intent) {
+
+        mLogger.noLongerInUse();
+
+        if (IContextReasoner.class.getName().equals(intent.getAction())) {
+            mLogger.logVerbose(LOGTAG, "Service no longer in use");
+        }
+
+        return true;
+    }
+
     public final ILogBackup.Stub mLogBackupBinder = new ILogBackup.Stub() {
 
         @Override
         public void runLogBackup() throws RemoteException {
-            mLogger.attemptBackup();
+            mLogger.attemptBackup(null);
         }
 
     };

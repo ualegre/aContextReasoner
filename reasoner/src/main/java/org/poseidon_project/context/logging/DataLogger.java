@@ -42,11 +42,11 @@ import java.util.UUID;
 
 
 /**
- * Provides logging capabilities for pilot debugging/data recovery.
+ * Provides logging capabilities for off-device learning, debugging, and data collection
  *
  * @author Dean Kramer <d.kramer@mdx.ac.uk>
  */
-public class DebugLogger {
+public class DataLogger {
 
     private static final int EARLIEST_BACKUP_HOUR = 20;
     private static final int ARRAY_CAPACITY = 50;
@@ -74,7 +74,7 @@ public class DebugLogger {
     //Whether or not verbose events should be sent to Android Log.
     private static final boolean VERBOSE = true;
 
-    public DebugLogger (Context context, ContextDB db) {
+    public DataLogger(Context context, ContextDB db) {
         mContextDB = db;
         mContext = context;
         mUploader = new LogUploader(mContext, mContextDB, this);

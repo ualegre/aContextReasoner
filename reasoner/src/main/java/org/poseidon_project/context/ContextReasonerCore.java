@@ -21,7 +21,7 @@ import android.content.Intent;
 
 import org.poseidon_project.context.database.ContextDB;
 import org.poseidon_project.context.database.ContextDBImpl;
-import org.poseidon_project.context.logging.DebugLogger;
+import org.poseidon_project.context.logging.DataLogger;
 import org.poseidon_project.context.management.ContextManager;
 import org.poseidon_project.context.reasoner.OntologyManager;
 
@@ -44,19 +44,19 @@ public class ContextReasonerCore {
     private OntologyManager mOntologyManager;
     private Context mContext;
     private HashMap<String, String> mContextValues = new HashMap<>();
-    private DebugLogger mLogger;
+    private DataLogger mLogger;
 
 
     public ContextReasonerCore(Context c) {
         mContext = c;
         mContextDatabase = new ContextDBImpl(mContext);
-        mLogger = new DebugLogger(mContext, mContextDatabase);
+        mLogger = new DataLogger(mContext, mContextDatabase);
         mOntologyManager = new OntologyManager(c, this);
         mContextManager = new ContextManager(c, this, mContextDatabase);
 
     }
 
-    public DebugLogger getLogger() { return mLogger;}
+    public DataLogger getLogger() { return mLogger;}
 
     public OntologyManager getOntologyManager() {return mOntologyManager;}
 

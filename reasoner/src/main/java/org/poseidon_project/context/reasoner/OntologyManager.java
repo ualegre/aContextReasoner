@@ -30,7 +30,7 @@ import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.ResultSet;
 
 import org.poseidon_project.context.ContextReasonerCore;
-import org.poseidon_project.context.logging.DebugLogger;
+import org.poseidon_project.context.logging.DataLogger;
 import org.poseidon_project.context.utility.FileOperations;
 import org.poseidon_project.contexts.IOntologyManager;
 
@@ -62,7 +62,7 @@ public class OntologyManager implements IOntologyManager{
     private CsparqlQueryResultProxy mCsparqlQRP;
     private ContextStream mContextStream;
     private ContextRuleObserver mContextRuleObserver;
-    private DebugLogger mLogger;
+    private DataLogger mLogger;
     //Only required for the pilot until the main infrastructure is done.
     public ContextMapper pilotMapper;
     private HashMap<String, Object> mOntIndividuals;

@@ -23,7 +23,7 @@ import android.util.Log;
 
 import org.poseidon_project.context.ContextReasonerCore;
 import org.poseidon_project.context.database.ContextDB;
-import org.poseidon_project.context.logging.DebugLogger;
+import org.poseidon_project.context.logging.DataLogger;
 import org.poseidon_project.contexts.ContextObserver;
 import org.poseidon_project.contexts.ContextReceiver;
 import org.poseidon_project.contexts.IContextManager;
@@ -65,7 +65,7 @@ public class ContextManager implements IContextManager{
     private Calendar mCalendar = Calendar.getInstance();
     public static final String CONTEXT_PREFS = "ContextPrefs";
     private ContextReasonerCore mReasonerCore;
-    private DebugLogger mLogger;
+    private DataLogger mLogger;
 
     public ContextManager(Context c, ContextReasonerCore reasonerCore, ContextDB db) {
 

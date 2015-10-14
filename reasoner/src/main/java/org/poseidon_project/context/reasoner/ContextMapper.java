@@ -17,7 +17,7 @@
 package org.poseidon_project.context.reasoner;
 
 import org.poseidon_project.context.ContextReasonerCore;
-import org.poseidon_project.context.logging.DebugLogger;
+import org.poseidon_project.context.logging.DataLogger;
 import org.poseidon_project.context.management.ContextManager;
 
 import java.util.HashMap;
@@ -37,7 +37,7 @@ public class ContextMapper {
     private OntologyManager mOntologyManager;
     private HashMap<String, CsparqlQueryResultProxy> rules = new HashMap<>();
     private static final String LOGTAG = "ContextMapper";
-    private DebugLogger mLogger;
+    private DataLogger mLogger;
 
 
     /*

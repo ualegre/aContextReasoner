@@ -50,6 +50,7 @@ public class DataLogger {
     private static final int ARRAY_CAPACITY = 50;
     private static final long FORCE_BACKUP_TIME = 1000 * 60 * 60 * 48;
     private static final long FORCED_RETRY_TIME = 1000 * 60 * 30;
+    private static final long NEXT_BACKUP_TIME = 1000 * 60 * 60 * 24;
     private long mBackupTime;
     private int mBackupHour;
     private int mBackupMin;
@@ -192,6 +193,8 @@ public class DataLogger {
         if (mForcedBackup) {
             mForcedBackup = false;
         }
+
+        mBackupTime += NEXT_BACKUP_TIME;
 
         SharedPreferences settings = mContext.getSharedPreferences(CONTEXT_PREFS, 0);
         SharedPreferences.Editor editor = settings.edit();

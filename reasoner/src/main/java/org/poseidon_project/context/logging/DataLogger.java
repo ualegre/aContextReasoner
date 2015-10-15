@@ -22,11 +22,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.BatteryManager;
 import android.os.Build;
 import android.os.PowerManager;
-import android.provider.Settings;
 import android.util.Log;
 
 import org.poseidon_project.context.database.ContextDB;
@@ -56,6 +54,7 @@ public class DataLogger {
     private int mBackupHour;
     private int mBackupMin;
     private int mUserID;
+    private boolean mAlarmset = false;
 
     private ContextDB mContextDB;
     private List<LogEvent> mEventsArray = new ArrayList<>(ARRAY_CAPACITY);
@@ -69,6 +68,8 @@ public class DataLogger {
     private LogLocationReceiver mLocationReceiver;
     private PluggedInContext mPluggedInContext;
     private boolean mForcedBackup = false;
+
+    public static final String BROADCAST_INTENT = "org.poseidon_project.context.NEEDS_BAT_OP_SET_OFF";
 
 
     //Whether or not verbose events should be sent to Android Log.
@@ -105,19 +106,20 @@ public class DataLogger {
             String packageName = mContext.getPackageName();
             if(powerManager.isIgnoringBatteryOptimizations(packageName)) {
                 alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, mBackupTime, pi);
+                mAlarmset = true;
             } else {
+                //Need the running app to take the user to whitelist this app
                 Intent intent = new Intent();
-                intent.setAction(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS);
-                intent.setData(Uri.parse("package:" + packageName));
-                mContext.startActivity(intent);
+                intent.setAction(BROADCAST_INTENT);
+                intent.putExtra("package", packageName);
+                mContext.sendBroadcast(intent);
             }
 
         } else {
             alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, timeToStart.getTimeInMillis(),
                     AlarmManager.INTERVAL_DAY, pi);
+            mAlarmset = true;
         }
-
-        Log.v(LOG_TAG, "Alarm Set");
 
     }
 
@@ -260,6 +262,10 @@ public class DataLogger {
         }
 
         synchronized (this) {
+
+            if (! mAlarmset) {
+                setupBackupAlarm();
+            }
 
             String dateTime = mDateFormater.format(new Date());
 

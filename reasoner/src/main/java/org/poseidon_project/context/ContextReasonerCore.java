@@ -95,7 +95,8 @@ public class ContextReasonerCore {
             intent.putExtra(CONTEXT_VALUE, contextValue);
             mContext.sendBroadcast(intent);
         } catch (Exception e) {
-            mLogger.logError(LOGTAG, "Cannot Broadcast Context: " + contextName + " Change");
+            mLogger.logError(DataLogger.SYSTEM_CORE, LOGTAG,
+                    "Cannot Broadcast Context: " + contextName + " Change");
         }
 
     }
@@ -121,12 +122,14 @@ public class ContextReasonerCore {
         if (previous==null) {
             //sendBroadcast
             sendContextResult(contextName, value);
-            mLogger.logVerbose(LOGTAG, "Context: " + contextName + " set to " + value);
+            mLogger.logVerbose(DataLogger.REASONER,
+                    LOGTAG, "Context: " + contextName + " set to " + value);
         } else {
             if(! value.equals(previous)) {
                 //sendBroadcast
                 sendContextResult(contextName, value);
-                mLogger.logVerbose(LOGTAG, "Context: " + contextName + " set to " + value);
+                mLogger.logVerbose(DataLogger.REASONER,
+                        LOGTAG, "Context: " + contextName + " set to " + value);
             }
         }
     }

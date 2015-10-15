@@ -46,6 +46,10 @@ import java.util.UUID;
  */
 public class DataLogger {
 
+    public static final int SYSTEM_CORE = 0;
+    public static final int CONTEXT_MANAGER = 1;
+    public static final int REASONER = 2;
+
     private static final int EARLIEST_BACKUP_HOUR = 20;
     private static final int ARRAY_CAPACITY = 50;
     private static final long FORCE_BACKUP_TIME = 1000 * 60 * 60 * 48;
@@ -258,7 +262,7 @@ public class DataLogger {
     }
 
 
-    private void log(String event) {
+    private void log(int origin, String event) {
 
         if (mEventsArraySize == 50)  {
             persist();
@@ -272,10 +276,8 @@ public class DataLogger {
 
             String dateTime = mDateFormater.format(new Date());
 
-            LogEvent logEvent = new LogEvent(0, mLocationReceiver.getLocationString(),
+            LogEvent logEvent = new LogEvent(origin, mLocationReceiver.getLocationString(),
                     dateTime, event);
-
-            Log.e("Event", logEvent.toString());
 
             mEventsArray.add(logEvent);
             mEventsArraySize++;
@@ -283,27 +285,27 @@ public class DataLogger {
 
     }
 
-    public void logError(String event) {
+    public void logError(int origin, String event) {
         event = "Error: " + event;
-        log(event);
+        log(origin, event);
         Log.e(LOG_TAG, event);
     }
 
-    public void logError(String logtag, String event) {
+    public void logError(int origin, String logtag, String event) {
         event = "Error: " + event;
-        log(event);
+        log(origin, event);
         Log.e(logtag, event);
     }
 
-    public void logVerbose(String event) {
-        log(event);
+    public void logVerbose(int origin, String event) {
+        log(origin, event);
         if(VERBOSE) {
             Log.v(LOG_TAG, event);
         }
     }
 
-    public void logVerbose(String logtag, String event) {
-        log(event);
+    public void logVerbose(int origin, String logtag, String event) {
+        log(origin, event);
         if (VERBOSE) {
             Log.v(logtag, event);
         }

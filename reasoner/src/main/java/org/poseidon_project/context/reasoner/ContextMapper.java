@@ -260,7 +260,7 @@ public class ContextMapper {
             return registerStandstill();
         }
 
-        mLogger.logError(LOGTAG, "Context: " + context + " not found!");
+        mLogger.logError(DataLogger.REASONER, LOGTAG, "Context: " + context + " not found!");
 
         return false;
     }
@@ -279,7 +279,7 @@ public class ContextMapper {
             return unRegisterStandstill();
         }
 
-        mLogger.logError(LOGTAG, "Context: " + context + " not found!");
+        mLogger.logError(DataLogger.REASONER, LOGTAG, "Context: " + context + " not found!");
 
         return false;
     }
@@ -306,7 +306,8 @@ public class ContextMapper {
             mOntologyManager.unregisterCSPARQLQuery(c1.getId());
         } else {
             okExit = false;
-            mLogger.logError(LOGTAG, "isStandstillForLongQuery was not registered");
+            mLogger.logError(DataLogger.REASONER, LOGTAG,
+                    "isStandstillForLongQuery was not registered");
         }
 
 
@@ -314,7 +315,8 @@ public class ContextMapper {
             mOntologyManager.unregisterCSPARQLQuery(c2.getId());
         } else {
             okExit = false;
-            mLogger.logError(LOGTAG, "isStandstillForShortQuery was not registered");
+            mLogger.logError(DataLogger.REASONER, LOGTAG,
+                    "isStandstillForShortQuery was not registered");
         }
 
         mReasonerCore.removeContextValue("STANDSTILL");
@@ -333,14 +335,16 @@ public class ContextMapper {
             rules.put(navigationAssistNeededQuery, c1);
         } else {
             okExit = false;
-            mLogger.logError(LOGTAG, "navigationAssistNeededQuery couldn't register");
+            mLogger.logError(DataLogger.REASONER, LOGTAG,
+                    "navigationAssistNeededQuery couldn't register");
         }
 
         if (c2 != null) {
             rules.put(navigationAssistNotNeededQuery, c2);
         } else {
             okExit = false;
-            mLogger.logError(LOGTAG, "navigationAssistNotNeededQuery couldn't register");
+            mLogger.logError(DataLogger.REASONER, LOGTAG,
+                    "navigationAssistNotNeededQuery couldn't register");
         }
 
         return okExit;
@@ -357,14 +361,16 @@ public class ContextMapper {
             mOntologyManager.unregisterCSPARQLQuery(c1.getId());
         } else {
             okExit = false;
-            mLogger.logError(LOGTAG, "navigationAssistNeededQuery was not registered");
+            mLogger.logError(DataLogger.REASONER, LOGTAG,
+                    "navigationAssistNeededQuery was not registered");
         }
 
         if (c2 != null) {
             mOntologyManager.unregisterCSPARQLQuery(c2.getId());
         } else {
             okExit = false;
-            mLogger.logError(LOGTAG, "navigationAssistNeededQuery was not registered");
+            mLogger.logError(DataLogger.REASONER, LOGTAG,
+                    "navigationAssistNeededQuery was not registered");
         }
 
         mReasonerCore.removeContextValue("NAV");
@@ -399,35 +405,40 @@ public class ContextMapper {
             rules.put(weatherRainingAndColdQuery, c1);
         } else {
             okExit = false;
-            mLogger.logError(LOGTAG, "weatherRainingAndColdQuery couldn't register");
+            mLogger.logError(DataLogger.REASONER, LOGTAG,
+                    "weatherRainingAndColdQuery couldn't register");
         }
 
         if (c2 != null) {
             rules.put(weatherColdQuery, c2);
         } else {
             okExit = false;
-            mLogger.logError(LOGTAG, "weatherColdQuery couldn't register");
+            mLogger.logError(DataLogger.REASONER, LOGTAG,
+                    "weatherColdQuery couldn't register");
         }
 
         if (c3 != null) {
             rules.put(weatherRainingQuery, c3);
         } else {
             okExit = false;
-            mLogger.logError(LOGTAG, "weatherRainingQuery couldn't register");
+            mLogger.logError(DataLogger.REASONER, LOGTAG,
+                    "weatherRainingQuery couldn't register");
         }
 
         if (c4 != null) {
             rules.put(weatherHotQuery, c4);
         } else {
             okExit = false;
-            mLogger.logError(LOGTAG, "weatherHotQuery couldn't register");
+            mLogger.logError(DataLogger.REASONER, LOGTAG,
+                    "weatherHotQuery couldn't register");
         }
 
         if (c5 != null) {
             rules.put(weatherOkayQuery, c5);
         } else {
             okExit = false;
-            mLogger.logError(LOGTAG, "weatherOkayQuery couldn't register");
+            mLogger.logError(DataLogger.REASONER, LOGTAG,
+                    "weatherOkayQuery couldn't register");
         }
 
         if (okExit) {
@@ -452,35 +463,36 @@ public class ContextMapper {
             mOntologyManager.unregisterCSPARQLQuery(c1.getId());
         } else {
             okExit = false;
-            mLogger.logError(LOGTAG, "weatherRainingAndColdQuery was not registered");
+            mLogger.logError(DataLogger.REASONER, LOGTAG,
+                    "weatherRainingAndColdQuery was not registered");
         }
 
         if (c2 != null) {
             mOntologyManager.unregisterCSPARQLQuery(c2.getId());
         } else {
             okExit = false;
-            mLogger.logError(LOGTAG, "weatherColdQuery was not registered");
+            mLogger.logError(DataLogger.REASONER, LOGTAG, "weatherColdQuery was not registered");
         }
 
         if (c3 != null) {
             mOntologyManager.unregisterCSPARQLQuery(c3.getId());
         } else {
             okExit = false;
-            mLogger.logError(LOGTAG, "weatherRainingQuery was not registered");
+            mLogger.logError(DataLogger.REASONER, LOGTAG, "weatherRainingQuery was not registered");
         }
 
         if (c4 != null) {
             mOntologyManager.unregisterCSPARQLQuery(c4.getId());
         } else {
             okExit = false;
-            mLogger.logError(LOGTAG, "weatherHotQuery was not registered");
+            mLogger.logError(DataLogger.REASONER, LOGTAG, "weatherHotQuery was not registered");
         }
 
         if (c5 != null) {
             mOntologyManager.unregisterCSPARQLQuery(c5.getId());
         } else {
             okExit = false;
-            mLogger.logError(LOGTAG, "weatherOkayQuery was not registered");
+            mLogger.logError(DataLogger.REASONER, LOGTAG, "weatherOkayQuery was not registered");
         }
 
         mReasonerCore.removeContextValue("WEATHER");
@@ -499,14 +511,14 @@ public class ContextMapper {
             rules.put(batteryLOWQuery, c1);
         } else {
             okExit = false;
-            mLogger.logError(LOGTAG, "batteryLOWQuery could't register");
+            mLogger.logError(DataLogger.REASONER, LOGTAG, "batteryLOWQuery could't register");
         }
 
         if (c2 != null) {
             rules.put(batteryOkQuery, c2);
         } else {
             okExit = false;
-            mLogger.logError(LOGTAG, "batteryOkQuery couldn't register");
+            mLogger.logError(DataLogger.REASONER, LOGTAG, "batteryOkQuery couldn't register");
         }
 
         if (okExit) {
@@ -527,14 +539,14 @@ public class ContextMapper {
             mOntologyManager.unregisterCSPARQLQuery(c1.getId());
         } else {
             okExit = false;
-            mLogger.logError(LOGTAG, "batteryLOWQuery was not registered");
+            mLogger.logError(DataLogger.REASONER, LOGTAG, "batteryLOWQuery was not registered");
         }
 
         if (c2 != null) {
             mOntologyManager.unregisterCSPARQLQuery(c2.getId());
         } else {
             okExit = false;
-            mLogger.logError(LOGTAG, "batteryOkQuery was not registered");
+            mLogger.logError(DataLogger.REASONER, LOGTAG, "batteryOkQuery was not registered");
         }
 
         mReasonerCore.removeContextValue("BATTERY");

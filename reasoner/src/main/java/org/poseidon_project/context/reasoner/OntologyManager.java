@@ -107,7 +107,7 @@ public class OntologyManager implements IOntologyManager{
             queryResultProxy.addObserver(mContextRuleObserver);
 
         } catch (final ParseException e) {
-            mLogger.logError(LOGTAG, "Cannot parse: " + query);
+            mLogger.logError(DataLogger.SYSTEM_CORE, LOGTAG, "Cannot parse: " + query);
             Log.e(LOGTAG, "Error Parsing: " + e.getMessage());
         }
 
@@ -137,7 +137,8 @@ public class OntologyManager implements IOntologyManager{
 
         //Read and Open all POSEIDON Related Ontologies
         if (mModel == null) {
-            mLogger.logError(LOGTAG, "Model not initialised, ignoring");
+            mLogger.logError(DataLogger.SYSTEM_CORE, LOGTAG,
+                    "Model not initialised, ignoring");
             return false;
         } else {
             for (String uri : POSEIDONOntologies.ONTOLOGIES_ARRAY) {
@@ -173,7 +174,8 @@ public class OntologyManager implements IOntologyManager{
                     boolean copied = copyOntologyFile(filepath);
 
                     if (! copied ){
-                        mLogger.logError(LOGTAG, "Failed to copy to SD Card: " + filepath);
+                        mLogger.logError(DataLogger.SYSTEM_CORE, LOGTAG,
+                                "Failed to copy to SD Card: " + filepath);
                     }
                 }
 
@@ -249,7 +251,7 @@ public class OntologyManager implements IOntologyManager{
     public boolean mapOntologyURLtoFile(String url, String fileLocation) {
 
         if (mModel == null) {
-            mLogger.logError(LOGTAG, "Model not initialised, ignoring");
+            mLogger.logError(DataLogger.SYSTEM_CORE, LOGTAG, "Model not initialised, ignoring");
             return false;
         } else {
             OntDocumentManager dm = mModel.getDocumentManager();
@@ -263,7 +265,7 @@ public class OntologyManager implements IOntologyManager{
     public boolean runSPARQLQuery(String queryText) {
 
         if (mModel == null) {
-            mLogger.logError(LOGTAG, "Model not initialised, ignoring");
+            mLogger.logError(DataLogger.SYSTEM_CORE, LOGTAG, "Model not initialised, ignoring");
             return false;
         } else {
             runSPARQLQuery(queryText, mModel);

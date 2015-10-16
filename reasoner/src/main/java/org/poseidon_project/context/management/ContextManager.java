@@ -104,6 +104,8 @@ public class ContextManager implements IContextManager{
                     observer = null;
                     return false;
                 } else {
+                    mLogger.logVerbose(DataLogger.CONTEXT_MANAGER, LOGTAG,
+                            "Observer " + observerName + " started");
                     return true;
                 }
             }

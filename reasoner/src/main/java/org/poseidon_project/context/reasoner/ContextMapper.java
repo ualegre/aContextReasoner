@@ -291,6 +291,8 @@ public class ContextMapper {
         rules.put(isStandstillForLongQuery, c1);
         rules.put(isStandstillForShortQuery, c2);
         mContextManager.addObserverRequirement("engine", "DistanceTravelledContext");
+
+        mLogger.logVerbose(DataLogger.REASONER, LOGTAG, "Registered standstill");
         return true;
     }
 
@@ -320,6 +322,7 @@ public class ContextMapper {
         }
 
         mReasonerCore.removeContextValue("STANDSTILL");
+        mLogger.logVerbose(DataLogger.REASONER, LOGTAG, "Unregistered standstill");
 
         return okExit;
     }
@@ -346,6 +349,8 @@ public class ContextMapper {
             mLogger.logError(DataLogger.REASONER, LOGTAG,
                     "navigationAssistNotNeededQuery couldn't register");
         }
+
+        mLogger.logVerbose(DataLogger.REASONER, LOGTAG, "Registered navassistance");
 
         return okExit;
     }
@@ -374,12 +379,13 @@ public class ContextMapper {
         }
 
         mReasonerCore.removeContextValue("NAV");
+        mLogger.logVerbose(DataLogger.REASONER, LOGTAG, "Unregistered navassistance");
 
         return okExit;
     }
 
     private boolean registerIndoorOutdoorsContext() {
-
+        mLogger.logVerbose(DataLogger.REASONER, LOGTAG, "Registered GPSIndoorOutdoor");
         return mContextManager.addObserverRequirement("engine", "GPSIndoorOutdoorContext");
     }
 
@@ -387,6 +393,7 @@ public class ContextMapper {
 
         boolean okExit = mContextManager.removeObserverRequirement("engine", "GPSIndoorOutdoorContext");
         mReasonerCore.removeContextValue("INDOOR/OUTDOOR");
+        mLogger.logVerbose(DataLogger.REASONER, LOGTAG, "Unregistered GPSIndoorOutdoor");
 
         return okExit;
     }
@@ -440,6 +447,8 @@ public class ContextMapper {
             mLogger.logError(DataLogger.REASONER, LOGTAG,
                     "weatherOkayQuery couldn't register");
         }
+
+        mLogger.logVerbose(DataLogger.REASONER, LOGTAG, "Registered weather");
 
         if (okExit) {
             return mContextManager.addObserverRequirementWithParameters("engine", "LocationWeatherContext", parameters);
@@ -496,6 +505,7 @@ public class ContextMapper {
         }
 
         mReasonerCore.removeContextValue("WEATHER");
+        mLogger.logVerbose(DataLogger.REASONER, LOGTAG, "Unregistered weather");
 
         return okExit;
     }
@@ -520,6 +530,8 @@ public class ContextMapper {
             okExit = false;
             mLogger.logError(DataLogger.REASONER, LOGTAG, "batteryOkQuery couldn't register");
         }
+
+        mLogger.logVerbose(DataLogger.REASONER, LOGTAG, "Registered battery");
 
         if (okExit) {
             return mContextManager.addObserverRequirement("engine", "BatteryContext");
@@ -550,6 +562,7 @@ public class ContextMapper {
         }
 
         mReasonerCore.removeContextValue("BATTERY");
+        mLogger.logVerbose(DataLogger.REASONER, LOGTAG, "Unregistered battery");
 
         return okExit;
     }

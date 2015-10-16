@@ -26,6 +26,7 @@ import org.poseidon_project.contexts.UIEvent;
 import org.poseidon_project.contexts.hardware.CurrentLocationContext;
 import org.poseidon_project.contexts.hardware.PluggedInContext;
 
+import java.text.DecimalFormat;
 import java.util.Map;
 
 /**
@@ -40,6 +41,9 @@ public class LogLocationReceiver {
     private long mLastUpdate = 0;
     private Location mCurrentLocation;
     private Thread mGetterThread;
+
+    //To 5 decimal places is accurate enough
+    private DecimalFormat mFormatter = new DecimalFormat("###.#####");
 
     //Ten Minutes
     private static final int TIME_TO_REFRESH = 1000 * 60 * 10;
@@ -78,10 +82,9 @@ public class LogLocationReceiver {
             StringBuilder s = new StringBuilder();
 
             if (mCurrentLocation != null) {
-
-                s.append(mCurrentLocation.getLatitude());
+                s.append(mFormatter.format(mCurrentLocation.getLatitude()));
                 s.append(",");
-                s.append(mCurrentLocation.getLongitude());
+                s.append(mFormatter.format(mCurrentLocation.getLongitude()));
             }
 
             return s.toString();
@@ -89,18 +92,8 @@ public class LogLocationReceiver {
 
 
     public boolean stop() {
-        //mLocationContext.stop();
         return  mPluggedInContext.stop();
     }
-
-    public void startListening() {
-
-    }
-
-    public void stopListening() {
-        //mLocationContext.stop();
-    }
-
 
     public ContextReceiver mContextListener = new ContextReceiver() {
         @Override
@@ -134,7 +127,6 @@ public class LogLocationReceiver {
             mLastUpdate = mCurrentLocation.getTime();
 
             if (Thread.currentThread() == mGetterThread) {
-                Log.v("LocationReceiver", "joined");
                 mLocationContext.stop();
                 Looper.myLooper().quit();
                 return;

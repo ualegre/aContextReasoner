@@ -72,7 +72,6 @@ public class ContextReasonerService extends Service{
 
         if (IContextReasoner.class.getName().equals(intent.getAction())) {
             mLogger.logVerbose(DataLogger.SYSTEM_CORE, LOGTAG, "Service in use");
-            mLogger.inUse();
             return mContextBinder;
         } else if (ILogBackup.class.getName().equals(intent.getAction())) {
             return mLogBackupBinder;
@@ -82,8 +81,6 @@ public class ContextReasonerService extends Service{
     }
 
     public boolean onUnbind(Intent intent) {
-
-        mLogger.noLongerInUse();
 
         if (IContextReasoner.class.getName().equals(intent.getAction())) {
             mLogger.logVerbose(DataLogger.SYSTEM_CORE, LOGTAG, "Service no longer in use");

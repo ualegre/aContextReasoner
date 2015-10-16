@@ -311,14 +311,6 @@ public class DataLogger {
         }
     }
 
-    public void inUse() {
-        mLocationReceiver.startListening();
-    }
-
-    public void noLongerInUse() {
-        mLocationReceiver.stopListening();
-    }
-
     public boolean stop() {
 
         mLocationReceiver.stop();

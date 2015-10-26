@@ -52,4 +52,6 @@ public class ContextResult {
 
     public long getContextTime() { return mTime; }
 
+    public String getFullName() { return mContextName + "_" + mValue;}
+
 }

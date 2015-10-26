@@ -16,7 +16,13 @@
 
 package org.poseidon_project.context.reasoner;
 
+import org.prop4j.Literal;
+import org.prop4j.Node;
+import org.prop4j.NodeReader;
+
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -30,14 +36,78 @@ public class AggregateRule {
             "implies", "or", "and", "not", "(", ")" };
 
     private String mPropRule;
+    private Node mPropNodes;
+    private String mRule;
+    private boolean mHasCachableLiterals = false;
 
     //          Literal, Temporal Element
-    private Map<String, String> mTemporalLiterals;
+    private Map<String, TemporalValue> mTemporalLiterals;
+    private ArrayList<String> mLiterals;
 
 
     public AggregateRule(String rule) {
         mTemporalLiterals = new HashMap<>();
-        rule = checkForTemporalLiterals(rule);
+        mRule = rule;
+        mPropRule = checkForTemporalLiterals(rule);
+        NodeReader reader = new NodeReader();
+
+        mPropNodes = reader.stringToNode(mPropRule);
+
+        List<Node> literals = mPropNodes.getAllNodeTypes(Literal.class);
+
+        for (Node literal : literals) {
+            String literalString = (String) ((Literal)literal).var;
+
+            TemporalValue temp = mTemporalLiterals.get(literalString);
+
+            if (temp == null) {
+                mLiterals.add(literalString);
+            }
+
+        }
+    }
+
+    private TemporalValue parseTemporalValues(String value) {
+        TemporalValue tempValue = new TemporalValue();
+
+        String[] splittedValues = value.split("-");
+
+        tempValue.mStartTime = Long.getLong(splittedValues[0]);
+
+        if (splittedValues.length == 2) {
+            tempValue.mEndTime = Long.getLong(splittedValues[1]);
+            tempValue.mAbsolute = true;
+
+            if (tempValue.mEndTime < System.currentTimeMillis()) {
+                mHasCachableLiterals = true;
+            }
+        }
+
+        return tempValue;
+    }
+
+    public Map<String, TemporalValue> getTemporalLiterals() {
+        return mTemporalLiterals;
+    }
+
+    public List<String> getInstanceLiterals() {
+        return mLiterals;
+    }
+
+    public List<String> getAllLiterals() {
+
+        ArrayList<String> result = new ArrayList<>(mLiterals);
+        result.addAll(mTemporalLiterals.keySet());
+
+        return result;
+    }
+
+    public Node getPropNodes() {
+        return mPropNodes;
+    }
+
+    public String getRule() {
+        return mRule;
     }
 
     private String checkForTemporalLiterals(String rule) {
@@ -77,7 +147,7 @@ public class AggregateRule {
                 }
             }
 
-            mTemporalLiterals.put(sb.toString(), temporalValue);
+            mTemporalLiterals.put(sb.toString(), parseTemporalValues(temporalValue));
             rule = removeCharRange(rule, indStart, indEnd);
         }
 
@@ -111,5 +181,9 @@ public class AggregateRule {
             }
         }
         return strBuf.toString();
+    }
+
+    public List<Literal> getCachedLiterals() {
+        return null;
     }
 }

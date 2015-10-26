@@ -26,4 +26,5 @@ public class TemporalValue {
     public long mStartTime;
     public long mEndTime;
     public boolean mAbsolute = false;
+    public boolean mStrong = false;
 }

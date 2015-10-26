@@ -59,4 +59,8 @@ public interface ContextDB {
     HashMap<Integer, String> getContextAllOwners();
 
     ContextResult newContextValue(ContextResult previousContextValue, String context, long time);
+
+    boolean contextValuePresentAbsolute(String context, long startTime, long endTime, boolean strict);
+
+    boolean contextValuePresentRelative(String context, long startTime, boolean strict);
 }

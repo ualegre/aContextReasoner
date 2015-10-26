@@ -423,6 +423,7 @@ public class ContextDBImpl implements ContextDB{
         arg.put("contextState", context);
         arg.put("value", 1);
         arg.put("fromtime", time);
+        arg.put("totime", 0);
 
         long id = sqlite.insert("context_result", null, arg);
 
@@ -430,6 +431,62 @@ public class ContextDBImpl implements ContextDB{
 
         return result;
 
+    }
+
+    public boolean contextValuePresentAbsolute(String context, long startTime,
+                                               long endTime, boolean strict) {
+
+        SQLiteDatabase sqlite = dbHelper.getReadableDatabase();
+
+        String query = "";
+
+        String start = String.valueOf(startTime);
+        String end = String.valueOf(endTime);
+
+        if (strict) {
+            query = "SELECT _id FROM context_result WHERE contextState = '" + context + "' AND" +
+                    " fromtime <= " + start + " AND (totime >= " + end + " OR totime = 0)";
+        } else {
+            query = "SELECT _id FROM context_result WHERE contextState = '" + context + "' AND" +
+                    " fromtime >= " +  start + " AND (totime <= " + end + " OR totime = 0";
+        }
+
+        Cursor crsr = sqlite.rawQuery(query, null);
+
+        crsr.moveToFirst();
+
+        if ( crsr.getCount() > 0 ) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public boolean contextValuePresentRelative(String context, long startTime, boolean strict) {
+
+        SQLiteDatabase sqlite = dbHelper.getReadableDatabase();
+
+        String query = "";
+
+        String start = String.valueOf(startTime);
+
+        if (strict) {
+            query = "SELECT _id FROM context_result WHERE contextState = '" + context + "' AND" +
+                    " fromtime <= " + start + " AND totime = 0";
+        } else {
+            query = "SELECT _id FROM context_result WHERE contextState = '" + context + "' AND" +
+                    " fromtime >= " +  start;
+        }
+
+        Cursor crsr = sqlite.rawQuery(query, null);
+
+        crsr.moveToFirst();
+
+        if ( crsr.getCount() > 0 ) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
 }

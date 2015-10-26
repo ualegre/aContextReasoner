@@ -301,4 +301,12 @@ public class OntologyManager implements IOntologyManager{
     public void stop() {
         mCsparqlEngine.destroy();
     }
+
+    public void registerAggregateRule(String rule) {
+            AggregateRule agg = new AggregateRule(rule);
+    }
+
+    public void fireAggregateRules() {
+
+    }
 }

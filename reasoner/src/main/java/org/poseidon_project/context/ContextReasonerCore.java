@@ -21,6 +21,7 @@ import android.content.Intent;
 
 import org.poseidon_project.context.database.ContextDB;
 import org.poseidon_project.context.database.ContextDBImpl;
+import org.poseidon_project.context.database.ContextResult;
 import org.poseidon_project.context.logging.DataLogger;
 import org.poseidon_project.context.management.ContextManager;
 import org.poseidon_project.context.reasoner.OntologyManager;
@@ -43,7 +44,7 @@ public class ContextReasonerCore {
     private ContextManager mContextManager;
     private OntologyManager mOntologyManager;
     private Context mContext;
-    private HashMap<String, String> mContextValues = new HashMap<>();
+    private HashMap<String, ContextResult> mContextValues = new HashMap<>();
     private DataLogger mLogger;
 
 
@@ -117,16 +118,32 @@ public class ContextReasonerCore {
 
     public void updateContextValue(String contextName, String value) {
 
-        String previous = mContextValues.put(contextName, value);
+        ContextResult previous = mContextValues.get(contextName);
 
         if (previous==null) {
             //sendBroadcast
+            ContextResult newContext = mContextDatabase.newContextValue
+                    (null, contextName + "_" + value, System.currentTimeMillis());
+
+            if (newContext != null) {
+                mContextValues.put(contextName, newContext);
+                mOntologyManager.fireAggregateRules();
+            }
+
             sendContextResult(contextName, value);
             mLogger.logVerbose(DataLogger.REASONER,
                     LOGTAG, "Context: " + contextName + " set to " + value);
         } else {
-            if(! value.equals(previous)) {
+            if(! value.equals(previous.getContextValue())) {
                 //sendBroadcast
+                ContextResult newContext = mContextDatabase.newContextValue
+                        (previous, contextName + "_" + value, System.currentTimeMillis());
+
+                if (newContext != null) {
+                    mContextValues.put(contextName, newContext);
+                    mOntologyManager.fireAggregateRules();
+                }
+
                 sendContextResult(contextName, value);
                 mLogger.logVerbose(DataLogger.REASONER,
                         LOGTAG, "Context: " + contextName + " set to " + value);

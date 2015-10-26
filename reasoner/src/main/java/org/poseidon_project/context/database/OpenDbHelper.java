@@ -48,6 +48,12 @@ public class OpenDbHelper extends SQLiteOpenHelper {
             + "eventDateTime text,"
             + "eventText text);";
 
+    private static final String CONTEXTRESULT_CREATE = "create table context_result (_id integer primary key autoincrement, "
+            + "contextState text,"
+            + "value integer,"
+            + "fromtime integer,"
+            + "totime integer);";
+
     public OpenDbHelper(Context context) {
         super(context, DB_NAME, null, DATABASE_VERSION);
     }
@@ -57,6 +63,7 @@ public class OpenDbHelper extends SQLiteOpenHelper {
         db.execSQL(CONTEXTTABLE_CREATE);
         db.execSQL(RECEIVERTABLE_CREATE);
         db.execSQL(DEBUGEVENTSTABLE_CREATE);
+        db.execSQL(CONTEXTRESULT_CREATE);
         insertStandardContexts(db);
     }
 

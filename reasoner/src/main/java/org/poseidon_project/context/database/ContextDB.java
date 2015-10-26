@@ -58,4 +58,5 @@ public interface ContextDB {
 
     HashMap<Integer, String> getContextAllOwners();
 
+    ContextResult newContextValue(ContextResult previousContextValue, String context, long time);
 }

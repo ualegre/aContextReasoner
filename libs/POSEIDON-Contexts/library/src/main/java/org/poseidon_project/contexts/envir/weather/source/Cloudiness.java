@@ -21,19 +21,18 @@ package org.poseidon_project.contexts.envir.weather.source;
  */
 public class Cloudiness {
 
-	public enum Unit {
-		PERCENT, OKTA;
-	}
+	public static final int UNIT_PERCENT = 1;
+	public static final int UNIT_OKTA = 2;
 
-	private Unit mCloudUnit;
+	private int mCloudUnit;
 	private int mCloudValue = Integer.MIN_VALUE;
 	private String mCloudDesc;
 
-	public Cloudiness (Unit cloudUnit) {
+	public Cloudiness (int cloudUnit) {
 		mCloudUnit = cloudUnit;
 	}
 
-	public Cloudiness (Unit cloudUnit, int value) {
+	public Cloudiness (int cloudUnit, int value) {
 		mCloudUnit = cloudUnit;
 		mCloudValue = value;
 	}
@@ -42,7 +41,7 @@ public class Cloudiness {
 		mCloudValue = value;
 	}
 
-	public void setValue(int value, Unit cloudUnit) {
+	public void setValue(int value, int cloudUnit) {
 		if (value == Integer.MIN_VALUE) {
 			mCloudValue = value;
 			return;
@@ -55,26 +54,26 @@ public class Cloudiness {
 		return mCloudValue;
 	}
 
-	public Unit getCloudinessUnit() {
+	public int getCloudinessUnit() {
 		return mCloudUnit;
 	}
 
-	public static int convertCloudiness(int value, Unit currentCloudUnit, Unit desiredCloudUnit) {
+	public static int convertCloudiness(int value, int currentCloudUnit, int desiredCloudUnit) {
 
 		switch (currentCloudUnit) {
-		case PERCENT:
+		case UNIT_PERCENT:
 			switch (desiredCloudUnit) {
-			case PERCENT:
+			case UNIT_PERCENT:
 				return value;
-			case OKTA:
+			case UNIT_OKTA:
 				return (int)Math.round(8.0 / 100 * value);
 			}
 
-		case OKTA:
+		case UNIT_OKTA:
 			switch (desiredCloudUnit) {
-			case PERCENT:
+			case UNIT_PERCENT:
 				return (int)Math.round(100 / 8.0 * value);
-			case OKTA:
+			case UNIT_OKTA:
 				return value;
 			}
 		}

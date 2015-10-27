@@ -22,36 +22,43 @@ package org.poseidon_project.contexts.envir.weather.source;
  */
 public class Wind {
 
-	private SpeedUnit mWindSpeedUnit;
-	private Direction mWindDirection;
+	private int mWindSpeedUnit;
+	private int mWindDirection;
 	private int mWindSpeed;
 	private String mWindDesc;
 
-	public enum Direction {
-		N, NE, E, SE, S, SW, W, NW;
-	}
+	public static final int DIRECTION_N = 1;
+	public static final int DIRECTION_NE = 2;
+	public static final int DIRECTION_E = 3;
+	public static final int DIRECTION_SE = 4;
+	public static final int DIRECTION_S = 5;
+	public static final int DIRECTION_SW = 6;
+	public static final int DIRECTION_W = 7;
+	public static final int DIRECTION_NW = 8;
 
-	public enum SpeedUnit {
-		KPH, MPH, MPS, KN, FPS;
-	}
+	public static final int SPEEDUNIT_KPH = 9;
+	public static final int SPEEDUNIT_MPH = 10;
+	public static final int SPEEDUNIT_MPS = 11;
+	public static final int SPEEDUNIT_KN = 12;
+	public static final int SPEEDUNIT_FPS = 13;
 
-	public Wind (SpeedUnit sunit) {
+	public Wind (int sunit) {
 		mWindSpeedUnit = sunit;
 	}
 
-	public Wind (Direction dir, SpeedUnit sunit) {
+	public Wind (int dir, int sunit) {
 		mWindDirection = dir;
 		mWindSpeedUnit = sunit;
 	}
 
-	public Wind (Direction dir, SpeedUnit sunit, int speed) {
-		mWindDirection = dir;
-		mWindSpeedUnit = sunit;
-		mWindSpeed = convertSpeed(speed, sunit, sunit);
-	}
+	public Wind (int dir, int sunit, int speed, boolean degrees) {
 
-	public Wind (int direction, SpeedUnit sunit, int speed) {
-		mWindDirection =  getDirection(direction);
+		if (degrees) {
+			mWindDirection =  getDirection(dir);
+		} else {
+			mWindDirection = dir;
+		}
+
 		mWindSpeedUnit = sunit;
 		mWindSpeed = convertSpeed(speed, sunit, sunit);
 	}
@@ -60,7 +67,7 @@ public class Wind {
 		return mWindSpeed;
 	}
 
-	public SpeedUnit getSpeedUnit () {
+	public int getSpeedUnit () {
 		return mWindSpeedUnit;
 	}
 
@@ -68,7 +75,7 @@ public class Wind {
 		mWindSpeed = speed;
 	}
 
-	public void setSpeed(int speed, SpeedUnit speedunit){
+	public void setSpeed(int speed, int speedunit){
 
 		if (mWindSpeedUnit==speedunit) {
 			mWindSpeed = speed;
@@ -77,15 +84,21 @@ public class Wind {
 		}
 	}
 
-	public void setDirection(Direction dir) {
+	public void setDirectionUnit(int dir) {
 		mWindDirection = dir;
 	}
 
-	public void setDirection(int degrees) {
-		mWindDirection = getDirection(degrees);
+	public void setDirection(int dir, boolean degrees) {
+
+		if (degrees) {
+			mWindDirection = getDirection(dir);
+		} else {
+			mWindDirection = dir;
+		}
+
 	}
 
-	public Direction getDirection() {
+	public int getDirection() {
 		return mWindDirection;
 	}
 
@@ -98,7 +111,7 @@ public class Wind {
 	}
 
 
-	public static Direction getDirection(int degrees) {
+	public static int getDirection(int degrees) {
 
 		int degreesPositive = degrees;
         if (degrees < 0) {
@@ -109,95 +122,91 @@ public class Wind {
         int zone = degreesRotated / (360 / 8);
 
 		switch (zone) {
-			case 0: return Direction.N;
-			case 1: return Direction.NE;
-			case 2: return Direction.E;
-			case 3: return Direction.SE;
-			case 4: return Direction.S;
-			case 5: return Direction.SW;
-			case 6: return Direction.W;
-			case 7: return Direction.NW;
+			case 0: return DIRECTION_N;
+			case 1: return DIRECTION_NE;
+			case 2: return DIRECTION_E;
+			case 3: return DIRECTION_SE;
+			case 4: return DIRECTION_S;
+			case 5: return DIRECTION_SW;
+			case 6: return DIRECTION_W;
+			case 7: return DIRECTION_NW;
 		}
 
-		return Direction.N;
+		return DIRECTION_N;
 
 	}
 
-	public static int convertSpeed(int speed, SpeedUnit currentSpeedUnit, SpeedUnit desiredSpeedUnit) {
-
-		if((currentSpeedUnit == null) || (desiredSpeedUnit == null)) {
-			return Integer.MIN_VALUE;
-		}
+	public static int convertSpeed(int speed, int currentSpeedUnit, int desiredSpeedUnit) {
 
 		switch (currentSpeedUnit) {
 
-		case KPH:
+		case SPEEDUNIT_KPH:
 			switch (desiredSpeedUnit) {
-			case KPH:
+			case SPEEDUNIT_KPH:
 				return speed;
-			case MPH:
+			case SPEEDUNIT_MPH:
 				return (int)Math.round(speed * 0.62137);
-			case MPS:
+			case SPEEDUNIT_MPS:
 				return (int)Math.round(speed * 0.27777);
-			case KN:
+			case SPEEDUNIT_KN:
 				return (int)Math.round(speed * 0.53995);
-			case FPS:
+			case SPEEDUNIT_FPS:
 				return (int)Math.round(speed * 0.91134);
 			}
 
-		case MPH:
+		case SPEEDUNIT_MPH:
 			switch (desiredSpeedUnit) {
-			case KPH:
+			case SPEEDUNIT_KPH:
 				return (int)Math.round(speed * 1.60934);
-			case MPH:
+			case SPEEDUNIT_MPH:
 				return speed;
-			case MPS:
+			case SPEEDUNIT_MPS:
 				return (int)Math.round(speed * 0.44704);
-			case KN:
+			case SPEEDUNIT_KN:
 				return (int)Math.round(speed * 0.86897);
-			case FPS:
+			case SPEEDUNIT_FPS:
 				return (int)Math.round(speed * 1.46666);
 			}
 
-		case MPS:
+		case SPEEDUNIT_MPS:
 			switch (desiredSpeedUnit) {
-			case KPH:
+			case SPEEDUNIT_KPH:
 				return (int)Math.round(speed * 3.60000);
-			case MPH:
+			case SPEEDUNIT_MPH:
 				return (int)Math.round(speed * 2.23693);
-			case MPS:
+			case SPEEDUNIT_MPS:
 				return speed;
-			case KN:
+			case SPEEDUNIT_KN:
 				return (int)Math.round(speed * 1.94384);
-			case FPS:
+			case SPEEDUNIT_FPS:
 				return (int)Math.round(speed * 3.28084);
 			}
 
-		case KN:
+		case SPEEDUNIT_KN:
 			switch (desiredSpeedUnit) {
-			case KPH:
+			case SPEEDUNIT_KPH:
 				return (int)Math.round(speed * 1.85200);
-			case MPH:
+			case SPEEDUNIT_MPH:
 				return (int)Math.round(speed * 1.15077);
-			case MPS:
+			case SPEEDUNIT_MPS:
 				return (int)Math.round(speed * 0.51444);
-			case KN:
+			case SPEEDUNIT_KN:
 				return speed;
-			case FPS:
+			case SPEEDUNIT_FPS:
 				return (int)Math.round(speed * 1.68781);
 			}
 
-		case FPS:
+		case SPEEDUNIT_FPS:
 			switch (desiredSpeedUnit) {
-			case KPH:
+			case SPEEDUNIT_KPH:
 				return (int)Math.round(speed * 1.09728);
-			case MPH:
+			case SPEEDUNIT_MPH:
 				return (int)Math.round(speed * 1.09728);
-			case MPS:
+			case SPEEDUNIT_MPS:
 				return (int)Math.round(speed * 0.30480);
-			case KN:
+			case SPEEDUNIT_KN:
 				return (int)Math.round(speed * 0.59248);
-			case FPS:
+			case SPEEDUNIT_FPS:
 				return speed;
 			}
 		}

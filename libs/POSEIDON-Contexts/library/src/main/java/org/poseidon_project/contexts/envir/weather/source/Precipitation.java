@@ -23,15 +23,13 @@ package org.poseidon_project.contexts.envir.weather.source;
 public class Precipitation {
 
 	private int mPeriodHours = 0;
-	private Unit mPrecipitationUnit;
+	private int mPrecipitationUnit;
 	private float mPrecipitationValue = 0;
 
-	public enum Unit {
-		MM, IN;
-	}
+	public static final int UNIT_MM = 1;
+	public static final int UNIT_IN = 2;
 
-
-	public Precipitation(Unit unit) {
+	public Precipitation(int unit) {
 		mPrecipitationUnit = unit;
 	}
 
@@ -47,11 +45,11 @@ public class Precipitation {
 		mPrecipitationValue = value;
 	}
 
-	public void setValue(float value, Unit valueUnit) {
+	public void setValue(float value, int valueUnit) {
 		mPrecipitationValue = convertPrecipitation(value, valueUnit, mPrecipitationUnit);
 	}
 
-	public void setPrecipitationUnit(Unit newUnit) {
+	public void setPrecipitationUnit(int newUnit) {
 		if (newUnit == mPrecipitationUnit) {
 			return;
 		}
@@ -68,26 +66,26 @@ public class Precipitation {
 		return mPrecipitationValue;
 	}
 
-	public static float convertPrecipitation(float value, Unit currentPrecipUnit, Unit desiredPrecipUnit) {
+	public static float convertPrecipitation(float value, int currentPrecipUnit, int desiredPrecipUnit) {
 
 		if (value == 0) {
 			return value;
 		}
 
 		switch(currentPrecipUnit) {
-		case MM:
+		case UNIT_MM:
 			switch (desiredPrecipUnit) {
-			case MM :
+			case UNIT_MM :
 				return value;
-			case IN :
+			case UNIT_IN :
 				return (float) (value * 0.03937);
 			}
 
-		case IN:
+		case UNIT_IN:
 			switch (desiredPrecipUnit) {
-			case MM :
+			case UNIT_MM :
 				return (float) (value * 25.4);
-			case IN :
+			case UNIT_IN :
 				return value;
 			}
 		}

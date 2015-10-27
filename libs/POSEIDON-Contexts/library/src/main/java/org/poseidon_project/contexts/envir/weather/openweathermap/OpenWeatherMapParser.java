@@ -123,12 +123,12 @@ public class OpenWeatherMapParser {
 	}
 
 	private Wind parseWind() {
-		Wind wind = new Wind(Wind.SpeedUnit.MPS);
+		Wind wind = new Wind(Wind.SPEEDUNIT_MPS);
 		try {
 			double speed = mJson.getJSONObject("wind").getDouble("speed");
 			double degs = mJson.getJSONObject("wind").getDouble("deg");
 			wind.setSpeed((int) speed);
-			wind.setDirection((int) degs);
+			wind.setDirection((int) degs, true);
 		} catch (Exception e) {
 			Log.e(LOG_TAG, e.getMessage());
 		}
@@ -137,7 +137,7 @@ public class OpenWeatherMapParser {
 	}
 
 	private Precipitation parsePrecipitation() {
-		Precipitation rain = new Precipitation(Precipitation.Unit.MM);
+		Precipitation rain = new Precipitation(Precipitation.UNIT_MM);
 		try {
 			JSONObject rainObject = mJson.optJSONObject("rain");
 
@@ -164,7 +164,7 @@ public class OpenWeatherMapParser {
 
 
 	private Cloudiness parseCloudiness() {
-		Cloudiness cloud = new Cloudiness(Cloudiness.Unit.PERCENT);
+		Cloudiness cloud = new Cloudiness(Cloudiness.UNIT_PERCENT);
 		try {
 			double clpercent = mJson.getDouble("cloud");
 			cloud.setValue((int) clpercent);
@@ -176,7 +176,7 @@ public class OpenWeatherMapParser {
 
 
 	private Temperature parseTemperature() {
-		Temperature temp = new Temperature(Temperature.Unit.K);
+		Temperature temp = new Temperature(Temperature.UNIT_K);
 		try {
             double current = mJson.getJSONObject("main").getDouble("temp");
 			double high = mJson.getJSONObject("main").getDouble("temp_max");

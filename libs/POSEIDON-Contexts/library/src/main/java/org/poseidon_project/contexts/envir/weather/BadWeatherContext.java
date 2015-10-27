@@ -23,16 +23,15 @@ import android.util.Log;
 
 import org.poseidon_project.contexts.ContextException;
 import org.poseidon_project.contexts.ContextReceiver;
+import org.poseidon_project.contexts.TimerContext;
 import org.poseidon_project.contexts.envir.weather.openweathermap.OpenWeatherMapSource;
 import org.poseidon_project.contexts.envir.weather.source.Temperature;
 import org.poseidon_project.contexts.envir.weather.source.Weather;
-import org.poseidon_project.contexts.TimerContext;
 import org.poseidon_project.contexts.envir.weather.source.WeatherPeriod;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Class Description
@@ -109,9 +108,9 @@ public class BadWeatherContext extends TimerContext{
                     }
 
                     Temperature temp = condition.getTemperature();
-                    Temperature.Unit unit = temp.getTemperatureUnit();
+                    int unit = temp.getTemperatureUnit();
                     int tempUnit = temp.getHighValue();
-                    int tempC = Temperature.convertTemperature(tempUnit, unit, Temperature.Unit.C);
+                    int tempC = Temperature.convertTemperature(tempUnit, unit, Temperature.UNIT_C);
 
                     if (tempC <= 20) {
                         coldExpected = true;
@@ -121,12 +120,13 @@ public class BadWeatherContext extends TimerContext{
 
             }
 
+
             if ((coldExpected == true) && (rainExpected == false)) {
-                mReceiver.newContextValue("weather:cold", true);
+                mReceiver.newContextValue("envir.weather", "COLD");
             } else if ((coldExpected == false) && (rainExpected == true)) {
-                mReceiver.newContextValue("weather:rain", true);
+                mReceiver.newContextValue("envir.weather", "RAINING");
             } else {
-                mReceiver.newContextValue("weather:rainAndCold", true);
+                mReceiver.newContextValue("envir.weather", "RAININGANDCOLD");
             }
 
 

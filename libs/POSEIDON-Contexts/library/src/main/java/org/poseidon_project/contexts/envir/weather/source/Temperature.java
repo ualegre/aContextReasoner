@@ -21,33 +21,32 @@ package org.poseidon_project.contexts.envir.weather.source;
  */
 public class Temperature {
 
-	private Unit mTemperatureUnit;
+	private int mTemperatureUnit;
 	private int mCurrentTemp = Integer.MIN_VALUE;
 	private int mHighTemp = Integer.MIN_VALUE;
 	private int mLowTemp = Integer.MIN_VALUE;
 
+	public static final int UNIT_C = 1;
+	public static final int UNIT_F = 2;
+	public static final int UNIT_K = 3;
 
-	public enum Unit {
-		C, F, K;
-	}
-
-	public Temperature(Unit tempUnit) {
+	public Temperature(int tempUnit) {
 		mTemperatureUnit = tempUnit;
 	}
 
-	public Temperature(Unit tempUnit, int currentTemp) {
+	public Temperature(int tempUnit, int currentTemp) {
 		mTemperatureUnit = tempUnit;
 		mCurrentTemp =  currentTemp;
 	}
 
-	public Temperature(Unit tempUnit, int currentTemp, int highTemp, int lowTemp) {
+	public Temperature(int tempUnit, int currentTemp, int highTemp, int lowTemp) {
 		mTemperatureUnit = tempUnit;
 		mCurrentTemp =  currentTemp;
 		mHighTemp = highTemp;
 		mLowTemp = lowTemp;
 	}
 
-	public Unit getTemperatureUnit() {
+	public int getTemperatureUnit() {
 		return mTemperatureUnit;
 	}
 
@@ -61,7 +60,7 @@ public class Temperature {
 
     public void setCurrentValue(int value) { mCurrentTemp = value; }
 
-	public void setTemperatureUnit(Unit newUnit) {
+	public void setTemperatureUnit(int newUnit) {
 		if (newUnit == mTemperatureUnit) {
 			return;
 		}
@@ -85,7 +84,7 @@ public class Temperature {
 		return mCurrentTemp;
 	}
 
-	public void setCurrentValue (int value, Unit tempUnit) {
+	public void setCurrentValue (int value, int tempUnit) {
 		mCurrentTemp = convertTemperature(value, tempUnit, mTemperatureUnit);
 	}
 
@@ -93,7 +92,7 @@ public class Temperature {
 		return mHighTemp;
 	}
 
-	public void setHighValue (int value, Unit tempUnit) {
+	public void setHighValue (int value, int tempUnit) {
 		mHighTemp = convertTemperature(value, tempUnit, mTemperatureUnit);
 	}
 
@@ -101,44 +100,40 @@ public class Temperature {
 		return mLowTemp;
 	}
 
-	public void setLowValue (int value, Unit tempUnit) {
+	public void setLowValue (int value, int tempUnit) {
 		mLowTemp = convertTemperature(value, tempUnit, mTemperatureUnit);
 	}
 
-	public static int convertTemperature(int value, Unit currentTempUnit, Unit desiredTempUnit) {
-
-		if ((currentTempUnit == null) | (desiredTempUnit == null)) {
-			return Integer.MIN_VALUE;
-		}
+	public static int convertTemperature(int value, int currentTempUnit, int desiredTempUnit) {
 
 		switch (currentTempUnit) {
-		case C:
+		case UNIT_C:
 			switch (desiredTempUnit) {
-			case C:
+			case UNIT_C:
 				return value;
-			case F:
+			case UNIT_F:
 				return Math.round(value * 9f / 5f + 32);
-			case K:
+			case UNIT_K:
 				return Math.round(value + 273.15f);
 			}
 
-		case F:
+		case UNIT_F:
 			switch (desiredTempUnit) {
-			case C:
+			case UNIT_C:
 				return Math.round((value - 32) * 5f / 9f);
-			case F:
+			case UNIT_F:
 				return value;
-			case K:
+			case UNIT_K:
 				return Math.round((value - 32) * 5f / 9f + 273.15f);
 			}
 
-		case K:
+		case UNIT_K:
 			switch (desiredTempUnit) {
-			case C:
+			case UNIT_C:
 				return Math.round(value - 273.15f);
-			case F:
+			case UNIT_F:
 				return Math.round((value - 273.15f) * 9f / 5f + 32);
-			case K:
+			case UNIT_K:
 				return value;
 			}
 		}

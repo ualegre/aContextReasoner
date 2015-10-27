@@ -16,6 +16,7 @@
 
 package org.prop4j;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -26,6 +27,7 @@ import java.util.List;
  * (cnf).
  * 
  * @author Thomas Thum
+ * @author Dean Kramer <d.kramer@mdx.ac.uk> For get all node types
  */
 public abstract class Node {
 	
@@ -242,6 +244,21 @@ public abstract class Node {
 	protected static void negateNodes(Node[] nodes) {
 		for (int i = 0; i < nodes.length; i++)
 			nodes[i] = new Not(nodes[i]);
+	}
+
+	public List<Node> getAllNodeTypes(Class NodeType) {
+		ArrayList<Node> nodes = new ArrayList<>();
+
+		for (Node child : children) {
+
+			if (child.getClass().equals(NodeType)) {
+				nodes.add(child);
+			}
+
+			child.getAllNodeTypes(NodeType);
+		}
+
+		return nodes;
 	}
 
 }

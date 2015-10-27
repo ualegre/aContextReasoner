@@ -70,12 +70,16 @@ public class AggregateRule {
     private TemporalValue parseTemporalValues(String value) {
         TemporalValue tempValue = new TemporalValue();
 
+        if (value.contains("#")) {
+            tempValue.mStrong = true;
+        }
+
         String[] splittedValues = value.split("-");
 
-        tempValue.mStartTime = Long.getLong(splittedValues[0]);
+        tempValue.mStartTime = Long.parseLong(splittedValues[0]);
 
         if (splittedValues.length == 2) {
-            tempValue.mEndTime = Long.getLong(splittedValues[1]);
+            tempValue.mEndTime = Long.parseLong(splittedValues[1]);
             tempValue.mAbsolute = true;
 
             if (tempValue.mEndTime < System.currentTimeMillis()) {

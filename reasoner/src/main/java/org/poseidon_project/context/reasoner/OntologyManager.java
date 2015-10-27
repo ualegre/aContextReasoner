@@ -318,7 +318,7 @@ public class OntologyManager implements IOntologyManager{
             mAggregateRules.put("test", new AggregateRule(rule));
     }
 
-    public void fireAggregateRules() {
+    public synchronized void fireAggregateRules() {
 
         long mCurrentTime = System.currentTimeMillis();
 
@@ -378,7 +378,7 @@ public class OntologyManager implements IOntologyManager{
                     } else {
                         //check db
                         literal.positive = mContextDatabase.
-                                contextValuePresentRelative(literalName, literalValue.mStartTime,
+                                contextValuePresentRelative(literalName, mCurrentTime - literalValue.mStartTime,
                                         literalValue.mStrong);
                     }
 

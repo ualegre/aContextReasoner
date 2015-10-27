@@ -44,7 +44,7 @@ public class ContextReasonerCore {
     private ContextManager mContextManager;
     private OntologyManager mOntologyManager;
     private Context mContext;
-    private HashMap<String, ContextResult> mContextValues = new HashMap<>();
+    public HashMap<String, ContextResult> mContextValues = new HashMap<>();
     private DataLogger mLogger;
 
 
@@ -52,7 +52,7 @@ public class ContextReasonerCore {
         mContext = c;
         mContextDatabase = new ContextDBImpl(mContext);
         mLogger = new DataLogger(mContext, mContextDatabase);
-        mOntologyManager = new OntologyManager(c, this);
+        mOntologyManager = new OntologyManager(c, this, mContextDatabase);
         mContextManager = new ContextManager(c, this, mContextDatabase);
 
     }

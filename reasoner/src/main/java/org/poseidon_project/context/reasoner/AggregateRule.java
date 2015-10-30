@@ -75,7 +75,7 @@ public class AggregateRule {
             TemporalValue temp = mTemporalLiterals.get(literalString);
 
             if (temp == null) {
-                if (literalString.equalsIgnoreCase((String) mAggregateState.var)) {
+                if (! literalString.equalsIgnoreCase((String) mAggregateState.var)) {
                     mLiterals.add(literalString);
                 }
             }
@@ -87,8 +87,9 @@ public class AggregateRule {
 
     private void addInterestedContext(String literalString) {
 
-        if (literalString.equalsIgnoreCase((String) mAggregateState.var)) {
-            String contextName = literalString.substring(0, literalString.indexOf("_"));
+        if (! literalString.equalsIgnoreCase((String) mAggregateState.var)) {
+            String[] splittedValues = literalString.split("_");
+            String contextName = splittedValues[0];
             mInterestedContexts.add(contextName);
         }
     }
@@ -263,4 +264,9 @@ public class AggregateRule {
     }
 
     public Literal getStateLiteral() { return mAggregateState;}
+
+    @Override
+    public String toString() {
+        return mRule;
+    }
 }

@@ -78,7 +78,30 @@ public class AggregateRule {
 
         }
 
+    }
 
+    public void addCachedLiteral(Literal literal) {
+
+        String name = (String) literal.var;
+        mCachedLiterals.put(name, literal);
+        mTemporalLiterals.remove(name);
+    }
+
+    public boolean isAffectedBy(String contextState) {
+
+        for (String literal : mLiterals) {
+            if (literal.equals(contextState)) {
+                return true;
+            }
+        }
+
+        for (String literal : mTemporalLiterals.keySet()) {
+            if (literal.equals(contextState)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private void setStateLiteral() {

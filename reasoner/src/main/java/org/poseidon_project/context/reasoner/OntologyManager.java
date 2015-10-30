@@ -318,13 +318,15 @@ public class OntologyManager implements IOntologyManager{
             mAggregateRules.put("test", new AggregateRule(rule));
     }
 
-    public synchronized void fireAggregateRules() {
+    public synchronized void fireAggregateRules(String newContextValue) {
 
         long mCurrentTime = System.currentTimeMillis();
 
         for (AggregateRule rule : mAggregateRules.values()) {
             //Consider threadpool
-            fireRule(rule, mCurrentTime);
+            if (rule.isAffectedBy(newContextValue)) {
+                fireRule(rule, mCurrentTime);
+            }
         }
     }
 

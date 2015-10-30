@@ -127,7 +127,7 @@ public class ContextReasonerCore {
 
             if (newContext != null) {
                 mContextValues.put(contextName, newContext);
-                mOntologyManager.fireAggregateRules();
+                mOntologyManager.fireAggregateRules(newContext.getFullName());
             }
 
             sendContextResult(contextName, value);
@@ -141,7 +141,7 @@ public class ContextReasonerCore {
 
                 if (newContext != null) {
                     mContextValues.put(contextName, newContext);
-                    mOntologyManager.fireAggregateRules();
+                    mOntologyManager.fireAggregateRules(newContext.getFullName());
                 }
 
                 sendContextResult(contextName, value);

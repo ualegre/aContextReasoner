@@ -23,8 +23,10 @@ import org.prop4j.NodeReader;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Class for holding aggregate rules, and handling temporal literals.
@@ -46,6 +48,7 @@ public class AggregateRule {
     private ArrayList<String> mLiterals;
     private ArrayList<String> mCachibleLiterals;
     private Literal mAggregateState;
+    private Set<String> mInterestedContexts;
 
 
     public AggregateRule(String rule) {
@@ -53,6 +56,7 @@ public class AggregateRule {
         mCachibleLiterals = new ArrayList<>();
         mCachedLiterals = new HashMap<>();
         mTemporalLiterals = new HashMap<>();
+        mInterestedContexts = new HashSet<>();
 
         mRule = rule;
         mPropRule = checkForTemporalLiterals(rule);
@@ -76,8 +80,17 @@ public class AggregateRule {
                 }
             }
 
+            addInterestedContext(literalString);
         }
 
+    }
+
+    private void addInterestedContext(String literalString) {
+
+        if (literalString.equalsIgnoreCase((String) mAggregateState.var)) {
+            String contextName = literalString.substring(0, literalString.indexOf("_"));
+            mInterestedContexts.add(contextName);
+        }
     }
 
     public void addCachedLiteral(Literal literal) {
@@ -89,14 +102,8 @@ public class AggregateRule {
 
     public boolean isAffectedBy(String contextState) {
 
-        for (String literal : mLiterals) {
-            if (literal.equals(contextState)) {
-                return true;
-            }
-        }
-
-        for (String literal : mTemporalLiterals.keySet()) {
-            if (literal.equals(contextState)) {
+        for (String context : mInterestedContexts) {
+            if (context.equals(contextState)) {
                 return true;
             }
         }

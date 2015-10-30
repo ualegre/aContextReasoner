@@ -129,6 +129,10 @@ public class AggregateRule {
 
     }
 
+    public TemporalValue getTemporalValue(String literalName) {
+        return mTemporalLiterals.get(literalName);
+    }
+
     private TemporalValue parseTemporalValues(String literalName, String value) {
         TemporalValue tempValue = new TemporalValue();
 
@@ -268,5 +272,9 @@ public class AggregateRule {
     @Override
     public String toString() {
         return mRule;
+    }
+
+    public List<String> getCachibleLiterals() {
+        return mCachibleLiterals;
     }
 }

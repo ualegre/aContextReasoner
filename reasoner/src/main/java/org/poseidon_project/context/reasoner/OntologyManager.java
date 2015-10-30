@@ -47,6 +47,7 @@ import java.io.InputStream;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import eu.larkc.csparql.core.engine.CsparqlEngine;
@@ -315,7 +316,25 @@ public class OntologyManager implements IOntologyManager{
     }
 
     public void registerAggregateRule(String rule) {
-            mAggregateRules.put("test", new AggregateRule(rule));
+
+        long currentTime = System.currentTimeMillis();
+
+        AggregateRule aggregateRule = new AggregateRule(rule);
+        List<String> cachLiterals = aggregateRule.getCachibleLiterals();
+
+        for (String needToCache : cachLiterals) {
+
+            TemporalValue tvalue = aggregateRule.getTemporalValue(needToCache);
+
+            if (tvalue != null) {
+                aggregateRule.addCachedLiteral(
+                        evaluateTemporalLiteral(needToCache, tvalue, currentTime));
+            }
+
+            mLogger.logError(DataLogger.REASONER, "Cachible Literal has no temporal value");
+        }
+
+        mAggregateRules.put("test", aggregateRule);
     }
 
     public synchronized void fireAggregateRules(String newContextValue) {
@@ -360,40 +379,8 @@ public class OntologyManager implements IOntologyManager{
 
         //Lets get all non-cached Temporal literals
         for (Map.Entry<String, TemporalValue> temporalLiteral : rule.getTemporalLiterals().entrySet()) {
-
-            String literalName = temporalLiteral.getKey();
-            TemporalValue literalValue = temporalLiteral.getValue();
-
-            Literal literal = new Literal(literalName, false);
-
-            if (literalValue.mAbsolute) {
-                //check db
-                literal.positive = mContextDatabase.
-                        contextValuePresentAbsolute(literalName, literalValue.mStartTime,
-                                literalValue.mEndTime, literalValue.mStrong);
-            } else {
-                String contextName = literalName.substring(0, literalName.indexOf("_"));
-
-                ContextResult cr = mReasonerCore.mContextValues.get(contextName);
-
-                if (cr != null) {
-                    if (cr.getFullName().equals(literalName)) {
-
-                        long diff = mCurrentTime - cr.getContextTime();
-
-                        if (diff > literalValue.mStartTime) {
-                            literal.positive = true;
-                        }
-                    }
-                } else {
-                    //check db
-                    literal.positive = mContextDatabase.
-                            contextValuePresentRelative(literalName, mCurrentTime - literalValue.mStartTime,
-                                    literalValue.mStrong);
-                }
-
-                literalValues.add(literal);
-            }
+                literalValues.add(evaluateTemporalLiteral(
+                        temporalLiteral.getKey(), temporalLiteral.getValue(), mCurrentTime));
         }
 
         try {
@@ -403,6 +390,42 @@ public class OntologyManager implements IOntologyManager{
         } catch (TimeoutException exception) {
             exception.printStackTrace();
         }
+    }
+
+    private Literal evaluateTemporalLiteral(String literalName, TemporalValue literalValue,
+                                            long currentTime) {
+
+        Literal literal = new Literal(literalName, false);
+
+        if (literalValue.mAbsolute) {
+            //check db
+            literal.positive = mContextDatabase.
+                    contextValuePresentAbsolute(literalName, literalValue.mStartTime,
+                            literalValue.mEndTime, literalValue.mStrong);
+        } else {
+            String contextName = literalName.substring(0, literalName.indexOf("_"));
+
+            ContextResult cr = mReasonerCore.mContextValues.get(contextName);
+
+            if (cr != null) {
+                if (cr.getFullName().equals(literalName)) {
+
+                    long diff = currentTime - cr.getContextTime();
+
+                    if (diff > literalValue.mStartTime) {
+                        literal.positive = true;
+                    }
+                }
+            } else {
+                //check db
+                literal.positive = mContextDatabase.
+                        contextValuePresentRelative(literalName, currentTime - literalValue.mStartTime,
+                                literalValue.mStrong);
+            }
+
+        }
+
+        return literal;
     }
 
 }

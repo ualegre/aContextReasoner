@@ -49,6 +49,7 @@ public class AggregateRule {
     private ArrayList<String> mCachibleLiterals;
     private Literal mAggregateState;
     private Set<String> mInterestedContexts;
+    private String mContextName;
 
 
     public AggregateRule(String rule) {
@@ -66,6 +67,7 @@ public class AggregateRule {
         mPropNodes = reader.stringToNode(mPropRule);
 
         setStateLiteral();
+        setContextName();
 
         List<Node> literals = mPropNodes.getAllNodeTypes(Literal.class);
 
@@ -83,6 +85,16 @@ public class AggregateRule {
             addInterestedContext(literalString);
         }
 
+    }
+
+    private void setContextName() {
+        String name = (String) mAggregateState.var;
+        String[] splittedValues = name.split("_");
+        mContextName = splittedValues[0];
+    }
+
+    public String getContextName() {
+        return mContextName;
     }
 
     private void addInterestedContext(String literalString) {

@@ -386,7 +386,11 @@ public class OntologyManager implements IOntologyManager{
         try {
             SatSolver solver = new SatSolver(rule.getPropNodes(), TIMEOUT);
 
-            boolean result = solver.isSatisfiable(literalValues);
+            if (solver.isSatisfiable(literalValues)) {
+                mReasonerCore.updateContextValue(rule.getContextName(),
+                        (String) rule.getStateLiteral().var);
+            }
+
         } catch (TimeoutException exception) {
             exception.printStackTrace();
         }

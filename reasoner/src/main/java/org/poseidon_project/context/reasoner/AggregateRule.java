@@ -16,6 +16,7 @@
 
 package org.poseidon_project.context.reasoner;
 
+import org.prop4j.Equals;
 import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.prop4j.NodeReader;
@@ -38,20 +39,29 @@ public class AggregateRule {
     private String mPropRule;
     private Node mPropNodes;
     private String mRule;
-    private boolean mHasCachableLiterals = false;
 
     //          Literal, Temporal Element
     private Map<String, TemporalValue> mTemporalLiterals;
+    private Map<String, Literal> mCachedLiterals;
     private ArrayList<String> mLiterals;
+    private ArrayList<String> mCachibleLiterals;
+    private Literal mAggregateState;
 
 
     public AggregateRule(String rule) {
+        mLiterals = new ArrayList<>();
+        mCachibleLiterals = new ArrayList<>();
+        mCachedLiterals = new HashMap<>();
         mTemporalLiterals = new HashMap<>();
+
         mRule = rule;
         mPropRule = checkForTemporalLiterals(rule);
+
         NodeReader reader = new NodeReader();
 
         mPropNodes = reader.stringToNode(mPropRule);
+
+        setStateLiteral();
 
         List<Node> literals = mPropNodes.getAllNodeTypes(Literal.class);
 
@@ -61,13 +71,34 @@ public class AggregateRule {
             TemporalValue temp = mTemporalLiterals.get(literalString);
 
             if (temp == null) {
-                mLiterals.add(literalString);
+                if (literalString.equalsIgnoreCase((String) mAggregateState.var)) {
+                    mLiterals.add(literalString);
+                }
             }
 
         }
+
+
     }
 
-    private TemporalValue parseTemporalValues(String value) {
+    private void setStateLiteral() {
+
+        List<Node> nodes = mPropNodes.getAllNodeTypes(Equals.class);
+
+        if (nodes.size() == 1) {
+            Node[] children = nodes.get(0).getChildren();
+
+            for (Node child : children) {
+                if (child instanceof Literal) {
+                    mAggregateState = (Literal) child.clone();
+                    mAggregateState.positive = true;
+                }
+            }
+        }
+
+    }
+
+    private TemporalValue parseTemporalValues(String literalName, String value) {
         TemporalValue tempValue = new TemporalValue();
 
         if (value.contains("#")) {
@@ -83,7 +114,7 @@ public class AggregateRule {
             tempValue.mAbsolute = true;
 
             if (tempValue.mEndTime < System.currentTimeMillis()) {
-                mHasCachableLiterals = true;
+                mCachibleLiterals.add(literalName);
             }
         }
 
@@ -151,7 +182,9 @@ public class AggregateRule {
                 }
             }
 
-            mTemporalLiterals.put(sb.toString(), parseTemporalValues(temporalValue));
+            String literalName = sb.toString();
+
+            mTemporalLiterals.put(literalName, parseTemporalValues(literalName, temporalValue));
             rule = removeCharRange(rule, indStart, indEnd);
         }
 
@@ -188,6 +221,16 @@ public class AggregateRule {
     }
 
     public List<Literal> getCachedLiterals() {
-        return null;
+
+        List<Literal> cachedLiterals =  new ArrayList<>(mCachedLiterals.values());
+        cachedLiterals.add(mAggregateState);
+
+        return cachedLiterals;
     }
+
+    public String getStateName() {
+        return (String) mAggregateState.var;
+    }
+
+    public Literal getStateLiteral() { return mAggregateState;}
 }

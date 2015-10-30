@@ -323,76 +323,83 @@ public class OntologyManager implements IOntologyManager{
         long mCurrentTime = System.currentTimeMillis();
 
         for (AggregateRule rule : mAggregateRules.values()) {
-            LinkedList<Node> literalValues = new LinkedList<Node>();
+            //Consider threadpool
+            fireRule(rule, mCurrentTime);
+        }
+    }
 
-            //Lets get any cached temporal literals;
-            literalValues.addAll(rule.getCachedLiterals());
+    private void fireRule(AggregateRule rule, long mCurrentTime) {
 
-            //Lets get all instance literals
-            for (String instanceLiteral : rule.getInstanceLiterals()) {
-                String contextName = instanceLiteral.substring(0, instanceLiteral.indexOf("_"));
+        LinkedList<Node> literalValues = new LinkedList<Node>();
+
+        //Lets get any cached temporal literals;
+        literalValues.addAll(rule.getCachedLiterals());
+
+        //Lets get all instance literals
+        for (String instanceLiteral : rule.getInstanceLiterals()) {
+            String contextName = instanceLiteral.substring(0, instanceLiteral.indexOf("_"));
+
+            ContextResult cr = mReasonerCore.mContextValues.get(contextName);
+            Literal literal = new Literal(instanceLiteral, false);
+
+            if (cr == null) {
+
+            } else {
+                if (cr.getFullName().equals(instanceLiteral)) {
+                    literal.flip();
+                } else {
+
+                }
+            }
+
+            literalValues.add(literal);
+
+        }
+
+        //Lets get all non-cached Temporal literals
+        for (Map.Entry<String, TemporalValue> temporalLiteral : rule.getTemporalLiterals().entrySet()) {
+
+            String literalName = temporalLiteral.getKey();
+            TemporalValue literalValue = temporalLiteral.getValue();
+
+            Literal literal = new Literal(literalName, false);
+
+            if (literalValue.mAbsolute) {
+                //check db
+                literal.positive = mContextDatabase.
+                        contextValuePresentAbsolute(literalName, literalValue.mStartTime,
+                                literalValue.mEndTime, literalValue.mStrong);
+            } else {
+                String contextName = literalName.substring(0, literalName.indexOf("_"));
 
                 ContextResult cr = mReasonerCore.mContextValues.get(contextName);
-                Literal literal = new Literal(instanceLiteral, false);
 
-                if (cr == null) {
+                if (cr != null) {
+                    if (cr.getFullName().equals(literalName)) {
 
-                } else {
-                    if (cr.getFullName().equals(instanceLiteral)) {
-                        literal.flip();
-                    } else {
+                        long diff = mCurrentTime - cr.getContextTime();
 
+                        if (diff > literalValue.mStartTime) {
+                            literal.positive = true;
+                        }
                     }
+                } else {
+                    //check db
+                    literal.positive = mContextDatabase.
+                            contextValuePresentRelative(literalName, mCurrentTime - literalValue.mStartTime,
+                                    literalValue.mStrong);
                 }
 
                 literalValues.add(literal);
             }
+        }
 
-            //Lets get all non-cached Temporal literals
-            for (Map.Entry<String, TemporalValue> temporalLiteral : rule.getTemporalLiterals().entrySet()) {
+        try {
+            SatSolver solver = new SatSolver(rule.getPropNodes(), TIMEOUT);
 
-                String literalName = temporalLiteral.getKey();
-                TemporalValue literalValue = temporalLiteral.getValue();
-
-                Literal literal = new Literal(literalName, false);
-
-                if (literalValue.mAbsolute) {
-                    //check db
-                    literal.positive = mContextDatabase.
-                            contextValuePresentAbsolute(literalName, literalValue.mStartTime,
-                                    literalValue.mEndTime, literalValue.mStrong);
-                } else {
-                    String contextName = literalName.substring(0, literalName.indexOf("_"));
-
-                    ContextResult cr = mReasonerCore.mContextValues.get(contextName);
-
-                    if (cr != null) {
-                        if (cr.getFullName().equals(literalName)) {
-
-                            long diff = mCurrentTime - cr.getContextTime();
-
-                            if (diff > literalValue.mStartTime) {
-                                literal.positive = true;
-                            }
-                        }
-                    } else {
-                        //check db
-                        literal.positive = mContextDatabase.
-                                contextValuePresentRelative(literalName, mCurrentTime - literalValue.mStartTime,
-                                        literalValue.mStrong);
-                    }
-
-                    literalValues.add(literal);
-                }
-            }
-
-            try {
-                SatSolver solver = new SatSolver(rule.getPropNodes(), TIMEOUT);
-
-                boolean result = solver.isSatisfiable(literalValues);
-            } catch (TimeoutException exception) {
-                exception.printStackTrace();
-            }
+            boolean result = solver.isSatisfiable(literalValues);
+        } catch (TimeoutException exception) {
+            exception.printStackTrace();
         }
     }
 

@@ -16,7 +16,6 @@
 
 package org.prop4j;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -247,15 +246,22 @@ public abstract class Node {
 	}
 
 	public List<Node> getAllNodeTypes(Class NodeType) {
-		ArrayList<Node> nodes = new ArrayList<>();
 
-		for (Node child : children) {
+		LinkedList<Node> nodes = new LinkedList<>();
 
-			if (child.getClass().equals(NodeType)) {
-				nodes.add(child);
+		return getAllNodeTypes(NodeType, nodes);
+	}
+
+	public List<Node> getAllNodeTypes(Class NodeType, List<Node> nodes) {
+
+		if (this.getClass().equals(NodeType)) {
+			nodes.add(this);
+		}
+
+		if (children != null) {
+			for (Node child : children) {
+				child.getAllNodeTypes(NodeType, nodes);
 			}
-
-			child.getAllNodeTypes(NodeType);
 		}
 
 		return nodes;

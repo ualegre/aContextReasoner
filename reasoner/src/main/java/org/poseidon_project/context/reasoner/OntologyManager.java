@@ -68,7 +68,6 @@ public class OntologyManager implements IOntologyManager{
     private static final String ONTOLOGY_PREFS = "OntologyPrefs";
     private ContextReasonerCore mReasonerCore;
     private CsparqlEngine mCsparqlEngine;
-    private CsparqlQueryResultProxy mCsparqlQRP;
     private ContextStream mContextStream;
     private ContextRuleObserver mContextRuleObserver;
     private DataLogger mLogger;
@@ -337,10 +336,24 @@ public class OntologyManager implements IOntologyManager{
         mAggregateRules.put("test", aggregateRule);
     }
 
+    public boolean unregisterAggregateRule(String rule) {
+
+        AggregateRule agg = mAggregateRules.remove(rule);
+
+        if (agg == null) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    //Should make sure we fire all rules before considering rerunning due to context change
     public synchronized void fireAggregateRules(String newContextValue) {
 
         long mCurrentTime = System.currentTimeMillis();
 
+        //Might be better to hold/check a local Map (context type-list of agg contexts) instead of
+        //checking each rule separately.
         for (AggregateRule rule : mAggregateRules.values()) {
             //Consider threadpool
             if (rule.isAffectedBy(newContextValue)) {

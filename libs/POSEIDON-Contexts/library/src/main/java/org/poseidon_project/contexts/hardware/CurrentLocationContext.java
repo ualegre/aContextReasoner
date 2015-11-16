@@ -63,16 +63,20 @@ public class CurrentLocationContext extends LocationContext {
         Thread t = null;
 
         if ( mIsPassive ) {
-            t = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    Looper.prepare();
-                    mLocationManager.requestSingleUpdate(LocationManager.NETWORK_PROVIDER, CurrentLocationContext.this, null);
-                    Looper.loop();
-                }
-            });
 
-            t.start();
+            if (mLocationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+                t = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Looper.prepare();
+                        mLocationManager.requestSingleUpdate(LocationManager.NETWORK_PROVIDER,
+                                CurrentLocationContext.this, null);
+                        Looper.loop();
+                    }
+                });
+
+                t.start();
+            }
         }
 
         return t;

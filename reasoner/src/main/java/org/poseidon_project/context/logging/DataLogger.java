@@ -161,7 +161,11 @@ public class DataLogger {
 
         if (mUserID < 0) {
             String uuid = UUID.randomUUID().toString();
-            registerUser(uuid);
+
+            if (! registerUser(uuid)) {
+                incompleteBackup();
+                return;
+            }
         }
 
         persist();
@@ -339,9 +343,7 @@ public class DataLogger {
     }
 
     public boolean registerUser(String userIdent) {
-
-        mUploader.registerUser(new Integer(mUserID), userIdent);
-        return true;
+        return mUploader.registerUser(new Integer(mUserID), userIdent);
     }
 
     public void newUserID(int userID) {

@@ -41,6 +41,7 @@ public class LogLocationReceiver {
     private long mLastUpdate = 0;
     private Location mCurrentLocation;
     private Thread mGetterThread;
+    private static final String LOG_TAG = "LocationReceiver";
 
     //To 5 decimal places is accurate enough
     private DecimalFormat mFormatter = new DecimalFormat("###.#####");
@@ -59,37 +60,52 @@ public class LogLocationReceiver {
 
     public synchronized String getLocationString() {
 
-
         mCurrentLocation = mLocationContext.getLastKnownLocation("passive");
-        mLastUpdate = mCurrentLocation.getTime();
 
-        long timeSinceLast = System.currentTimeMillis() - mLastUpdate;
+        if (mCurrentLocation != null) {
+
+            mLastUpdate = mCurrentLocation.getTime();
+
+            long timeSinceLast = System.currentTimeMillis() - mLastUpdate;
 
 
-        if (timeSinceLast > TIME_TO_REFRESH) {
-            Log.v("LocationReceiver", "Manual Refresh");
-            mGetterThread = mLocationContext.getCurrentLocation();
+            if (timeSinceLast > TIME_TO_REFRESH) {
+                manualRefresh();
+            }
 
-            if (mGetterThread != null) {
-                try {
-                    mGetterThread.join();
-                } catch (Exception e) {
-                    Log.e("Log", e.getMessage().toString());
-                }
+        } else {
+            manualRefresh();
+        }
+
+        StringBuilder s = new StringBuilder();
+
+        if (mCurrentLocation != null) {
+            s.append(mFormatter.format(mCurrentLocation.getLatitude()));
+            s.append(",");
+            s.append(mFormatter.format(mCurrentLocation.getLongitude()));
+        } else {
+            s.append("unknown");
+            Log.e(LOG_TAG, "Unknown Location");
+        }
+
+        return s.toString();
+
+    }
+
+    private void manualRefresh() {
+
+        Log.v(LOG_TAG, "Manual Refresh");
+        mGetterThread = mLocationContext.getCurrentLocation();
+
+        if (mGetterThread != null) {
+            try {
+                mGetterThread.join();
+            } catch (Exception e) {
+                Log.e(LOG_TAG, e.getMessage().toString());
             }
         }
 
-            StringBuilder s = new StringBuilder();
-
-            if (mCurrentLocation != null) {
-                s.append(mFormatter.format(mCurrentLocation.getLatitude()));
-                s.append(",");
-                s.append(mFormatter.format(mCurrentLocation.getLongitude()));
-            }
-
-            return s.toString();
-        }
-
+    }
 
     public boolean stop() {
         return  mPluggedInContext.stop();

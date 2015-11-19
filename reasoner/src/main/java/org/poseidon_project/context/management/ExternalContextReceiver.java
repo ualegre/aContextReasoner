@@ -20,7 +20,10 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
+
+import org.poseidon_project.context.logging.DataLogger;
+
+import java.util.Map;
 
 /**
  * Listens for context values being broadcasted from other applications.
@@ -34,9 +37,11 @@ public class ExternalContextReceiver extends BroadcastReceiver {
     public static final String CONTEXT_VALUE_TYPE = "context_value_type";
     public static final String CONTEXT_VALUE = "context_value";
     private ContextManager mContextManager;
+    private DataLogger mLogger;
 
-    public ExternalContextReceiver(ContextManager cm) {
+    public ExternalContextReceiver(ContextManager cm, DataLogger logger) {
         mContextManager = cm;
+        mLogger = logger;
     }
 
     @Override
@@ -46,28 +51,132 @@ public class ExternalContextReceiver extends BroadcastReceiver {
 
         String contextName = bundle.getString(CONTEXT_NAME);
         String contextType = bundle.getString(CONTEXT_VALUE_TYPE);
+        Object contextValue = bundle.getSerializable(CONTEXT_VALUE);
 
-        if(contextType.equals("long")) {
-            mContextManager.newExternalContextValue(contextName, bundle.getLong(CONTEXT_VALUE));
 
-        } else if (contextType.equalsIgnoreCase("double")) {
-            mContextManager.newExternalContextValue(contextName, bundle.getDouble(CONTEXT_VALUE));
-
-        } else if (contextType.equalsIgnoreCase("boolean")) {
-            mContextManager.newExternalContextValue(contextName, bundle.getBoolean(CONTEXT_VALUE));
-
-        } else if (contextType.equalsIgnoreCase("String")) {
-            mContextManager.newExternalContextValue(contextName, bundle.getString(CONTEXT_VALUE));
-
-        } else if (contextType.equalsIgnoreCase("Object")) {
-            mContextManager.newExternalContextValue(contextName, bundle.getSerializable(CONTEXT_VALUE));
-
-        } else if (contextType.equalsIgnoreCase("Map")) {
-            mContextManager.newExternalContextValue(contextName, bundle.getSerializable(CONTEXT_VALUE));
-
-        } else {
-            Log.e("ExternalContextReceiver", "context type: " + contextType + " is not recongised");
+        if (contextName == null) {
+            mLogger.logError(DataLogger.CONTEXT_MANAGER, "Null Context Name in External Context");
+            return;
         }
 
+        if (contextType == null) {
+            mLogger.logError(DataLogger.CONTEXT_MANAGER, "Null Context Type in External Context");
+            return;
+        }
+
+        if (contextValue == null) {
+            mLogger.logError(DataLogger.CONTEXT_MANAGER, "Null Context Value in External Context");
+            return;
+        }
+
+        if (contextType.equals("long")) {
+
+            long value = 0;
+
+            if (contextValue instanceof Long) {
+                value = (Long) contextValue;
+            } else if (contextValue instanceof Integer) {
+                value = ((Integer) contextValue).longValue();
+            } else if (contextValue instanceof String) {
+                try {
+                    value = Long.parseLong((String) contextValue);
+                } catch (Exception ex) {
+                    mLogger.logError(DataLogger.CONTEXT_MANAGER, "Couldn't pass: " + contextValue +
+                    " to a long");
+                    return;
+                }
+
+            } else {
+                mLogger.logError(DataLogger.CONTEXT_MANAGER, "context object: " + contextValue +
+                        " could not be used for Long");
+                return;
+            }
+
+            mContextManager.newExternalContextValue(contextName, value);
+
+        } else if (contextType.equalsIgnoreCase("double")) {
+
+            double value = 0;
+
+            if (contextValue instanceof Double) {
+                value = (Double) contextValue;
+            } else if (contextValue instanceof Float) {
+                value = ((Float) contextValue).doubleValue();
+            } else if (contextValue instanceof Integer) {
+                value = ((Integer) contextValue).doubleValue();
+            } else if (contextValue instanceof Long) {
+                value = ((Long) contextValue).doubleValue();
+            } else if (contextValue instanceof String) {
+                try {
+                    value = Double.parseDouble((String) contextValue);
+                } catch (Exception ex) {
+                    mLogger.logError(DataLogger.CONTEXT_MANAGER, "Couldn't pass: " + contextValue +
+                            " to a double");
+                    return;
+                }
+
+            } else {
+                mLogger.logError(DataLogger.CONTEXT_MANAGER, "context object: " + contextValue +
+                        " could not be used for Double");
+                return;
+            }
+
+            mContextManager.newExternalContextValue(contextName, value);
+
+        } else if (contextType.equalsIgnoreCase("boolean")) {
+
+            boolean value = false;
+
+            if (contextValue instanceof Boolean) {
+                value = (Boolean) contextValue;
+            } else if (contextValue instanceof Integer) {
+                value = (((Integer) contextValue) > 0) ? true : false;
+            } else if (contextValue instanceof Long) {
+                value = (((Long) contextValue) > 0) ? true : false;
+            } else if (contextValue instanceof String) {
+                try {
+                    value = Boolean.parseBoolean((String) contextValue);
+                } catch (Exception ex) {
+                    mLogger.logError(DataLogger.CONTEXT_MANAGER, "Couldn't pass: " + contextValue +
+                            " to a boolean");
+                    return;
+                }
+
+            } else {
+                mLogger.logError(DataLogger.CONTEXT_MANAGER, "context type: " + contextValue
+                        +
+                        " could not be used for boolean");
+                return;
+            }
+
+            mContextManager.newExternalContextValue(contextName, value);
+
+        } else if (contextType.equalsIgnoreCase("String")) {
+
+            if (contextValue instanceof String) {
+                mContextManager.newExternalContextValue(contextName, (String) contextValue);
+            } else {
+                mLogger.logError(DataLogger.CONTEXT_MANAGER, "context object: " + contextValue +
+                        " is not a String");
+                return;
+            }
+
+        } else if (contextType.equalsIgnoreCase("Object")) {
+            mContextManager.newExternalContextValue(contextName, contextValue);
+
+        } else if (contextType.equalsIgnoreCase("Map")) {
+
+            if (contextValue instanceof Map) {
+                mContextManager.newExternalContextValue(contextName, (Map) contextValue);
+            } else {
+                mLogger.logError(DataLogger.CONTEXT_MANAGER, "context object: " + contextValue +
+                        " is not a Map");
+                return;
+            }
+
+        } else {
+            mLogger.logError(DataLogger.CONTEXT_MANAGER, "context name: " + contextName +
+                    " does not have a recognisable type");
+        }
     }
 }

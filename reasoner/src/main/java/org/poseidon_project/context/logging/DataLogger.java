@@ -207,6 +207,7 @@ public class DataLogger {
         SharedPreferences settings = mContext.getSharedPreferences(CONTEXT_PREFS, 0);
         SharedPreferences.Editor editor = settings.edit();
         editor.putLong("logLastBackup", System.currentTimeMillis());
+        editor.commit();
         mContextDB.emptyEvents();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {

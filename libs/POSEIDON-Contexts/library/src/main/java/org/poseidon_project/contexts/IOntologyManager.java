@@ -25,4 +25,6 @@ public interface IOntologyManager {
 
     public void updateValues(String subject, String predicate, String value);
     public void updateValues(String subject, String predicate, String value, long time);
+    public void updateValues(String stream, String subject, String predicate, String value);
+    public void updateValues(String stream, String subject, String predicate, String value, long time);
 }

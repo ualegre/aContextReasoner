@@ -61,6 +61,7 @@ public class OntologyManager implements IOntologyManager{
     private CsparqlEngine mCsparqlEngine;
     private CsparqlQueryResultProxy mCsparqlQRP;
     private ContextStream mContextStream;
+    private HashMap<String, ContextStream> mContextStreams;
     private ContextRuleObserver mContextRuleObserver;
     private DataLogger mLogger;
     //Only required for the pilot until the main infrastructure is done.
@@ -97,6 +98,8 @@ public class OntologyManager implements IOntologyManager{
 
         mCsparqlEngine.registerStream(mContextStream);
         mContextRuleObserver = new ContextRuleObserver(mReasonerCore);
+
+        mContextStreams = new HashMap<>();
     }
 
     public CsparqlQueryResultProxy registerCSPARQLQuery(String query) {
@@ -114,8 +117,39 @@ public class OntologyManager implements IOntologyManager{
         return queryResultProxy;
     }
 
+    public CsparqlQueryResultProxy registerCSPARQLQuery(String stream, String query) {
+
+        ContextStream cs = new ContextStream(stream);
+        mCsparqlEngine.registerStream(cs);
+
+        mContextStreams.put(stream, cs);
+
+        CsparqlQueryResultProxy queryResultProxy = null;
+        try {
+            queryResultProxy = mCsparqlEngine.registerQuery(query, true);
+            queryResultProxy.addObserver(mContextRuleObserver);
+
+        } catch (final ParseException e) {
+            mLogger.logError(DataLogger.SYSTEM_CORE, LOGTAG, "Cannot parse: " + query);
+            Log.e(LOGTAG, "Error Parsing: " + e.getMessage());
+        }
+
+        return queryResultProxy;
+    }
+
     public void unregisterCSPARQLQuery(String id) {
         mCsparqlEngine.unregisterQuery(id);
+    }
+
+    public void unregisterCSPARQLStream(String stream) {
+        ContextStream cs = mContextStreams.get(stream);
+
+        if (cs == null) {
+            mLogger.logVerbose(DataLogger.REASONER, "Cannot unregister stream: " + stream +
+                    ". Needs to be registered first");
+        } else {
+            mCsparqlEngine.unregisterStream(stream);
+        }
     }
 
     private void loadMappingFiles() {
@@ -296,6 +330,21 @@ public class OntologyManager implements IOntologyManager{
 
     public void updateValues(String subject, String predicate, String value, long time) {
         mContextStream.sendStream(subject, predicate, value, time);
+    }
+
+    public void updateValues(String stream, String subject, String predicate, String value) {
+        updateValues(stream, subject, predicate, value, System.currentTimeMillis());
+    }
+
+    public void updateValues(String stream, String subject, String predicate, String value, long time) {
+
+        ContextStream cs = mContextStreams.get(stream);
+
+        if (cs == null) {
+            updateValues(subject, predicate, value, time);
+        } else {
+            cs.sendStream(subject, predicate, value, time);
+        }
     }
 
     public void stop() {

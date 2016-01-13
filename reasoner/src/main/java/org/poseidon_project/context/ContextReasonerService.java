@@ -45,7 +45,6 @@ public class ContextReasonerService extends Service{
         mReasonerCore = new ContextReasonerCore(mContext);
         mLogger = mReasonerCore.getLogger();
 
-        mLogger.logVerbose(DataLogger.SYSTEM_CORE, LOGTAG, "Started Service");
     }
 
     @Override
@@ -63,7 +62,6 @@ public class ContextReasonerService extends Service{
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mLogger.logVerbose(DataLogger.SYSTEM_CORE, LOGTAG, "Stopping Service");
         mReasonerCore.onDestroy();
     }
 
@@ -71,7 +69,7 @@ public class ContextReasonerService extends Service{
     public IBinder onBind(Intent intent) {
 
         if (IContextReasoner.class.getName().equals(intent.getAction())) {
-            mLogger.logVerbose(DataLogger.SYSTEM_CORE, LOGTAG, "Service in use");
+            //mLogger.logVerbose(DataLogger.SYSTEM_CORE, LOGTAG, "Service in use");
             return mContextBinder;
         } else if (ILogBackup.class.getName().equals(intent.getAction())) {
             return mLogBackupBinder;
@@ -82,10 +80,10 @@ public class ContextReasonerService extends Service{
 
     public boolean onUnbind(Intent intent) {
 
-        if (IContextReasoner.class.getName().equals(intent.getAction())) {
+       /* if (IContextReasoner.class.getName().equals(intent.getAction())) {
             mLogger.logVerbose(DataLogger.SYSTEM_CORE, LOGTAG, "Service no longer in use");
         }
-
+        */
         return true;
     }
 

@@ -25,8 +25,10 @@ import android.content.SharedPreferences;
 import android.os.BatteryManager;
 import android.os.Build;
 import android.os.PowerManager;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 
+import org.poseidon_project.context.BuildConfig;
 import org.poseidon_project.context.database.ContextDB;
 import org.poseidon_project.contexts.hardware.PluggedInContext;
 
@@ -73,6 +75,7 @@ public class DataLogger {
     private LogLocationReceiver mLocationReceiver;
     private PluggedInContext mPluggedInContext;
     private boolean mForcedBackup = false;
+    private String mDeviceID;
 
     public static final String BROADCAST_INTENT = "org.poseidon_project.context.NEEDS_BAT_OP_SET_OFF";
 
@@ -133,7 +136,12 @@ public class DataLogger {
         SharedPreferences settings = mContext.getSharedPreferences(CONTEXT_PREFS, 0);
         int backupHour = settings.getInt("logBackupHour", -1);
         int backupMin = settings.getInt("logBackupMin", -1);
-        mUserID = settings.getInt("userId", -1);
+
+        if (needsNewID(settings)) {
+            mUserID = -1;
+        } else {
+            mUserID = settings.getInt("userId", -1);
+        }
 
         if (backupHour < 0 || backupMin < 0) {
             Random randomGenerator = new Random();
@@ -157,12 +165,25 @@ public class DataLogger {
         }
     }
 
+    private boolean needsNewID(SharedPreferences prefs) {
+
+        int lastIDVersion = prefs.getInt("userIdVersion", -1);
+
+        if (lastIDVersion < 16) {
+            return true;
+        } else {
+            return false;
+        }
+
+    }
+
     private void uploadLog() {
 
         if (mUserID < 0) {
             String uuid = UUID.randomUUID().toString();
+            mDeviceID = getDeviceID();
 
-            if (! registerUser(uuid)) {
+            if (! registerUser(uuid, mDeviceID)) {
                 incompleteBackup();
                 return;
             }
@@ -170,6 +191,16 @@ public class DataLogger {
 
         persist();
         mUploader.uploadLogToServer(mUserID);
+    }
+
+    private String getDeviceID() {
+
+        final String deviceId = ((TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE)).getDeviceId();
+        if (deviceId != null) {
+            return "p:" + deviceId;
+        } else {
+            return "s:" + android.os.Build.SERIAL;
+        }
     }
 
     public void attemptBackup(Intent intent) {
@@ -343,8 +374,13 @@ public class DataLogger {
         return mContextDB.newEvents(temp);
     }
 
+    public boolean registerUser(String userIdent, String deviceIdent) {
+        return mUploader.registerUser(new Integer(mUserID), userIdent, deviceIdent);
+    }
+
     public boolean registerUser(String userIdent) {
-        return mUploader.registerUser(new Integer(mUserID), userIdent);
+        mDeviceID = getDeviceID();
+        return registerUser(userIdent, mDeviceID);
     }
 
     public void newUserID(int userID) {
@@ -354,6 +390,8 @@ public class DataLogger {
             SharedPreferences settings = mContext.getSharedPreferences(CONTEXT_PREFS, 0);
             SharedPreferences.Editor editor = settings.edit();
             editor.putInt("userId", userID);
+            editor.putString("deviceId", mDeviceID);
+            editor.putInt("userIdVersion", BuildConfig.VERSION_CODE);
             editor.commit();
         }
     }

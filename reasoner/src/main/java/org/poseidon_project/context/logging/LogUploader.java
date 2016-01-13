@@ -67,7 +67,7 @@ public class LogUploader implements XMLRPCCallback{
 
     }
 
-    protected boolean registerUser(final Integer userNumber, final String userIdent) {
+    protected boolean registerUser(final Integer userNumber, final String userIdent, final String deviceIdent) {
 
         final boolean[] success = {false};
 
@@ -78,6 +78,7 @@ public class LogUploader implements XMLRPCCallback{
                     ArrayList params = new ArrayList();
                     params.add(userNumber);
                     params.add(userIdent);
+                    params.add(deviceIdent);
 
                     Object i = mRPCClient.call(RPC_REGISTER_FUNCTION, params);
 

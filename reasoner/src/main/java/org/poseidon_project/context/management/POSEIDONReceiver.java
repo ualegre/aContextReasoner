@@ -121,13 +121,13 @@ public class POSEIDONReceiver extends ContextReceiver{
 
                 //Temperature - First lets be sure it is in the units we need!
                 Temperature temp = period.getTemperature();
-                temp.setTemperatureUnit(Temperature.Unit.C);
+                temp.setTemperatureUnit(Temperature.UNIT_C);
                 ontologyManager.updateValues("envir#t1", "envir#temperatureValue", temp.getCurrentValue() + "^^http://www.w3.org/2001/XMLSchema#integer", time);
                 //ontologyManager.updateValues("envir#t1", "envir#temperatureUnit", iri + "envir#C", time);
 
                 //Rain - First lets be sure it is in the units we need!
                 Precipitation precip = period.getPrecipitation();
-                precip.setPrecipitationUnit(Precipitation.Unit.MM);
+                precip.setPrecipitationUnit(Precipitation.UNIT_MM);
                 ontologyManager.updateValues("envir#p1", "envir#precipitationValue", precip.getValue() + "^^http://www.w3.org/2001/XMLSchema#float", time);
                 //ontologyManager.updateValues("envir#p1", "envir#precipitationUnit", iri + "envir#MilliMeter", time);
                 //ontologyManager.updateValues("envir#p1", "envir#precipitationHoursValue", precip.getHours() + "^^http://www.w3.org/2001/XMLSchema#integer", time);

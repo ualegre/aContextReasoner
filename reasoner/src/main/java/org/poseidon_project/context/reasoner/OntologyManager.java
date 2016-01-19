@@ -30,9 +30,15 @@ import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.ResultSet;
 
 import org.poseidon_project.context.ContextReasonerCore;
+import org.poseidon_project.context.database.ContextDB;
+import org.poseidon_project.context.database.ContextResult;
 import org.poseidon_project.context.logging.DataLogger;
 import org.poseidon_project.context.utility.FileOperations;
 import org.poseidon_project.contexts.IOntologyManager;
+import org.prop4j.Literal;
+import org.prop4j.Node;
+import org.prop4j.SatSolver;
+import org.sat4j.specs.TimeoutException;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -40,6 +46,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import eu.larkc.csparql.core.engine.CsparqlEngine;
@@ -53,13 +61,13 @@ import eu.larkc.csparql.core.engine.CsparqlQueryResultProxy;
  */
 public class OntologyManager implements IOntologyManager{
 
+    private long TIMEOUT = 5000;
     private Context mContext;
     private OntModel mModel;
     private static final String LOGTAG  = "OntologyManager";
     private static final String ONTOLOGY_PREFS = "OntologyPrefs";
     private ContextReasonerCore mReasonerCore;
     private CsparqlEngine mCsparqlEngine;
-    private CsparqlQueryResultProxy mCsparqlQRP;
     private ContextStream mContextStream;
     private HashMap<String, ContextStream> mContextStreams;
     private ContextRuleObserver mContextRuleObserver;
@@ -67,11 +75,15 @@ public class OntologyManager implements IOntologyManager{
     //Only required for the pilot until the main infrastructure is done.
     public ContextMapper pilotMapper;
     private HashMap<String, Object> mOntIndividuals;
+    private HashMap<String, AggregateRule> mAggregateRules;
+    private ContextDB mContextDatabase;
 
-    public OntologyManager(Context context, ContextReasonerCore core){
+    public OntologyManager(Context context, ContextReasonerCore core, ContextDB db){
         mContext = context;
         mReasonerCore = core;
         mLogger = core.getLogger();
+        mAggregateRules = new HashMap<>();
+        mContextDatabase = db;
 
         /* Not currently used, pointless loading unless we use this.
         runFirstTime();
@@ -350,4 +362,136 @@ public class OntologyManager implements IOntologyManager{
     public void stop() {
         mCsparqlEngine.destroy();
     }
+
+    public void registerAggregateRule(String rule) {
+
+        long currentTime = System.currentTimeMillis();
+
+        AggregateRule aggregateRule = new AggregateRule(rule);
+        List<String> cachLiterals = aggregateRule.getCachibleLiterals();
+
+        for (String needToCache : cachLiterals) {
+
+            TemporalValue tvalue = aggregateRule.getTemporalValue(needToCache);
+
+            if (tvalue != null) {
+                aggregateRule.addCachedLiteral(
+                        evaluateTemporalLiteral(needToCache, tvalue, currentTime));
+            }
+
+            mLogger.logError(DataLogger.REASONER, "Cachible Literal has no temporal value");
+        }
+
+        mAggregateRules.put("test", aggregateRule);
+    }
+
+    public boolean unregisterAggregateRule(String rule) {
+
+        AggregateRule agg = mAggregateRules.remove(rule);
+
+        if (agg == null) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    //Should make sure we fire all rules before considering rerunning due to context change
+    public synchronized void fireAggregateRules(String newContextValue) {
+
+        long mCurrentTime = System.currentTimeMillis();
+
+        //Might be better to hold/check a local Map (context type-list of agg contexts) instead of
+        //checking each rule separately.
+        for (AggregateRule rule : mAggregateRules.values()) {
+            //Consider threadpool
+            if (rule.isAffectedBy(newContextValue)) {
+                fireRule(rule, mCurrentTime);
+            }
+        }
+    }
+
+    private void fireRule(AggregateRule rule, long mCurrentTime) {
+
+        LinkedList<Node> literalValues = new LinkedList<Node>();
+
+        //Lets get any cached temporal literals;
+        literalValues.addAll(rule.getCachedLiterals());
+
+        //Lets get all instance literals
+        for (String instanceLiteral : rule.getInstanceLiterals()) {
+            String contextName = instanceLiteral.substring(0, instanceLiteral.indexOf("_"));
+
+            ContextResult cr = mReasonerCore.mContextValues.get(contextName);
+            Literal literal = new Literal(instanceLiteral, false);
+
+            if (cr == null) {
+
+            } else {
+                if (cr.getFullName().equals(instanceLiteral)) {
+                    literal.flip();
+                } else {
+
+                }
+            }
+
+            literalValues.add(literal);
+
+        }
+
+        //Lets get all non-cached Temporal literals
+        for (Map.Entry<String, TemporalValue> temporalLiteral : rule.getTemporalLiterals().entrySet()) {
+                literalValues.add(evaluateTemporalLiteral(
+                        temporalLiteral.getKey(), temporalLiteral.getValue(), mCurrentTime));
+        }
+
+        try {
+            SatSolver solver = new SatSolver(rule.getPropNodes(), TIMEOUT);
+
+            if (solver.isSatisfiable(literalValues)) {
+                mReasonerCore.updateContextValue(rule.getContextName(),
+                        (String) rule.getStateLiteral().var);
+            }
+
+        } catch (TimeoutException exception) {
+            exception.printStackTrace();
+        }
+    }
+
+    private Literal evaluateTemporalLiteral(String literalName, TemporalValue literalValue,
+                                            long currentTime) {
+
+        Literal literal = new Literal(literalName, false);
+
+        if (literalValue.mAbsolute) {
+            //check db
+            literal.positive = mContextDatabase.
+                    contextValuePresentAbsolute(literalName, literalValue.mStartTime,
+                            literalValue.mEndTime, literalValue.mStrong);
+        } else {
+            String contextName = literalName.substring(0, literalName.indexOf("_"));
+
+            ContextResult cr = mReasonerCore.mContextValues.get(contextName);
+
+            if (cr != null) {
+                if (cr.getFullName().equals(literalName)) {
+
+                    long diff = currentTime - cr.getContextTime();
+
+                    if (diff > literalValue.mStartTime) {
+                        literal.positive = true;
+                    }
+                }
+            } else {
+                //check db
+                literal.positive = mContextDatabase.
+                        contextValuePresentRelative(literalName, currentTime - literalValue.mStartTime,
+                                literalValue.mStrong);
+            }
+
+        }
+
+        return literal;
+    }
+
 }

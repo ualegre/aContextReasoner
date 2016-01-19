@@ -379,4 +379,114 @@ public class ContextDBImpl implements ContextDB{
         return contexts;
     }
 
+    @Override
+    public ContextResult newContextValue(ContextResult previousContextValue, String context, long time) {
+
+        SQLiteDatabase sqlite = dbHelper.getWritableDatabase();
+
+        if (previousContextValue == null) {
+            try {
+                return insertNewContextValue(sqlite, context, time);
+            } catch (Exception sqlerror) {
+                Log.v("Table insert error", sqlerror.getMessage());
+                return null;
+            }
+        } else {
+            ContextResult result = null;
+            try {
+                sqlite.beginTransaction();
+
+                ContentValues args = new ContentValues();
+                args.put("totime", time);
+                sqlite.update("context_result", args, "_id", null);
+
+                result = insertNewContextValue(sqlite, context, time);
+
+                sqlite.setTransactionSuccessful();
+            } catch (Exception sqlerror) {
+                Log.v("Table insert error", sqlerror.getMessage());
+                return null;
+            } finally {
+                sqlite.endTransaction();
+                return result;
+            }
+        }
+
+    }
+
+    private ContextResult insertNewContextValue(SQLiteDatabase sqlite,
+                                                String context, long time) throws Exception{
+
+        ContextResult result = null;
+
+        ContentValues arg = new ContentValues();
+        arg.put("contextState", context);
+        arg.put("value", 1);
+        arg.put("fromtime", time);
+        arg.put("totime", 0);
+
+        long id = sqlite.insert("context_result", null, arg);
+
+        result = new ContextResult(id, context, time);
+
+        return result;
+
+    }
+
+    public boolean contextValuePresentAbsolute(String context, long startTime,
+                                               long endTime, boolean strict) {
+
+        SQLiteDatabase sqlite = dbHelper.getReadableDatabase();
+
+        String query = "";
+
+        String start = String.valueOf(startTime);
+        String end = String.valueOf(endTime);
+
+        if (strict) {
+            query = "SELECT _id FROM context_result WHERE contextState = '" + context + "' AND" +
+                    " fromtime <= " + start + " AND (totime >= " + end + " OR totime = 0)";
+        } else {
+            query = "SELECT _id FROM context_result WHERE contextState = '" + context + "' AND" +
+                    " fromtime >= " +  start + " AND (totime <= " + end + " OR totime = 0";
+        }
+
+        Cursor crsr = sqlite.rawQuery(query, null);
+
+        crsr.moveToFirst();
+
+        if ( crsr.getCount() > 0 ) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public boolean contextValuePresentRelative(String context, long startTime, boolean strict) {
+
+        SQLiteDatabase sqlite = dbHelper.getReadableDatabase();
+
+        String query = "";
+
+        String start = String.valueOf(startTime);
+
+        if (strict) {
+            query = "SELECT _id FROM context_result WHERE contextState = '" + context + "' AND" +
+                    " fromtime <= " + start + " AND totime = 0";
+        } else {
+            query = "SELECT _id FROM context_result WHERE contextState = '" + context + "' AND" +
+                    " fromtime >= " +  start;
+        }
+
+        Cursor crsr = sqlite.rawQuery(query, null);
+
+        crsr.moveToFirst();
+
+        if ( crsr.getCount() > 0 ) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
 }

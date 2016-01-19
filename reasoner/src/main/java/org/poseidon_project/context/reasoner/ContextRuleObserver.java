@@ -16,8 +16,6 @@
 
 package org.poseidon_project.context.reasoner;
 
-import android.util.Log;
-
 import org.poseidon_project.context.ContextReasonerCore;
 
 import java.util.Observable;
@@ -48,7 +46,7 @@ public class ContextRuleObserver extends ResultFormatter {
         for (final RDFTuple t: q) {
 
             String context = t.get(2);
-            context = context.substring(context.indexOf("\""), context.lastIndexOf("\""));
+            context = context.substring(context.indexOf("\"") + 1, context.lastIndexOf("\""));
             String contextName = context.substring(0, context.indexOf("_"));
             String contextValue = context.replace(contextName + "_", "");
             mEngineCore.updateContextValue(contextName, contextValue);

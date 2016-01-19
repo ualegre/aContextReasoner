@@ -38,6 +38,7 @@ public class ContextMapper {
     private HashMap<String, CsparqlQueryResultProxy> rules = new HashMap<>();
     private static final String LOGTAG = "ContextMapper";
     private DataLogger mLogger;
+    private static final String mStreamRoot = "http://poseidon-project.org/context-stream";
 
 
     /*
@@ -146,7 +147,7 @@ public class ContextMapper {
     /*
         Checks if navigation assistance is required. We do this by seeing if the user has either:
         1 - Critically deviated, which requires a new route calculation; or
-        2 - Deviated a 3 or more times (albeit small deviations) within 10 minutes.
+        2 - Deviated a 2 or more times (albeit small deviations) within 10 minutes.
 
         Deviation data is received in terms of integers:
         0 - Navigation is off
@@ -155,7 +156,7 @@ public class ContextMapper {
         3 - Navigation is on, currently no deviation.
 
         We therefore firstly count the number of small deviations (subquery). We then see if
-        either the number of small deviations is 3 or greater, or if a critical deviation has
+        either the number of small deviations is 2 or greater, or if a critical deviation has
         occured.
      */
     private static final String navigationAssistNeededQuery =
@@ -167,13 +168,13 @@ public class ContextMapper {
                     + " {"
                     + " SELECT (COUNT(?user) AS ?smallDevNum) WHERE { ?user ex:hasNavigationStatus 2 . }"
                     + " }"
-                    + " FILTER( ?smallDevNum >= 3 || ?o = 1 ) "
+                    + " FILTER( ?smallDevNum >= 2 || ?o = 1 ) "
                     + " } ";
 
     /*
         Checks if navigation assistance is NOT required. We do this by seeing if the user has either:
         1 - Critically deviated, which requires a new route calculation; or
-        2 - Deviated less than 3 times (albeit small deviations) within 10 minutes.
+        2 - Deviated less than 2 times (albeit small deviations) within 10 minutes.
 
         Deviation data is received in terms of integers:
         0 - Navigation is off
@@ -197,40 +198,40 @@ public class ContextMapper {
                     + " {"
                     + " SELECT (COUNT(?user) AS ?largeDevNum) WHERE { ?user ex:hasNavigationStatus 1 . }"
                     + " } . "
-                    + " FILTER( ?smallDevNum < 3 && ?largeDevNum < 1) "
-                    + " FILTER( ?o = 3) "
+                    + " FILTER( ?smallDevNum < 2 && ?largeDevNum < 1) "
+                    //+ " FILTER( ?o = 3) "
                     + " } ";
 
     /*
         Checks to see how fast the user is walking, to tell if they are too standstill for too long.
-        Checks that the user is walking less than 15m every 5 minutes.
+        Checks that the user is walking less than 20m every 5 minutes.
      */
     private static final String isStandstillForLongQuery =
             "REGISTER QUERY notWalkingFastEnough AS "
                     + "PREFIX ex: <http://ie.cs.mdx.ac.uk/POSEIDON/user#> "
                     + "CONSTRUCT { ex:u1 <http://ie.cs.mdx.ac.uk/POSEIDON/context/is> \"STANDSTILL_LONG\" } "
-                    + "FROM STREAM <http://poseidon-project.org/context-stream> [RANGE 5m STEP 1m] "
+                    + "FROM STREAM <http://poseidon-project.org/context-stream> [RANGE 5m STEP 5m] "
                     + " WHERE { ?user ex:hasMoved ?distance . "
                     + " { "
                     + " SELECT ( SUM(?distance) AS ?totalDistance ) WHERE { ?user ex:hasMoved ?distance . } "
                     + " } . "
-                    + " FILTER ( ?totalDistance < 15) "
+                    + " FILTER ( ?totalDistance < 20) "
                     + " }";
 
     /*
         Checks to see how fast the user is walking, to tell if they are not stanstill for long.
-        Checks that the user is walking 15m or more every 5 minutes.
+        Checks that the user is walking 20m or more every 5 minutes.
      */
     private static final String isStandstillForShortQuery =
             "REGISTER QUERY isWalkingFastEnough AS "
                     + "PREFIX ex: <http://ie.cs.mdx.ac.uk/POSEIDON/user#> "
                     + "CONSTRUCT { ex:u1 <http://ie.cs.mdx.ac.uk/POSEIDON/context/is> \"STANDSTILL_SHORT\" } "
-                    + "FROM STREAM <http://poseidon-project.org/context-stream> [RANGE 5m STEP 1m] "
+                    + "FROM STREAM <http://poseidon-project.org/context-stream> [RANGE 5m STEP 5m] "
                     + " WHERE { ?user ex:hasMoved ?distance . "
                     + " { "
                     + " SELECT ( SUM(?distance) AS ?totalDistance ) WHERE { ?user ex:hasMoved ?distance . } "
                     + " } . "
-                    + " FILTER( ?totalDistance >= 15) "
+                    + " FILTER( ?totalDistance >= 20) "
                     + " }";
 
     public ContextMapper(ContextReasonerCore crc, OntologyManager on) {

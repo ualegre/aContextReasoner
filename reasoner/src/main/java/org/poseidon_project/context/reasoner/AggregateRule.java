@@ -16,11 +16,14 @@
 
 package org.poseidon_project.context.reasoner;
 
+import android.util.Log;
+
 import org.prop4j.Equals;
 import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.prop4j.NodeReader;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -35,6 +38,7 @@ import java.util.Set;
  */
 public class AggregateRule {
 
+    private int mDateIncrement = 86400000;
     public final static String[] propSymbols = new String[] { "iff",
             "implies", "or", "and", "not", "(", ")" };
 
@@ -154,18 +158,50 @@ public class AggregateRule {
 
         String[] splittedValues = value.split("-");
 
-        tempValue.mStartTime = Long.parseLong(splittedValues[0]);
+        tempValue.mStartTimeString = splittedValues[0];
 
         if (splittedValues.length == 2) {
-            tempValue.mEndTime = Long.parseLong(splittedValues[1]);
-            tempValue.mAbsolute = true;
+            tempValue.mEndTimeString = splittedValues[1];
+        }
 
-            if (tempValue.mEndTime < System.currentTimeMillis()) {
-                mCachibleLiterals.add(literalName);
+        try {
+            if (tempValue.parseTemporalValues()){
+                if (tempValue.mEndTime < System.currentTimeMillis()) {
+                    mCachibleLiterals.add(literalName);
+                }
             }
+        } catch (ParseException ex) {
+            Log.e("Aggregate Rule", "Cannot parse: " + tempValue.mStartTimeString
+                    + " +  " + tempValue.mEndTimeString);
         }
 
         return tempValue;
+    }
+
+
+    public boolean requiresTemporalValueUpdates() {
+
+        for (TemporalValue temporalValue : mTemporalLiterals.values()) {
+            if (temporalValue.mStartUpdate || temporalValue.mEndUpdate) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public void incrementTemporalValueDates() {
+
+        for (TemporalValue tempValue : mTemporalLiterals.values()) {
+            if (tempValue.mStartUpdate) {
+                tempValue.mStartTime += mDateIncrement;
+            }
+
+            if (tempValue.mEndUpdate) {
+                tempValue.mEndTime += mDateIncrement;
+            }
+
+        }
     }
 
     public Map<String, TemporalValue> getTemporalLiterals() {

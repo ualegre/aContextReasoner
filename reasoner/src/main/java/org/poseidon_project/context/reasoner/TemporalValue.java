@@ -19,6 +19,7 @@ package org.poseidon_project.context.reasoner;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 
 /**
  * Holds Temporal Literal Value information
@@ -41,18 +42,29 @@ public class TemporalValue {
         SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         SimpleDateFormat timeFormatter = new SimpleDateFormat("HH:mm:ss");
 
+        Date day = new Date();
+
         String[] startDateTime = mStartTimeString.split(" ");
 
         Calendar startCal = Calendar.getInstance();
 
         if (startDateTime.length == 1) {
-            startCal.setTime(timeFormatter.parse(mStartTimeString));
+            if (mStartTimeString.contains(":")) {
+                Date date = timeFormatter.parse(mStartTimeString);
+                startCal.set(Calendar.HOUR_OF_DAY, date.getHours());
+                startCal.set(Calendar.MINUTE, date.getMinutes());
+                startCal.set(Calendar.SECOND, date.getSeconds());
+                mStartTime = startCal.getTimeInMillis();
+                mAbsolute = true;
+                mStartUpdate = true;
+            } else {
+                mStartTime = Long.parseLong(mStartTimeString);
+            }
+
         } else if (startDateTime.length == 2) {
             startCal.setTime(dateFormatter.parse(mStartTimeString));
+            mStartTime = startCal.getTimeInMillis();
         }
-
-
-        mStartTime = startCal.getTimeInMillis();
 
         Calendar cal = Calendar.getInstance();
         long currentMilli = cal.getTimeInMillis();
@@ -62,13 +74,17 @@ public class TemporalValue {
             mStartTime -= 86400000;
         }
 
-        if (! mEndTimeString.isEmpty()) {
+        if (! mEndTimeString.isEmpty() && mAbsolute) {
             String[] endDateTime = mEndTimeString.split(" ");
 
             Calendar endCal = Calendar.getInstance();
 
             if (endDateTime.length == 1) {
-                endCal.setTime(timeFormatter.parse(mEndTimeString));
+                Date date = timeFormatter.parse(mEndTimeString);
+                endCal.set(Calendar.HOUR_OF_DAY, date.getHours());
+                endCal.set(Calendar.MINUTE, date.getMinutes());
+                endCal.set(Calendar.SECOND, date.getSeconds());
+                mEndUpdate = true;
             } else if (endDateTime.length == 2) {
                 endCal.setTime(dateFormatter.parse(mEndTimeString));
             }
@@ -82,10 +98,6 @@ public class TemporalValue {
                 }
             }
 
-        }
-
-        if (mEndTime > 0) {
-            mAbsolute = true;
         }
 
         return mAbsolute;

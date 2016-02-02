@@ -64,14 +64,17 @@ public class TemporalValue {
         } else if (startDateTime.length == 2) {
             startCal.setTime(dateFormatter.parse(mStartTimeString));
             mStartTime = startCal.getTimeInMillis();
+            mAbsolute = true;
         }
 
         Calendar cal = Calendar.getInstance();
         long currentMilli = cal.getTimeInMillis();
 
         //if time is later in the day, we must check against yesterday with same time.
+        boolean startYesterday = false;
         if (mStartTime > currentMilli) {
             mStartTime -= 86400000;
+            startYesterday = true;
         }
 
         if (! mEndTimeString.isEmpty() && mAbsolute) {
@@ -95,6 +98,11 @@ public class TemporalValue {
             if (mStrong) {
                 if (mEndTime > currentMilli) {
                     mEndTime -= 86400000;
+
+                    //If the start date isn't yesterday already we need to also change
+                    if (!startYesterday) {
+                        mStartTime -= 86400000;
+                    }
                 }
             }
 

@@ -154,6 +154,7 @@ public class AggregateRule {
 
         if (value.contains("#")) {
             tempValue.mStrong = true;
+            value = value.replace("#", "");
         }
 
         String[] splittedValues = value.split("-");

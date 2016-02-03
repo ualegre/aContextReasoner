@@ -363,7 +363,7 @@ public class OntologyManager implements IOntologyManager{
         mCsparqlEngine.destroy();
     }
 
-    public void registerAggregateRule(String rule) {
+    public void registerAggregateRule(String name, String rule) {
 
         long currentTime = System.currentTimeMillis();
 
@@ -377,17 +377,24 @@ public class OntologyManager implements IOntologyManager{
             if (tvalue != null) {
                 aggregateRule.addCachedLiteral(
                         evaluateTemporalLiteral(needToCache, tvalue, currentTime));
+            } else {
+                mLogger.logError(DataLogger.REASONER, "Cachible Literal has no temporal value");
             }
 
-            mLogger.logError(DataLogger.REASONER, "Cachible Literal has no temporal value");
         }
 
-        mAggregateRules.put("test", aggregateRule);
+        mAggregateRules.put(name, aggregateRule);
     }
 
-    public boolean unregisterAggregateRule(String rule) {
+    public void incrementDateRelativeTemporals() {
+        for (AggregateRule rule : mAggregateRules.values()) {
+            rule.incrementTemporalValueDates();
+        }
+    }
 
-        AggregateRule agg = mAggregateRules.remove(rule);
+    public boolean unregisterAggregateRule(String name) {
+
+        AggregateRule agg = mAggregateRules.remove(name);
 
         if (agg == null) {
             return false;

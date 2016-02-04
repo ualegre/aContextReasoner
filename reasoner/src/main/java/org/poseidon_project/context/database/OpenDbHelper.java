@@ -65,6 +65,8 @@ public class OpenDbHelper extends SQLiteOpenHelper {
         db.execSQL(DEBUGEVENTSTABLE_CREATE);
         db.execSQL(CONTEXTRESULT_CREATE);
         insertStandardContexts(db);
+
+        //insertTestAggregationData(db);
     }
 
     @Override
@@ -81,6 +83,13 @@ public class OpenDbHelper extends SQLiteOpenHelper {
         db.execSQL(DEBUGEVENTSTABLE_CREATE);
 
     }
+
+    /*private void insertTestAggregationData(SQLiteDatabase db) {
+
+        db.execSQL("insert into context_result values (1, 'TEMP_COLD', 1, 1454393100000, 1454421900000)");
+        db.execSQL("insert into context_result values (2, 'PRECIP_RAIN', 1, 1454393100000, 1454421900000)");
+
+    }*/
 
     private void insertStandardContexts(SQLiteDatabase db) {
 

@@ -144,6 +144,63 @@ public class ContextMapper {
                     + " FILTER (?tempValue < 25) "
                     + "}";
 
+    private static final String tempOkay =
+            "REGISTER QUERY tempContextIsOkay AS "
+                    + "PREFIX ex: <http://ie.cs.mdx.ac.uk/POSEIDON/envir#> "
+                    + "CONSTRUCT { ex:temp <http://ie.cs.mdx.ac.uk/POSEIDON/context/is> \"TEMP_OKAY\" } "
+                    + "FROM STREAM <http://poseidon-project.org/context-stream> [RANGE 10s STEP 4s] "
+                    + "WHERE { ?m ex:hasTemperatureValue ?tempValueIRI . "
+                    + "?tempValueIRI ex:temperatureValue ?tempValue . "
+                    + "FILTER (?tempValue >= 15) "
+                    + "FILTER (?tempValue < 25) "
+                    + "}";
+
+    private static final String tempCold =
+            "REGISTER QUERY tempContextIsCold AS "
+                    + "PREFIX ex: <http://ie.cs.mdx.ac.uk/POSEIDON/envir#> "
+                    + "CONSTRUCT { ex:temp <http://ie.cs.mdx.ac.uk/POSEIDON/context/is> \"TEMP_COLD\" } "
+                    + "FROM STREAM <http://poseidon-project.org/context-stream> [RANGE 10s STEP 4s] "
+                    + "WHERE { ?m ex:hasTemperatureValue ?tempValueIRI . "
+                    + "?tempValueIRI ex:temperatureValue ?tempValue . "
+                    + "FILTER (?tempValue < 15) "
+                    + "}";
+
+    private static final String tempHot =
+            "REGISTER QUERY tempContextIsOkay AS "
+                    + "PREFIX ex: <http://ie.cs.mdx.ac.uk/POSEIDON/envir#> "
+                    + "CONSTRUCT { ex:temp <http://ie.cs.mdx.ac.uk/POSEIDON/context/is> \"TEMP_HOT\" } "
+                    + "FROM STREAM <http://poseidon-project.org/context-stream> [RANGE 10s STEP 4s] "
+                    + "WHERE { ?m ex:hasTemperatureValue ?tempValueIRI . "
+                    + "?tempValueIRI ex:temperatureValue ?tempValue . "
+                    + "FILTER (?tempValue >= 25) "
+                    + "}";
+
+    private static final String precipRain =
+            "REGISTER QUERY precipContextIsRaining AS "
+                    + "PREFIX ex: <http://ie.cs.mdx.ac.uk/POSEIDON/envir#> "
+                    + "CONSTRUCT { ex:temp <http://ie.cs.mdx.ac.uk/POSEIDON/context/is> \"PRECIP_RAINING\" } "
+                    + "FROM STREAM <http://poseidon-project.org/context-stream> [RANGE 10s STEP 4s] "
+                    + "WHERE { ?m ex:hasPrecipitationValue ?precipValueIRI . "
+                    + "?precipValueIRI ex:precipitationValue ?precipValue . "
+                    + "FILTER (?precipValue >= 0.1) "
+                    + "}";
+
+    private static final String precipDry =
+            "REGISTER QUERY precipContextIsDry AS "
+                    + "PREFIX ex: <http://ie.cs.mdx.ac.uk/POSEIDON/envir#> "
+                    + "CONSTRUCT { ex:temp <http://ie.cs.mdx.ac.uk/POSEIDON/context/is> \"PRECIP_DRY\" } "
+                    + "FROM STREAM <http://poseidon-project.org/context-stream> [RANGE 10s STEP 4s] "
+                    + "WHERE { ?m ex:hasPrecipitationValue ?precipValueIRI . "
+                    + "?precipValueIRI ex:precipitationValue ?precipValue . "
+                    + "FILTER (?precipValue < 0.1) "
+                    + "}";
+
+    private static final String newWeatherOKAY = "TEMP_OKAY and PRECIP_DRY iff WEATHER_OKAY";
+    private static final String newWeatherRAINING = "TEMP_OKAY and PRECIP_RAINING iff WEATHER_RAINING";
+    private static final String newWeatherCOLD = "TEMP_COLD and PRECIP_DRY iff WEATHER_COLD";
+    private static final String newWeatherCOLDANDRAINING = "TEMP_COLD and PRECIP_RAINING iff WEATHER_RAININGANDCOLD";
+    private static final String newWeatherHOT = "TEMP_HOT and PRECIP_DRY iff WEATHER_HOT";
+
     /*
         Checks if navigation assistance is required. We do this by seeing if the user has either:
         1 - Critically deviated, which requires a new route calculation; or
@@ -252,13 +309,17 @@ public class ContextMapper {
         if (context.equals("battery")) {
             return registerBatteryContext();
         } else if (context.equals("weather")) {
-            return registerWeatherContext(parameters);
+            return registerOldWeatherContext(parameters);
         } else if (context.equals("indoor/outdoor")) {
             return registerIndoorOutdoorsContext();
         } else if (context.equals("navassistance")) {
             return registerNavAssistance();
         } else if (context.equals("standstill")) {
             return registerStandstill();
+        } else if (context.equals("agg")) {
+            return registerAgg();
+        } else if (context.equals("newweather")) {
+            return registerWeather(parameters);
         }
 
         mLogger.logError(DataLogger.REASONER, LOGTAG, "Context: " + context + " not found!");
@@ -266,23 +327,165 @@ public class ContextMapper {
         return false;
     }
 
+    private boolean registerWeather(Map parameters) {
+
+        boolean okExit = true;
+
+        CsparqlQueryResultProxy c1 = mOntologyManager.registerCSPARQLQuery(tempCold);
+        CsparqlQueryResultProxy c2 = mOntologyManager.registerCSPARQLQuery(tempHot);
+        CsparqlQueryResultProxy c3 = mOntologyManager.registerCSPARQLQuery(tempOkay);
+        CsparqlQueryResultProxy c4 = mOntologyManager.registerCSPARQLQuery(precipRain);
+        CsparqlQueryResultProxy c5 = mOntologyManager.registerCSPARQLQuery(precipDry);
+
+        if (c1 != null) {
+            rules.put(tempCold, c1);
+        } else {
+            okExit = false;
+            mLogger.logError(DataLogger.REASONER, LOGTAG,
+                    "tempColdQuery couldn't register");
+        }
+
+        if (c2 != null) {
+            rules.put(tempHot, c2);
+        } else {
+            okExit = false;
+            mLogger.logError(DataLogger.REASONER, LOGTAG,
+                    "tempHotQuery couldn't register");
+        }
+
+        if (c3 != null) {
+            rules.put(tempOkay, c3);
+        } else {
+            okExit = false;
+            mLogger.logError(DataLogger.REASONER, LOGTAG,
+                    "tempOkayQuery couldn't register");
+        }
+
+        if (c4 != null) {
+            rules.put(precipRain, c4);
+        } else {
+            okExit = false;
+            mLogger.logError(DataLogger.REASONER, LOGTAG,
+                    "precipRain couldn't register");
+        }
+
+        if (c5 != null) {
+            rules.put(precipDry, c5);
+        } else {
+            okExit = false;
+            mLogger.logError(DataLogger.REASONER, LOGTAG,
+                    "precipDry couldn't register");
+        }
+
+        mOntologyManager.registerAggregateRule("weatherokay", newWeatherOKAY);
+        mOntologyManager.registerAggregateRule("weatherraining", newWeatherRAINING);
+        mOntologyManager.registerAggregateRule("weatherrainingandcold", newWeatherCOLDANDRAINING);
+        mOntologyManager.registerAggregateRule("weathercold", newWeatherCOLD);
+        mOntologyManager.registerAggregateRule("weatherhot", newWeatherHOT);
+
+
+
+        mLogger.logVerbose(DataLogger.REASONER, LOGTAG, "Registered weather");
+
+        if (okExit) {
+            return mContextManager.addObserverRequirementWithParameters("engine", "LocationWeatherContext", parameters);
+        } else {
+            return false;
+        }
+
+
+    }
+
+    private boolean registerAgg() {
+
+        String rule = "TEMP_COLD[06:00:00-21:00:00] and PRECIP_RAIN[#06:06:00-11:00:00] iff WEATHER_MISERABLE";
+
+        mOntologyManager.registerAggregateRule("agg", rule);
+        mOntologyManager.fireAggregateRules("TEMP_COLD");
+
+        return true;
+    }
+
     public boolean unregisterContext(String context, Map parameters) {
 
         if (context.equals("battery")) {
             return unRegisterBatteryContext();
-        } else if (context.equals("weather")) {
-            return unRegisterWeatherContext();
+        } else if (context.equals("oldweather")) {
+            return unRegisterOldWeatherContext();
         } else if (context.equals("indoor/outdoor")) {
             return unRegisterIndoorOutdoorsContext();
         } else if (context.equals("navassistance")) {
             return unRegisterNavAssistance();
         } else if (context.equals("standstill")) {
             return unRegisterStandstill();
+        } else if (context.equals("weather")) {
+            return unRegisterWeatherContext();
         }
 
         mLogger.logError(DataLogger.REASONER, LOGTAG, "Context: " + context + " not found!");
 
         return false;
+    }
+
+    private boolean unRegisterWeatherContext() {
+
+        boolean okExit = mContextManager.removeObserverRequirement("engine", "LocationWeatherContext");
+
+        CsparqlQueryResultProxy c1 = rules.remove(tempOkay);
+        CsparqlQueryResultProxy c2 = rules.remove(tempCold);
+        CsparqlQueryResultProxy c3 = rules.remove(tempHot);
+        CsparqlQueryResultProxy c4 = rules.remove(precipDry);
+        CsparqlQueryResultProxy c5 = rules.remove(precipRain);
+
+        if (c1 != null) {
+            mOntologyManager.unregisterCSPARQLQuery(c1.getId());
+        } else {
+            okExit = false;
+            mLogger.logError(DataLogger.REASONER, LOGTAG,
+                    "tempOkayQuery was not registered");
+        }
+
+        if (c2 != null) {
+            mOntologyManager.unregisterCSPARQLQuery(c2.getId());
+        } else {
+            okExit = false;
+            mLogger.logError(DataLogger.REASONER, LOGTAG, "tempColdQuery was not registered");
+        }
+
+        if (c3 != null) {
+            mOntologyManager.unregisterCSPARQLQuery(c3.getId());
+        } else {
+            okExit = false;
+            mLogger.logError(DataLogger.REASONER, LOGTAG, "tempHotQuery was not registered");
+        }
+
+        if (c4 != null) {
+            mOntologyManager.unregisterCSPARQLQuery(c4.getId());
+        } else {
+            okExit = false;
+            mLogger.logError(DataLogger.REASONER, LOGTAG, "precipDryQuery was not registered");
+        }
+
+        if (c5 != null) {
+            mOntologyManager.unregisterCSPARQLQuery(c5.getId());
+        } else {
+            okExit = false;
+            mLogger.logError(DataLogger.REASONER, LOGTAG, "precipRainQuery was not registered");
+        }
+
+        mOntologyManager.unregisterAggregateRule("weatherokay");
+        mOntologyManager.unregisterAggregateRule("weatherraining");
+        mOntologyManager.unregisterAggregateRule("weatherrainingandcold");
+        mOntologyManager.unregisterAggregateRule("weathercold");
+        mOntologyManager.unregisterAggregateRule("weatherhot");
+
+        mReasonerCore.removeContextValue("WEATHER");
+        mReasonerCore.removeContextValue("TEMP");
+        mReasonerCore.removeContextValue("PRECIP");
+
+        mLogger.logVerbose(DataLogger.REASONER, LOGTAG, "Unregistered weather");
+
+        return okExit;
     }
 
 
@@ -399,7 +602,7 @@ public class ContextMapper {
         return okExit;
     }
 
-    private boolean registerWeatherContext(Map parameters) {
+    private boolean registerOldWeatherContext(Map parameters) {
 
         boolean okExit = true;
 
@@ -459,7 +662,7 @@ public class ContextMapper {
 
     }
 
-    private boolean unRegisterWeatherContext() {
+    private boolean unRegisterOldWeatherContext() {
 
         boolean okExit = mContextManager.removeObserverRequirement("engine", "LocationWeatherContext");
 

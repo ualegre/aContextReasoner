@@ -60,6 +60,8 @@ public interface ContextDB {
 
     ContextResult newContextValue(ContextResult previousContextValue, String context, long time);
 
+    boolean updateContextValueToTime(ContextResult contextResult, long time);
+
     boolean contextValuePresentAbsolute(String context, long startTime, long endTime, boolean strict);
 
     boolean contextValuePresentRelative(String context, long startTime, boolean strict);

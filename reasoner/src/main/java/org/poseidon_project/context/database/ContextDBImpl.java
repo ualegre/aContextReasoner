@@ -398,7 +398,9 @@ public class ContextDBImpl implements ContextDB{
 
                 ContentValues args = new ContentValues();
                 args.put("totime", time);
-                sqlite.update("context_result", args, "_id", null);
+
+                long id = previousContextValue.getId();
+                sqlite.update("context_result", args, "_id=" + String.valueOf(id), null);
 
                 result = insertNewContextValue(sqlite, context, time);
 
@@ -412,6 +414,29 @@ public class ContextDBImpl implements ContextDB{
             }
         }
 
+    }
+
+    public boolean updateContextValueToTime(ContextResult contextResult, long time) {
+
+        SQLiteDatabase sqlite = dbHelper.getWritableDatabase();
+
+        try {
+            sqlite.beginTransaction();
+
+            ContentValues args = new ContentValues();
+            args.put("totime", time);
+
+            long id = contextResult.getId();
+            sqlite.update("context_result", args, "_id=" + String.valueOf(id), null);
+
+            sqlite.setTransactionSuccessful();
+        } catch (Exception sqlerror) {
+            Log.v("Table insert error", sqlerror.getMessage());
+            return false;
+        } finally {
+            sqlite.endTransaction();
+            return true;
+        }
     }
 
     private ContextResult insertNewContextValue(SQLiteDatabase sqlite,

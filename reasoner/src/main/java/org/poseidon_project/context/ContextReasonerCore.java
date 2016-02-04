@@ -152,6 +152,10 @@ public class ContextReasonerCore {
     }
 
     public void removeContextValue(String contextName) {
-        mContextValues.remove(contextName);
+        ContextResult cr = mContextValues.remove(contextName);
+
+        if (cr != null) {
+            mContextDatabase.updateContextValueToTime(cr, System.currentTimeMillis());
+        }
     }
 }

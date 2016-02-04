@@ -308,7 +308,7 @@ public class ContextMapper {
 
         if (context.equals("battery")) {
             return registerBatteryContext();
-        } else if (context.equals("weather")) {
+        } else if (context.equals("oldweather")) {
             return registerOldWeatherContext(parameters);
         } else if (context.equals("indoor/outdoor")) {
             return registerIndoorOutdoorsContext();
@@ -318,7 +318,7 @@ public class ContextMapper {
             return registerStandstill();
         } else if (context.equals("agg")) {
             return registerAgg();
-        } else if (context.equals("newweather")) {
+        } else if (context.equals("weather")) {
             return registerWeather(parameters);
         }
 

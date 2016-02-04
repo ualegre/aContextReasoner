@@ -105,6 +105,13 @@ public class ContextReasonerCore {
     public void onDestroy() {
         mContextManager.stop();
         mOntologyManager.stop();
+
+        long time = System.currentTimeMillis();
+
+        for (ContextResult cr : mContextValues.values()) {
+            mContextDatabase.updateContextValueToTime(cr,time);
+        }
+
         if ( mLogger != null ) {
             mLogger.stop();
         }

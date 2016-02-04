@@ -360,6 +360,7 @@ public class OntologyManager implements IOntologyManager{
     }
 
     public void stop() {
+        mAggregateRules.clear();
         mCsparqlEngine.destroy();
     }
 

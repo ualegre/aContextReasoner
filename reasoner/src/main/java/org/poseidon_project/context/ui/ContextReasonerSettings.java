@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package org.poseidon_project.context;
+package org.poseidon_project.context.ui;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.preference.PreferenceFragment;
+
 
 /**
  * The user visible activity to personalise context rules
@@ -38,7 +38,4 @@ public class ContextReasonerSettings extends Activity {
 
     }
 
-    public static class ContextReasonerSettingsFragment extends PreferenceFragment {
-
-    }
 }

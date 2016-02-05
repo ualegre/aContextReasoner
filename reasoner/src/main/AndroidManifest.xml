@@ -37,7 +37,7 @@
         <receiver android:name=".logging.BackupLogAlarmReceiver">
         </receiver>
 
-        <activity android:name=".ContextReasonerSettings" android:label="@string/app_settings">
+        <activity android:name=".ui.ContextReasonerSettings" android:label="@string/app_settings">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>

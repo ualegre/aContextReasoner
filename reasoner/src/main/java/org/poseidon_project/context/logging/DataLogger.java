@@ -105,6 +105,10 @@ public class DataLogger {
         timeToStart.set(Calendar.SECOND, 0);
         mBackupTime = timeToStart.getTimeInMillis();
 
+        if(mBackupTime < System.currentTimeMillis()) {
+            mBackupTime += NEXT_BACKUP_TIME;
+        }
+
         AlarmManager alarmManager = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
 
         PendingIntent pi = PendingIntent.getBroadcast(mContext, 0, new Intent(mContext, BackupLogAlarmReceiver.class), 0);
@@ -124,7 +128,7 @@ public class DataLogger {
             }
 
         } else {
-            alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, timeToStart.getTimeInMillis(),
+            alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, mBackupTime,
                     AlarmManager.INTERVAL_DAY, pi);
             mAlarmset = true;
         }
@@ -149,7 +153,7 @@ public class DataLogger {
             int hourAfterEarliest = randomGenerator.nextInt(8);
 
             mBackupHour = EARLIEST_BACKUP_HOUR + hourAfterEarliest;
-            if (mBackupHour > 24) {
+            if (mBackupHour >= 24) {
                 mBackupHour =- 24;
             }
 

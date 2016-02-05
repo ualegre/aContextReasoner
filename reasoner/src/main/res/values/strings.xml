@@ -1,4 +1,6 @@
 <resources>
     <string name="app_name">POSEIDON-Context</string>
 
+    <string name="app_settings">Reasoner Settings</string>
+
 </resources>

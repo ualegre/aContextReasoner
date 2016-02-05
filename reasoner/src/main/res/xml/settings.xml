@@ -18,7 +18,14 @@
     <PreferenceCategory
         android:key=""
         android:title="@string/weather_settings">
-
+        <EditTextPreference
+            android:key="@string/pref_hot"
+            android:title="@string/hot_temp"
+            android:inputType="number"/>
+        <EditTextPreference
+            android:key="@string/pref_cold"
+            android:title="@string/cold_temp"
+            android:inputType="number"/>
     </PreferenceCategory>
 
 </PreferenceScreen>

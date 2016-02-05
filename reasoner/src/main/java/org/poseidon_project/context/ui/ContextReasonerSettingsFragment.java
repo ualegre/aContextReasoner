@@ -19,6 +19,7 @@ package org.poseidon_project.context.ui;
 import android.app.Activity;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.EditTextPreference;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.Preference.OnPreferenceClickListener;
@@ -42,9 +43,15 @@ public class ContextReasonerSettingsFragment extends PreferenceFragment
     private Preference mLogUserNamePreference;
     private Preference mLastSynchronised;
     private TimePreferenceDialog mTimeToBackupPreference;
+    private EditTextPreference mHotTemperaturePreference;
+    private EditTextPreference mOkayTemperaturePreference;
+    private EditTextPreference mColdTemperaturePreference;
     private SharedPreferences mMainSettings;
     private SharedPreferences mRuleSettings;
     private Activity mActivity;
+    private int mHotTemperature;
+    private int mOkayTemperature;
+    private int mColdTemperature;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -57,12 +64,15 @@ public class ContextReasonerSettingsFragment extends PreferenceFragment
 
         addPreferencesFromResource(R.xml.settings);
 
+        setupMainSettings();
+
+        setupWeatherSettings();
+    }
+
+    private void setupMainSettings(){
         setupLastSychronisedPref();
-
         setupUserIdentifierPref();
-
         setupTimeToSychonisePref();
-
     }
 
     @Override
@@ -158,6 +168,85 @@ public class ContextReasonerSettingsFragment extends PreferenceFragment
 
         mTimeToBackupPreference.updateTime(backupHour, backupMin);
         mTimeToBackupPreference.setOnPreferenceChangeListener(timeChangeListerner);
+    }
+
+    private void setupWeatherSettings() {
+        mHotTemperature = mRuleSettings.getInt(getString(R.string.pref_hot), 25);
+        mColdTemperature = mRuleSettings.getInt(getString(R.string.pref_cold), 15);
+
+        mHotTemperaturePreference = (EditTextPreference)
+                findPreference(getString(R.string.pref_hot));
+
+        String hot_temp = String.valueOf(mHotTemperature);
+        mHotTemperaturePreference.setText(hot_temp);
+        mHotTemperaturePreference.setSummary(hot_temp);
+
+        OnPreferenceChangeListener hotChangeListerner = new OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+
+                if (newValue != null) {
+
+                    if (temperatureSatisfible((Integer) newValue, mColdTemperature)) {
+                        SharedPreferences.Editor editor = mRuleSettings.edit();
+                        editor.putInt(getString(R.string.pref_hot), (Integer) newValue);
+                        editor.commit();
+                        mHotTemperature = (Integer) newValue;
+                        preference.setSummary(String.valueOf(mHotTemperature));
+                        return true;
+                    } else {
+                        ((EditTextPreference) preference).setText(String.valueOf(mHotTemperature));
+                        preference.setSummary(String.valueOf(mHotTemperature));
+                        return false;
+                    }
+                }
+
+                return false;
+            }
+        };
+
+        mHotTemperaturePreference.setOnPreferenceChangeListener(hotChangeListerner);
+
+        mColdTemperaturePreference = (EditTextPreference)
+                findPreference(getString(R.string.pref_cold));
+
+        String cold_temp = String.valueOf(mColdTemperature);
+        mColdTemperaturePreference.setText(cold_temp);
+        mColdTemperaturePreference.setSummary(cold_temp);
+
+        OnPreferenceChangeListener coldChangeListerner = new OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+
+                if (newValue != null) {
+
+                    if (temperatureSatisfible(mHotTemperature, (Integer) newValue)) {
+                        SharedPreferences.Editor editor = mRuleSettings.edit();
+                        editor.putInt(getString(R.string.pref_cold), (Integer) newValue);
+                        editor.commit();
+                        mColdTemperature = (Integer) newValue;
+                        preference.setSummary(String.valueOf(mColdTemperature));
+                        return true;
+                    } else {
+                        ((EditTextPreference) preference).setText(String.valueOf(mColdTemperature));
+                        preference.setSummary(String.valueOf(mColdTemperature));
+                        return false;
+                    }
+                }
+
+                return false;
+            }
+        };
+
+        mColdTemperaturePreference.setOnPreferenceChangeListener(coldChangeListerner);
+
+    }
+
+    private boolean temperatureSatisfible(int hot, int cold) {
+
+
+
+        return true;
     }
 
 }

@@ -3,20 +3,28 @@
 
     <string name="app_settings">R-Settings</string>
 
-    <string name="pref_sync">pref_sync</string>
-    <string name="pref_userid">pref_userid</string>
-
+    <!-- Main Settings-->
     <string name="main_settings">Main Settings</string>
+    <string name="pref_sync">pref_sync</string>
     <string name="last_sync">Synchronised</string>
     <string name="sync_never">Never</string>
+    <string name="pref_userid">pref_userid</string>
     <string name="user_identifier">User Identifier</string>
     <string name="pref_backuptime">pref_backuptime</string>
     <string name="backup_time">Synchronisation Time</string>
 
+    <!-- Weather Settings-->
+    <string name="weather_settings">Weather Settings</string>
+    <string name="pref_hot">pref_hot</string>
+    <string name="hot_temp">Hot, if greater than (\u2103)</string>
+    <string name="pref_okay">pref_okay</string>
+    <string name="okay_temp">OK Temperature in \u2103</string>
+    <string name="pref_cold">pref_cold</string>
+    <string name="cold_temp">Cold, if less than (\u2103)</string>
+
 
     <string name="setTime">Set</string>
     <string name="cancelTime">Cancel</string>
-    <string name="weather_settings">Weather Settings</string>
 
 
 </resources>

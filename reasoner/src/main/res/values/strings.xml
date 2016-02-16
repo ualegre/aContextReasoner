@@ -6,12 +6,12 @@
     <!-- Main Settings-->
     <string name="main_settings">Main Settings</string>
     <string name="pref_sync">pref_sync</string>
-    <string name="last_sync">Synchronised</string>
+    <string name="last_sync">Last Synced</string>
     <string name="sync_never">Never</string>
     <string name="pref_userid">pref_userid</string>
     <string name="user_identifier">User Identifier</string>
     <string name="pref_backuptime">pref_backuptime</string>
-    <string name="backup_time">Synchronisation Time</string>
+    <string name="backup_time">Automatic Sync Time</string>
 
     <!-- Weather Settings-->
     <string name="weather_settings">Weather Settings</string>
@@ -21,10 +21,22 @@
     <string name="okay_temp">OK Temperature in \u2103</string>
     <string name="pref_cold">pref_cold</string>
     <string name="cold_temp">Cold, if less than (\u2103)</string>
+    <string name="hot_unsat">Specified hot temperature must be greater than cold</string>
+    <string name="cold_unsat">Specified cold temperature must be less than hot</string>
 
+    <string name="nav_settings">Navigation Assistence Settings</string>
+    <string name="pref_max_wait">pref_max_wait</string>
+    <string name="max_wait_time">Max waiting time (minutes)</string>
+    <string name="pref_max_dev">pref_max_dev</string>
+    <string name="max_num_dev">Max number of small route mistakes</string>
 
     <string name="setTime">Set</string>
     <string name="cancelTime">Cancel</string>
+
+    <string name="logintitle">POSEIDON Login</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="login">Login</string>
 
 
 </resources>

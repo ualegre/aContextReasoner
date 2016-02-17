@@ -76,6 +76,7 @@ public class DataLogger {
     private PluggedInContext mPluggedInContext;
     private boolean mForcedBackup = false;
     private String mDeviceID;
+    private SharedPreferences mSettings;
 
     public static final String BROADCAST_INTENT = "org.poseidon_project.context.NEEDS_BAT_OP_SET_OFF";
 
@@ -88,6 +89,7 @@ public class DataLogger {
         mContext = context;
         mUploader = new LogUploader(mContext, mContextDB, this);
         mLocationReceiver = new LogLocationReceiver(mContext);
+        mSettings = mContext.getSharedPreferences(CONTEXT_PREFS, 0);
 
         checkBackupSettings();
         setupBackupAlarm();
@@ -113,6 +115,9 @@ public class DataLogger {
 
         PendingIntent pi = PendingIntent.getBroadcast(mContext, 0, new Intent(mContext, BackupLogAlarmReceiver.class), 0);
 
+        //Cancel previous defined alarms
+        alarmManager.cancel(pi);
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             PowerManager powerManager = (PowerManager) mContext.getSystemService(Context.POWER_SERVICE);
             String packageName = mContext.getPackageName();
@@ -137,14 +142,13 @@ public class DataLogger {
 
     private void checkBackupSettings() {
 
-        SharedPreferences settings = mContext.getSharedPreferences(CONTEXT_PREFS, 0);
-        int backupHour = settings.getInt("logBackupHour", -1);
-        int backupMin = settings.getInt("logBackupMin", -1);
+        int backupHour = mSettings.getInt("logBackupHour", -1);
+        int backupMin = mSettings.getInt("logBackupMin", -1);
 
-        if (needsNewID(settings)) {
+        if (needsNewID(mSettings)) {
             mUserID = -1;
         } else {
-            mUserID = settings.getInt("userId", -1);
+            mUserID = mSettings.getInt("userId", -1);
         }
 
         if (backupHour < 0 || backupMin < 0) {
@@ -159,7 +163,7 @@ public class DataLogger {
 
             mBackupMin = randomGenerator.nextInt(60);
 
-            SharedPreferences.Editor editor = settings.edit();
+            SharedPreferences.Editor editor = mSettings.edit();
             editor.putInt("logBackupHour", mBackupHour);
             editor.putInt("logBackupMin", mBackupMin);
             editor.commit();
@@ -167,6 +171,19 @@ public class DataLogger {
             mBackupHour = backupHour;
             mBackupMin = backupMin;
         }
+    }
+
+    public void setBackupTime(int hour, int mins) {
+
+        mBackupHour = hour;
+        mBackupMin = mins;
+
+        SharedPreferences.Editor editor = mSettings.edit();
+        editor.putInt("logBackupHour", mBackupHour);
+        editor.putInt("logBackupMin", mBackupMin);
+        editor.commit();
+
+        setupBackupAlarm();
     }
 
     private boolean needsNewID(SharedPreferences prefs) {
@@ -181,7 +198,7 @@ public class DataLogger {
 
     }
 
-    private void uploadLog() {
+    public void uploadLog() {
 
         if (mUserID < 0) {
             String uuid = UUID.randomUUID().toString();
@@ -239,8 +256,7 @@ public class DataLogger {
 
         mBackupTime += NEXT_BACKUP_TIME;
 
-        SharedPreferences settings = mContext.getSharedPreferences(CONTEXT_PREFS, 0);
-        SharedPreferences.Editor editor = settings.edit();
+        SharedPreferences.Editor editor = mSettings.edit();
         editor.putLong("logLastBackup", System.currentTimeMillis());
         editor.commit();
         mContextDB.emptyEvents();
@@ -391,8 +407,7 @@ public class DataLogger {
 
         if (userID > 0) {
             mUserID = userID;
-            SharedPreferences settings = mContext.getSharedPreferences(CONTEXT_PREFS, 0);
-            SharedPreferences.Editor editor = settings.edit();
+            SharedPreferences.Editor editor = mSettings.edit();
             editor.putInt("userId", userID);
             editor.putString("deviceId", mDeviceID);
             editor.putInt("userIdVersion", BuildConfig.VERSION_CODE);
@@ -402,9 +417,7 @@ public class DataLogger {
 
     private boolean needsForcedBackup () {
 
-        SharedPreferences settings = mContext.getSharedPreferences(CONTEXT_PREFS, 0);
-
-        long lastBackupMS = settings.getLong("logLastBackup", -1);
+        long lastBackupMS = mSettings.getLong("logLastBackup", -1);
         long diffMS = System.currentTimeMillis() - lastBackupMS;
 
         if (diffMS > FORCE_BACKUP_TIME) {

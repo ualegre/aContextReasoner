@@ -44,7 +44,6 @@ public class ContextReasonerService extends Service{
         mContext = getApplicationContext();
         mReasonerCore = new ContextReasonerCore(mContext);
         mLogger = mReasonerCore.getLogger();
-
     }
 
     @Override
@@ -73,6 +72,8 @@ public class ContextReasonerService extends Service{
             return mContextBinder;
         } else if (ILogBackup.class.getName().equals(intent.getAction())) {
             return mLogBackupBinder;
+        } else if (IContextPreference.class.getName().equals(intent.getAction())) {
+            return mContextPreferenceBinder;
         }
 
         return null;
@@ -86,6 +87,44 @@ public class ContextReasonerService extends Service{
         */
         return true;
     }
+
+    public final IContextPreference.Stub mContextPreferenceBinder = new IContextPreference.Stub() {
+
+        @Override
+        public void synchroniseService() throws RemoteException {
+            mLogger.uploadLog();
+        }
+
+        @Override
+        public void alterSynchroniseTime(int hour, int min) throws RemoteException {
+            mReasonerCore.alterSychroiniseTime(hour, min);
+        }
+
+        @Override
+        public void alterPreferenceLong(String prefName, long value) throws RemoteException {
+
+        }
+
+        @Override
+        public void alterPreferenceDouble(String prefName, double value) throws RemoteException {
+
+        }
+
+        @Override
+        public void alterPreferenceBool(String prefName, boolean value) throws RemoteException {
+
+        }
+
+        @Override
+        public void alterPreferenceString(String prefName, String value) throws RemoteException {
+
+        }
+
+        @Override
+        public void alterPreferenceObject(String prefName, Map values) throws RemoteException {
+
+        }
+    };
 
     public final ILogBackup.Stub mLogBackupBinder = new ILogBackup.Stub() {
 

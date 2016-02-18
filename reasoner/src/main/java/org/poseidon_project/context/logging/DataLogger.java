@@ -79,6 +79,7 @@ public class DataLogger {
     private SharedPreferences mSettings;
 
     public static final String BROADCAST_INTENT = "org.poseidon_project.context.NEEDS_BAT_OP_SET_OFF";
+    public static final String BROADCAST_BACKUP = "org.poseidon_project.context.BACKEDUP";
 
 
     //Whether or not verbose events should be sent to Android Log.
@@ -273,6 +274,10 @@ public class DataLogger {
             BackupLogAlarmReceiver.completeWakefulIntent(mAlarmIntent);
             mAlarmIntent = null;
         }
+
+        Intent intent = new Intent();
+        intent.setAction(BROADCAST_BACKUP);
+        mContext.sendBroadcast(intent);
     }
 
     public void incompleteBackup() {

@@ -18,10 +18,18 @@ package org.poseidon_project.context.ui;
 
 import android.app.Activity;
 import android.app.FragmentManager;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
+import android.util.Log;
 import android.widget.Toast;
 
+import org.poseidon_project.context.IContextPreference;
 import org.poseidon_project.context.R;
+import org.poseidon_project.context.utility.ExplicitIntentGenerator;
 
 import no.tellu.findit.client.api.AsyncService;
 import no.tellu.findit.client.api.AsyncServiceImpl;
@@ -34,6 +42,10 @@ import no.tellu.findit.client.api.AsyncServiceImpl;
  */
 public class ContextReasonerSettings extends Activity implements DialogReturnInterface {
 
+    public IContextPreference mContextService;
+    private boolean mBound = false;
+    private Context mContext;
+
     //Tellu related
     private AsyncService mTelluApiService;
     private FragmentManager mFragManager;
@@ -43,11 +55,37 @@ public class ContextReasonerSettings extends Activity implements DialogReturnInt
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        mContext = getApplicationContext();
+
         mFragManager = getFragmentManager();
 
         mFragManager.beginTransaction()
                 .replace(android.R.id.content, new ContextReasonerSettingsFragment())
                 .commit();
+
+        bindToService();
+    }
+
+    private void bindToService() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Intent serviceIntent = new Intent(IContextPreference.class.getName());
+
+                serviceIntent = ExplicitIntentGenerator
+                        .createExplicitFromImplicitIntent(mContext, serviceIntent);
+                if (serviceIntent != null) {
+                    bindService(serviceIntent, mConnection, Context.BIND_AUTO_CREATE);
+                    Log.d("POSEIDON-Universaal", "Context Reasoner is connected");
+                } else {
+                    Log.e("POSEIDON-Universaal", "Context Reasoner not installed!");
+                }
+            }
+        }).start();
+    }
+
+    public boolean isBound(){
+        return mBound;
     }
 
     @Override
@@ -92,5 +130,32 @@ public class ContextReasonerSettings extends Activity implements DialogReturnInt
     @Override
     public void doNeutralButtonClick(Object... para) {
 
+    }
+
+    private ServiceConnection mConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            mContextService = IContextPreference.Stub.asInterface(service);
+            mBound = ! mBound;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            mContextService = null;
+            mBound = ! mBound;
+        }
+    };
+
+    public void unBindFromService() {
+        if (mBound) {
+            unbindService(mConnection);
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unBindFromService();
     }
 }

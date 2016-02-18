@@ -22,8 +22,6 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.os.RemoteException;
 
-import org.poseidon_project.context.logging.DataLogger;
-
 import java.util.Map;
 
 /**
@@ -36,14 +34,12 @@ public class ContextReasonerService extends Service{
     private static final String LOGTAG = "ContextService";
     private ContextReasonerCore mReasonerCore;
     private Context mContext;
-    private DataLogger mLogger;
 
     @Override
     public void onCreate() {
         super.onCreate();
         mContext = getApplicationContext();
         mReasonerCore = new ContextReasonerCore(mContext);
-        mLogger = mReasonerCore.getLogger();
     }
 
     @Override
@@ -52,7 +48,7 @@ public class ContextReasonerService extends Service{
         if (IContextReasoner.class.getName().equals(intent.getAction())) {
             ContextReasonerBootReceiver.completeWakefulIntent(intent);
         } else if (ILogBackup.class.getName().equals(intent.getAction())){
-            mLogger.attemptBackup(intent);
+            mReasonerCore.getLogger().attemptBackup(intent);
         }
 
         return START_STICKY;
@@ -92,7 +88,7 @@ public class ContextReasonerService extends Service{
 
         @Override
         public void synchroniseService() throws RemoteException {
-            mLogger.uploadLog();
+            mReasonerCore.getLogger().uploadLog();
         }
 
         @Override
@@ -130,7 +126,7 @@ public class ContextReasonerService extends Service{
 
         @Override
         public void runLogBackup() throws RemoteException {
-            mLogger.attemptBackup(null);
+            mReasonerCore.getLogger().attemptBackup(null);
         }
 
     };
@@ -179,7 +175,7 @@ public class ContextReasonerService extends Service{
 
         @Override
         public void registerUserIdentifier(String userIdentifier) throws RemoteException {
-            mLogger.registerUser(userIdentifier);
+            mReasonerCore.getLogger().registerUser(userIdentifier);
         }
 
     };

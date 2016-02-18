@@ -50,11 +50,18 @@ public class ContextReasonerCore {
 
     public ContextReasonerCore(Context c) {
         mContext = c;
-        mContextDatabase = new ContextDBImpl(mContext);
-        mLogger = new DataLogger(mContext, mContextDatabase);
-        mOntologyManager = new OntologyManager(c, this, mContextDatabase);
-        mContextManager = new ContextManager(c, this, mContextDatabase);
 
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                mContextDatabase = new ContextDBImpl(mContext);
+                mLogger = new DataLogger(mContext, mContextDatabase);
+                mOntologyManager = new OntologyManager(mContext,
+                        ContextReasonerCore.this, mContextDatabase);
+                mContextManager = new ContextManager(mContext,
+                        ContextReasonerCore.this, mContextDatabase);
+            }
+        }).start();
     }
 
     public DataLogger getLogger() { return mLogger;}
@@ -165,4 +172,9 @@ public class ContextReasonerCore {
             mContextDatabase.updateContextValueToTime(cr, System.currentTimeMillis());
         }
     }
+
+    public void alterSychroiniseTime(int hour, int min) {
+        mLogger.setBackupTime(hour, min);
+    }
+
 }

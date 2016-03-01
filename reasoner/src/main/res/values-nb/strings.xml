@@ -1,0 +1,44 @@
+<resources>
+    <string name="app_name">POSEIDON-Context</string>
+
+    <string name="app_settings">R-Settings</string>
+
+    <!-- Main Settings-->
+    <string name="main_settings">Hovedinnstillinger</string>
+    <string name="pref_sync">pref_sync</string>
+    <string name="last_sync">Sist synkronisert</string>
+    <string name="sync_never">Aldri</string>
+    <string name="pref_userid">pref_userid</string>
+    <string name="user_identifier">Bruker-ID</string>
+    <string name="pref_backuptime">pref_backuptime</string>
+    <string name="backup_time">Tidspunkt for automatisk synkronisering</string>
+
+    <!-- Weather Settings-->
+    <string name="weather_settings">Innstillinger for været</string>
+    <string name="pref_hot">pref_hot</string>
+    <string name="hot_temp">Varmere enn (\u2103)</string>
+    <string name="pref_okay">pref_okay</string>
+    <string name="okay_temp">OK Temperature in \u2103</string>
+    <string name="pref_cold">pref_cold</string>
+    <string name="cold_temp">Kaldere enn (\u2103)</string>
+    <string name="hot_unsat">Innstillingen for varmt må være høyere enn kaldt</string>
+    <string name="cold_unsat">Innstillingen for kaldt må være lavere enn varmt</string>
+
+    <string name="nav_settings">Innstillinger for navigeringshjelp</string>
+    <string name="pref_max_wait">pref_max_wait</string>
+    <string name="max_wait_time">Lengst ventetid (minutter)</string>
+    <string name="pref_max_dev">pref_max_dev</string>
+    <string name="max_num_dev">Tillatt antall ganger for små avvik fra ruter</string>
+
+    <string name="setTime">Still inn</string>
+    <string name="cancelTime">Avbryt</string>
+
+    <string name="logintitle">POSEIDON-innlogging</string>
+    <string name="username">Brukernavn</string>
+    <string name="password">Passord</string>
+    <string name="login">Logg inn</string>
+    <string name="authyes">Innlogging </string>
+    <string name="authno">Innlogging feilet</string>
+
+
+</resources>

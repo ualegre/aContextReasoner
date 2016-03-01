@@ -1,0 +1,44 @@
+<resources>
+    <string name="app_name">POSEIDON-Context</string>
+
+    <string name="app_settings">R-Settings</string>
+
+    <!-- Main Settings-->
+    <string name="main_settings">Haupteinstellungen</string>
+    <string name="pref_sync">pref_sync</string>
+    <string name="last_sync">Letzte Synchronisierung</string>
+    <string name="sync_never">Nie</string>
+    <string name="pref_userid">pref_userid</string>
+    <string name="user_identifier">Benutzerkennwort</string>
+    <string name="pref_backuptime">pref_backuptime</string>
+    <string name="backup_time">Automatische Synchronisierungszeit</string>
+
+    <!-- Weather Settings-->
+    <string name="weather_settings">Wettereinstellungen</string>
+    <string name="pref_hot">pref_hot</string>
+    <string name="hot_temp">Warm, wenn die Temperatur höher ist als (\u2103)</string>
+    <string name="pref_okay">pref_okay</string>
+    <string name="okay_temp">OK Temperature in \u2103</string>
+    <string name="pref_cold">pref_cold</string>
+    <string name="cold_temp">Kalt, wenn die Temperatur niedriger ist als (\u2103)</string>
+    <string name="hot_unsat">Die angegebene warme Temperatur muss höher sein als die kalte Temperatur.</string>
+    <string name="cold_unsat">Die angegebene kalte Temperatur muss niedriger sein als die warmeTemperatur.</string>
+
+    <string name="nav_settings">Einstellungen für Navigationshilfe</string>
+    <string name="pref_max_wait">pref_max_wait</string>
+    <string name="max_wait_time">Maximale Wartezeit (in Minuten)</string>
+    <string name="pref_max_dev">pref_max_dev</string>
+    <string name="max_num_dev">Maximale Anzahl an kleinen Abweichungen von der Route</string>
+
+    <string name="setTime">Einstellen</string>
+    <string name="cancelTime">Löschen</string>
+
+    <string name="logintitle">POSEIDON-Anmeldung</string>
+    <string name="username">Benutzername</string>
+    <string name="password">Passwort</string>
+    <string name="login">Anmeldung</string>
+    <string name="authyes">Anmeldung erfolgreich</string>
+    <string name="authno">Anmeldung nicht erfolgreich</string>
+
+
+</resources>

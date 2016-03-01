@@ -4,17 +4,17 @@
     <string name="app_settings">R-Settings</string>
 
     <!-- Main Settings-->
-    <string name="main_settings">Main Settings</string>
+    <string name="main_settings">Main settings</string>
     <string name="pref_sync">pref_sync</string>
-    <string name="last_sync">Last Synced</string>
+    <string name="last_sync">Last synced</string>
     <string name="sync_never">Never</string>
     <string name="pref_userid">pref_userid</string>
-    <string name="user_identifier">User Identifier</string>
+    <string name="user_identifier">User identifier</string>
     <string name="pref_backuptime">pref_backuptime</string>
-    <string name="backup_time">Automatic Sync Time</string>
+    <string name="backup_time">Automatic sync time</string>
 
     <!-- Weather Settings-->
-    <string name="weather_settings">Weather Settings</string>
+    <string name="weather_settings">Weather settings</string>
     <string name="pref_hot">pref_hot</string>
     <string name="hot_temp">Hot, if greater than (\u2103)</string>
     <string name="pref_okay">pref_okay</string>
@@ -24,7 +24,7 @@
     <string name="hot_unsat">Specified hot temperature must be greater than cold</string>
     <string name="cold_unsat">Specified cold temperature must be less than hot</string>
 
-    <string name="nav_settings">Navigation Assistence Settings</string>
+    <string name="nav_settings">Navigation assistence settings</string>
     <string name="pref_max_wait">pref_max_wait</string>
     <string name="max_wait_time">Max waiting time (minutes)</string>
     <string name="pref_max_dev">pref_max_dev</string>
@@ -33,12 +33,12 @@
     <string name="setTime">Set</string>
     <string name="cancelTime">Cancel</string>
 
-    <string name="logintitle">POSEIDON Login</string>
+    <string name="logintitle">POSEIDON login</string>
     <string name="username">Username</string>
     <string name="password">Password</string>
     <string name="login">Login</string>
-    <string name="authyes">Login Successful</string>
-    <string name="authno">Login Unsuccessful</string>
+    <string name="authyes">Login successful</string>
+    <string name="authno">Login unsuccessful</string>
 
 
 </resources>

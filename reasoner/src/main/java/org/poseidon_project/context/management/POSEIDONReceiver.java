@@ -81,7 +81,7 @@ public class POSEIDONReceiver extends ContextReceiver{
         String valueString = String.valueOf(value);
 
            if (name.equals("sensor.gps_indoor_outdoor")) {
-               responseString = "INDOOR/OUTDOOR";
+               responseString = "INDOOROUTDOOR";
                if (value) {
                    valueString = "ISOUTDOORS";
                } else {

@@ -659,7 +659,7 @@ public class ContextMapper {
     private boolean unRegisterIndoorOutdoorsContext() {
 
         boolean okExit = mContextManager.removeObserverRequirement("engine", "GPSIndoorOutdoorContext");
-        mReasonerCore.removeContextValue("INDOOR/OUTDOOR");
+        mReasonerCore.removeContextValue("INDOOROUTDOOR");
         mLogger.logVerbose(DataLogger.REASONER, LOGTAG, "Unregistered GPSIndoorOutdoor");
 
         return okExit;

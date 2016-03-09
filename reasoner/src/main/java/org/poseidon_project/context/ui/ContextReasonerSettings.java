@@ -76,9 +76,9 @@ public class ContextReasonerSettings extends Activity implements DialogReturnInt
                         .createExplicitFromImplicitIntent(mContext, serviceIntent);
                 if (serviceIntent != null) {
                     bindService(serviceIntent, mConnection, Context.BIND_AUTO_CREATE);
-                    Log.d("POSEIDON-Universaal", "Context Reasoner is connected");
+                    Log.d("POSEIDON-Context", "Context Reasoner Middleware is connected");
                 } else {
-                    Log.e("POSEIDON-Universaal", "Context Reasoner not installed!");
+                    Log.e("POSEIDON-Context", "Context Reasoner Middleware not installed!");
                 }
             }
         }).start();

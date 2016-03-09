@@ -21,7 +21,7 @@
         <EditTextPreference
             android:key="@string/pref_hot"
             android:title="@string/hot_temp"
-            android:inputType=""/>
+            android:inputType="number"/>
         <EditTextPreference
             android:key="@string/pref_cold"
             android:title="@string/cold_temp"

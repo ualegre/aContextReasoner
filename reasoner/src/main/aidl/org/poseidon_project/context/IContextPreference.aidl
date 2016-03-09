@@ -25,8 +25,7 @@ interface IContextPreference {
     void synchroniseService();
     void alterSynchroniseTime(int hour, int min);
     void alterPreferenceLong(in String prefName, long value);
-    void alterPreferenceDouble(in String prefName, double value);
+    void alterPreferenceFloat(in String prefName, float value);
     void alterPreferenceBool(in String prefName, boolean value);
     void alterPreferenceString(in String prefName, in String value);
-    void alterPreferenceObject(in String prefName, in Map values);
 }

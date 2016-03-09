@@ -16,6 +16,9 @@
 
 package org.poseidon_project.context.reasoner;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+
 import org.poseidon_project.context.ContextReasonerCore;
 import org.poseidon_project.context.logging.DataLogger;
 import org.poseidon_project.context.management.ContextManager;
@@ -39,6 +42,10 @@ public class ContextMapper {
     private static final String LOGTAG = "ContextMapper";
     private DataLogger mLogger;
     private static final String mStreamRoot = "http://poseidon-project.org/context-stream";
+    private SharedPreferences mRuleSettings;
+    private Context mContext;
+    public HashMap<String, Map> mContextParameters;
+
 
 
     /*
@@ -151,8 +158,8 @@ public class ContextMapper {
                     + "FROM STREAM <http://poseidon-project.org/context-stream> [RANGE 10s STEP 4s] "
                     + "WHERE { ?m ex:hasTemperatureValue ?tempValueIRI . "
                     + "?tempValueIRI ex:temperatureValue ?tempValue . "
-                    + "FILTER (?tempValue >= 15) "
-                    + "FILTER (?tempValue < 25) "
+                    + "FILTER (?tempValue >= $$pref_cold) "
+                    + "FILTER (?tempValue < $$pref_hot) "
                     + "}";
 
     private static final String tempCold =
@@ -162,7 +169,7 @@ public class ContextMapper {
                     + "FROM STREAM <http://poseidon-project.org/context-stream> [RANGE 10s STEP 4s] "
                     + "WHERE { ?m ex:hasTemperatureValue ?tempValueIRI . "
                     + "?tempValueIRI ex:temperatureValue ?tempValue . "
-                    + "FILTER (?tempValue < 15) "
+                    + "FILTER (?tempValue < $$pref_cold) "
                     + "}";
 
     private static final String tempHot =
@@ -172,7 +179,7 @@ public class ContextMapper {
                     + "FROM STREAM <http://poseidon-project.org/context-stream> [RANGE 10s STEP 4s] "
                     + "WHERE { ?m ex:hasTemperatureValue ?tempValueIRI . "
                     + "?tempValueIRI ex:temperatureValue ?tempValue . "
-                    + "FILTER (?tempValue >= 25) "
+                    + "FILTER (?tempValue >= $$pref_hot) "
                     + "}";
 
     private static final String precipRain =
@@ -225,7 +232,7 @@ public class ContextMapper {
                     + " {"
                     + " SELECT (COUNT(?user) AS ?smallDevNum) WHERE { ?user ex:hasNavigationStatus 2 . }"
                     + " }"
-                    + " FILTER( ?smallDevNum >= 2 || ?o = 1 ) "
+                    + " FILTER( ?smallDevNum >= $$pref_max_dev || ?o = 1 ) "
                     + " } ";
 
     /*
@@ -255,7 +262,7 @@ public class ContextMapper {
                     + " {"
                     + " SELECT (COUNT(?user) AS ?largeDevNum) WHERE { ?user ex:hasNavigationStatus 1 . }"
                     + " } . "
-                    + " FILTER( ?smallDevNum < 2 && ?largeDevNum < 1) "
+                    + " FILTER( ?smallDevNum < $$pref_max_dev && ?largeDevNum < 1) "
                     //+ " FILTER( ?o = 3) "
                     + " } ";
 
@@ -267,12 +274,12 @@ public class ContextMapper {
             "REGISTER QUERY notWalkingFastEnough AS "
                     + "PREFIX ex: <http://ie.cs.mdx.ac.uk/POSEIDON/user#> "
                     + "CONSTRUCT { ex:u1 <http://ie.cs.mdx.ac.uk/POSEIDON/context/is> \"STANDSTILL_LONG\" } "
-                    + "FROM STREAM <http://poseidon-project.org/context-stream> [RANGE 5m STEP 5m] "
+                    + "FROM STREAM <http://poseidon-project.org/context-stream> [RANGE $$timem STEP $$timem] "
                     + " WHERE { ?user ex:hasMoved ?distance . "
                     + " { "
                     + " SELECT ( SUM(?distance) AS ?totalDistance ) WHERE { ?user ex:hasMoved ?distance . } "
                     + " } . "
-                    + " FILTER ( ?totalDistance < 20) "
+                    + " FILTER ( ?totalDistance < $$tDistance) "
                     + " }";
 
     /*
@@ -283,20 +290,28 @@ public class ContextMapper {
             "REGISTER QUERY isWalkingFastEnough AS "
                     + "PREFIX ex: <http://ie.cs.mdx.ac.uk/POSEIDON/user#> "
                     + "CONSTRUCT { ex:u1 <http://ie.cs.mdx.ac.uk/POSEIDON/context/is> \"STANDSTILL_SHORT\" } "
-                    + "FROM STREAM <http://poseidon-project.org/context-stream> [RANGE 5m STEP 5m] "
+                    + "FROM STREAM <http://poseidon-project.org/context-stream> [RANGE $$timem STEP $$timem] "
                     + " WHERE { ?user ex:hasMoved ?distance . "
                     + " { "
                     + " SELECT ( SUM(?distance) AS ?totalDistance ) WHERE { ?user ex:hasMoved ?distance . } "
                     + " } . "
-                    + " FILTER( ?totalDistance >= 20) "
+                    + " FILTER( ?totalDistance >= $$tDistance) "
                     + " }";
 
-    public ContextMapper(ContextReasonerCore crc, OntologyManager on) {
+    public ContextMapper(ContextReasonerCore crc, OntologyManager on, Context con) {
 
         mReasonerCore = crc;
+        mContext = con;
+        mRuleSettings = con.getSharedPreferences("RulePrefs", 0);
         mLogger = crc.getLogger();
         mContextManager = crc.getContextManager();
         mOntologyManager = on;
+        mContextParameters = new HashMap<>();
+        //checkForDefaultContextPrefs();
+
+    }
+
+    private void checkForDefaultContextPrefs() {
 
     }
 
@@ -310,7 +325,7 @@ public class ContextMapper {
             return registerBatteryContext();
         } else if (context.equals("oldweather")) {
             return registerOldWeatherContext(parameters);
-        } else if (context.equals("indoor/outdoor")) {
+        } else if (context.equals("indoorOutdoor")) {
             return registerIndoorOutdoorsContext();
         } else if (context.equals("navassistance")) {
             return registerNavAssistance();
@@ -331,14 +346,30 @@ public class ContextMapper {
 
         boolean okExit = true;
 
-        CsparqlQueryResultProxy c1 = mOntologyManager.registerCSPARQLQuery(tempCold);
-        CsparqlQueryResultProxy c2 = mOntologyManager.registerCSPARQLQuery(tempHot);
-        CsparqlQueryResultProxy c3 = mOntologyManager.registerCSPARQLQuery(tempOkay);
+        int coldTemp = mRuleSettings.getInt("pref_cold", 15);
+
+        String cold = new String(tempCold);
+        cold = cold.replace("$$pref_cold", String.valueOf(coldTemp));
+
+        int hotTemp = mRuleSettings.getInt("pref_hot", 25);
+
+        String hot = new String(tempHot);
+        hot = hot.replace("$$pref_hot", String.valueOf(hotTemp));
+
+        String ok = new String(tempOkay);
+        ok = ok.replace("$$pref_hot", String.valueOf(hotTemp));
+        ok = ok.replace("$$pref_cold", String.valueOf(coldTemp));
+
+
+
+        CsparqlQueryResultProxy c1 = mOntologyManager.registerCSPARQLQuery(cold);
+        CsparqlQueryResultProxy c2 = mOntologyManager.registerCSPARQLQuery(hot);
+        CsparqlQueryResultProxy c3 = mOntologyManager.registerCSPARQLQuery(ok);
         CsparqlQueryResultProxy c4 = mOntologyManager.registerCSPARQLQuery(precipRain);
         CsparqlQueryResultProxy c5 = mOntologyManager.registerCSPARQLQuery(precipDry);
 
         if (c1 != null) {
-            rules.put(tempCold, c1);
+            rules.put("tempCold", c1);
         } else {
             okExit = false;
             mLogger.logError(DataLogger.REASONER, LOGTAG,
@@ -346,7 +377,7 @@ public class ContextMapper {
         }
 
         if (c2 != null) {
-            rules.put(tempHot, c2);
+            rules.put("tempHot", c2);
         } else {
             okExit = false;
             mLogger.logError(DataLogger.REASONER, LOGTAG,
@@ -354,7 +385,7 @@ public class ContextMapper {
         }
 
         if (c3 != null) {
-            rules.put(tempOkay, c3);
+            rules.put("tempOkay", c3);
         } else {
             okExit = false;
             mLogger.logError(DataLogger.REASONER, LOGTAG,
@@ -383,7 +414,8 @@ public class ContextMapper {
         mOntologyManager.registerAggregateRule("weathercold", newWeatherCOLD);
         mOntologyManager.registerAggregateRule("weatherhot", newWeatherHOT);
 
-
+        mOntologyManager.registerContextPrefAssociation("weather", "pref_cold");
+        mOntologyManager.registerContextPrefAssociation("weather", "pref_hot");
 
         mLogger.logVerbose(DataLogger.REASONER, LOGTAG, "Registered weather");
 
@@ -412,7 +444,7 @@ public class ContextMapper {
             return unRegisterBatteryContext();
         } else if (context.equals("oldweather")) {
             return unRegisterOldWeatherContext();
-        } else if (context.equals("indoor/outdoor")) {
+        } else if (context.equals("indoorOutdoor")) {
             return unRegisterIndoorOutdoorsContext();
         } else if (context.equals("navassistance")) {
             return unRegisterNavAssistance();
@@ -431,9 +463,9 @@ public class ContextMapper {
 
         boolean okExit = mContextManager.removeObserverRequirement("engine", "LocationWeatherContext");
 
-        CsparqlQueryResultProxy c1 = rules.remove(tempOkay);
-        CsparqlQueryResultProxy c2 = rules.remove(tempCold);
-        CsparqlQueryResultProxy c3 = rules.remove(tempHot);
+        CsparqlQueryResultProxy c1 = rules.remove("tempOkay");
+        CsparqlQueryResultProxy c2 = rules.remove("tempCold");
+        CsparqlQueryResultProxy c3 = rules.remove("tempHot");
         CsparqlQueryResultProxy c4 = rules.remove(precipDry);
         CsparqlQueryResultProxy c5 = rules.remove(precipRain);
 
@@ -483,6 +515,9 @@ public class ContextMapper {
         mReasonerCore.removeContextValue("TEMP");
         mReasonerCore.removeContextValue("PRECIP");
 
+        mOntologyManager.unRegisterContextPrefAssociation("weather", "pref_cold");
+        mOntologyManager.unRegisterContextPrefAssociation("weather", "pref_hot");
+
         mLogger.logVerbose(DataLogger.REASONER, LOGTAG, "Unregistered weather");
 
         return okExit;
@@ -490,12 +525,27 @@ public class ContextMapper {
 
 
     private boolean registerStandstill() {
-        CsparqlQueryResultProxy c1 = mOntologyManager.registerCSPARQLQuery(isStandstillForLongQuery);
-        CsparqlQueryResultProxy c2 = mOntologyManager.registerCSPARQLQuery(isStandstillForShortQuery);
-        rules.put(isStandstillForLongQuery, c1);
-        rules.put(isStandstillForShortQuery, c2);
+
+        int maxTime = mRuleSettings.getInt("pref_max_wait", 5);
+        int maxDistance = maxTime * 4;
+
+        String standStillLong = new String(isStandstillForLongQuery);
+        standStillLong = standStillLong.replace("$$time", String.valueOf(maxTime));
+        standStillLong = standStillLong.replace("$$tDistance", String.valueOf(maxDistance));
+
+        String standStillShort = new String(isStandstillForShortQuery);
+        standStillShort = standStillShort.replace("$$time", String.valueOf(maxTime));
+        standStillShort = standStillShort.replace("$$tDistance", String.valueOf(maxDistance));
+
+
+        CsparqlQueryResultProxy c1 = mOntologyManager.registerCSPARQLQuery(standStillLong);
+        CsparqlQueryResultProxy c2 = mOntologyManager.registerCSPARQLQuery(standStillShort);
+        rules.put("standstill_long", c1);
+        rules.put("standstill_short", c2);
+
         mContextManager.addObserverRequirement("engine", "DistanceTravelledContext");
 
+        mOntologyManager.registerContextPrefAssociation("standstill","pref_max_wait");
         mLogger.logVerbose(DataLogger.REASONER, LOGTAG, "Registered standstill");
         return true;
     }
@@ -505,8 +555,8 @@ public class ContextMapper {
 
         mContextManager.removeObserverRequirement("engine", "DistanceTravelledContext");
 
-        CsparqlQueryResultProxy c1 = rules.remove(isStandstillForLongQuery);
-        CsparqlQueryResultProxy c2 = rules.remove(isStandstillForShortQuery);
+        CsparqlQueryResultProxy c1 = rules.remove("standstill_long");
+        CsparqlQueryResultProxy c2 = rules.remove("standstill_short");
 
         if (c1 != null) {
             mOntologyManager.unregisterCSPARQLQuery(c1.getId());
@@ -526,6 +576,7 @@ public class ContextMapper {
         }
 
         mReasonerCore.removeContextValue("STANDSTILL");
+        mOntologyManager.unRegisterContextPrefAssociation("standstill", "pref_max_wait");
         mLogger.logVerbose(DataLogger.REASONER, LOGTAG, "Unregistered standstill");
 
         return okExit;
@@ -533,13 +584,22 @@ public class ContextMapper {
 
 
     private boolean registerNavAssistance() {
+
+        int max_dev = mRuleSettings.getInt("pref_max_dev", 2);
+
+        String navAssNeeded = new String(navigationAssistNeededQuery);
+        navAssNeeded = navAssNeeded.replace("$$pref_max_dev", String.valueOf(max_dev));
+
+        String navAssNotNeeded = new String(navigationAssistNotNeededQuery);
+        navAssNotNeeded = navAssNotNeeded.replace("$$pref_max_dev", String.valueOf(max_dev));
+
         boolean okExit = true;
 
-        CsparqlQueryResultProxy c1 = mOntologyManager.registerCSPARQLQuery(navigationAssistNeededQuery);
-        CsparqlQueryResultProxy c2 = mOntologyManager.registerCSPARQLQuery(navigationAssistNotNeededQuery);
+        CsparqlQueryResultProxy c1 = mOntologyManager.registerCSPARQLQuery(navAssNeeded);
+        CsparqlQueryResultProxy c2 = mOntologyManager.registerCSPARQLQuery(navAssNotNeeded);
 
         if (c1 != null) {
-            rules.put(navigationAssistNeededQuery, c1);
+            rules.put("navAssNeeded", c1);
         } else {
             okExit = false;
             mLogger.logError(DataLogger.REASONER, LOGTAG,
@@ -547,14 +607,16 @@ public class ContextMapper {
         }
 
         if (c2 != null) {
-            rules.put(navigationAssistNotNeededQuery, c2);
+            rules.put("navAssNotNeeded", c2);
         } else {
             okExit = false;
             mLogger.logError(DataLogger.REASONER, LOGTAG,
                     "navigationAssistNotNeededQuery couldn't register");
         }
 
+        mOntologyManager.registerContextPrefAssociation("navassistance", "pref_max_dev");
         mLogger.logVerbose(DataLogger.REASONER, LOGTAG, "Registered navassistance");
+
 
         return okExit;
     }
@@ -563,8 +625,8 @@ public class ContextMapper {
 
         boolean okExit = true;
 
-        CsparqlQueryResultProxy c1 = rules.remove(navigationAssistNeededQuery);
-        CsparqlQueryResultProxy c2 = rules.remove(navigationAssistNotNeededQuery);
+        CsparqlQueryResultProxy c1 = rules.remove("navAssNeeded");
+        CsparqlQueryResultProxy c2 = rules.remove("navAssNotNeeded");
 
         if (c1 != null) {
             mOntologyManager.unregisterCSPARQLQuery(c1.getId());
@@ -582,6 +644,7 @@ public class ContextMapper {
                     "navigationAssistNeededQuery was not registered");
         }
 
+        mOntologyManager.unRegisterContextPrefAssociation("navassistance", "pref_max_dev");
         mReasonerCore.removeContextValue("NAV");
         mLogger.logVerbose(DataLogger.REASONER, LOGTAG, "Unregistered navassistance");
 

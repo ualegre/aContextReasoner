@@ -59,8 +59,9 @@ public class ContextReasonerSettingsFragment extends PreferenceFragment
     private SharedPreferences mMainSettings;
     private SharedPreferences mRuleSettings;
     private ContextReasonerSettings mActivity;
-    private int mHotTemperature;
-    private int mColdTemperature;
+    private long mHotTemperature;
+    private long mColdTemperature;
+    private static final String LOG_TAG = "ContextReasonerSettings";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -172,10 +173,11 @@ public class ContextReasonerSettingsFragment extends PreferenceFragment
 
             backupMin = randomGenerator.nextInt(60);
 
-            SharedPreferences.Editor editor = mMainSettings.edit();
-            editor.putInt("logBackupHour", backupHour);
-            editor.putInt("logBackupMin", backupMin);
-            editor.commit();
+            try {
+                mActivity.mContextService.alterSynchroniseTime(backupHour, backupMin);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
         }
 
         OnPreferenceChangeListener timeChangeListerner = new OnPreferenceChangeListener() {
@@ -185,12 +187,11 @@ public class ContextReasonerSettingsFragment extends PreferenceFragment
                 if (newValue != null) {
                     Integer hour = ((ArrayList<Integer>) newValue).get(0);
                     Integer min = ((ArrayList<Integer>) newValue).get(1);
-                    SharedPreferences.Editor editor = mMainSettings.edit();
-                    editor.putInt("logBackupHour", hour);
-                    editor.putInt("logBackupMin", min);
-                    editor.commit();
-
-                    //@TODO Need to update reasoner without needing it to restart
+                    try {
+                        mActivity.mContextService.alterSynchroniseTime(hour, min);
+                    } catch (RemoteException e) {
+                        Log.e(LOG_TAG, e.getMessage());
+                    }
 
                     return true;
                 }
@@ -211,8 +212,8 @@ public class ContextReasonerSettingsFragment extends PreferenceFragment
         final String pref_hot = getString(R.string.pref_hot);
         final String pref_cold = getString(R.string.pref_cold);
 
-        mHotTemperature = mRuleSettings.getInt(pref_hot, 25);
-        mColdTemperature = mRuleSettings.getInt(pref_cold, 15);
+        mHotTemperature = mRuleSettings.getLong(pref_hot, 25);
+        mColdTemperature = mRuleSettings.getLong(pref_cold, 15);
 
         mHotTemperaturePreference = (EditTextPreference)
                 findPreference(pref_hot);
@@ -227,11 +228,15 @@ public class ContextReasonerSettingsFragment extends PreferenceFragment
 
                 if (newValue != null) {
 
-                    if (temperatureSatisfible((Integer) newValue, mColdTemperature)) {
-                        SharedPreferences.Editor editor = mRuleSettings.edit();
-                        editor.putInt(pref_hot, (Integer) newValue);
-                        editor.commit();
-                        mHotTemperature = (Integer) newValue;
+                    long newValueint = Long.parseLong((String) newValue);
+
+                    if (temperatureSatisfible(newValueint, mColdTemperature)) {
+                        try {
+                            mActivity.mContextService.alterPreferenceLong(pref_hot, newValueint);
+                        } catch (RemoteException e) {
+                            Log.e(LOG_TAG, e.getMessage());
+                        }
+                        mHotTemperature = newValueint;
                         preference.setSummary(String.valueOf(mHotTemperature));
                         return true;
                     } else {
@@ -263,11 +268,15 @@ public class ContextReasonerSettingsFragment extends PreferenceFragment
 
                 if (newValue != null) {
 
-                    if (temperatureSatisfible(mHotTemperature, (Integer) newValue)) {
-                        SharedPreferences.Editor editor = mRuleSettings.edit();
-                        editor.putInt(pref_cold, (Integer) newValue);
-                        editor.commit();
-                        mColdTemperature = (Integer) newValue;
+                    long newValueint = Long.parseLong((String) newValue);
+
+                    if (temperatureSatisfible(mHotTemperature, newValueint)) {
+                        try {
+                            mActivity.mContextService.alterPreferenceLong(pref_cold, newValueint);
+                        } catch (RemoteException e) {
+                            Log.e(LOG_TAG, e.getMessage());
+                        }
+                        mColdTemperature = newValueint;
                         preference.setSummary(String.valueOf(mColdTemperature));
                         return true;
                     } else {
@@ -287,7 +296,7 @@ public class ContextReasonerSettingsFragment extends PreferenceFragment
 
     }
 
-    private boolean temperatureSatisfible(int hot, int cold) {
+    private boolean temperatureSatisfible(long hot, long cold) {
 
         if (hot > cold) {
             return true;
@@ -300,7 +309,7 @@ public class ContextReasonerSettingsFragment extends PreferenceFragment
         //max wait
         final String pref_max_wait = getString(R.string.pref_max_wait);
 
-        int max_wait = mRuleSettings.getInt(pref_max_wait, 5);
+        long max_wait = mRuleSettings.getLong(pref_max_wait, 5);
 
         String max_wait_str = String.valueOf(max_wait);
 
@@ -315,10 +324,15 @@ public class ContextReasonerSettingsFragment extends PreferenceFragment
             public boolean onPreferenceChange(Preference preference, Object newValue) {
 
                 if (newValue != null) {
-                    SharedPreferences.Editor editor = mRuleSettings.edit();
-                    editor.putInt(pref_max_wait, (Integer) newValue);
-                    editor.commit();
-                    preference.setSummary(String.valueOf((Integer) newValue));
+
+                    long newValueint = Long.parseLong((String) newValue);
+
+                    try {
+                        mActivity.mContextService.alterPreferenceLong(pref_max_wait, newValueint);
+                    } catch (RemoteException e) {
+                        Log.e(LOG_TAG, e.getMessage());
+                    }
+                    preference.setSummary((String) newValue);
                     return true;
                 }
 
@@ -331,7 +345,7 @@ public class ContextReasonerSettingsFragment extends PreferenceFragment
 
         //deviation
         final String pref_max_dev = getString(R.string.pref_max_dev);
-        int max_dev = mRuleSettings.getInt(pref_max_dev, 2);
+        long max_dev = mRuleSettings.getInt(pref_max_dev, 2);
 
         String max_dev_str = String.valueOf(max_dev);
 
@@ -346,10 +360,15 @@ public class ContextReasonerSettingsFragment extends PreferenceFragment
             public boolean onPreferenceChange(Preference preference, Object newValue) {
 
                 if (newValue != null) {
-                    SharedPreferences.Editor editor = mRuleSettings.edit();
-                    editor.putInt(pref_max_dev, (Integer) newValue);
-                    editor.commit();
-                    preference.setSummary(String.valueOf((Integer) newValue));
+
+                    long newValueint = Long.parseLong((String) newValue);
+
+                    try {
+                        mActivity.mContextService.alterPreferenceLong(pref_max_dev, newValueint);
+                    } catch (RemoteException e) {
+                        Log.e(LOG_TAG, e.getMessage());
+                    }
+                    preference.setSummary(String.valueOf(newValueint));
                     return true;
                 }
 

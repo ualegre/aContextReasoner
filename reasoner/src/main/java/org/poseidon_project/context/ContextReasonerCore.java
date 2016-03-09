@@ -177,4 +177,20 @@ public class ContextReasonerCore {
         mLogger.setBackupTime(hour, min);
     }
 
+
+    public void alterPreferenceLong(String prefName, long value) {
+        mOntologyManager.alterContextPreference(prefName, value);
+    }
+
+    public void alterPreferenceFloat(String prefName, float value) {
+        mOntologyManager.alterContextPreference(prefName, value);
+    }
+
+    public void alterPreferenceBool(String prefName, boolean value) {
+        mOntologyManager.alterContextPreference(prefName, value);
+    }
+
+    public void alterPreferenceString(String prefName, String value) {
+        mOntologyManager.alterContextPreference(prefName, value);
+    }
 }

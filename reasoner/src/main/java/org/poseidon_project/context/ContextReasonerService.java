@@ -98,27 +98,22 @@ public class ContextReasonerService extends Service{
 
         @Override
         public void alterPreferenceLong(String prefName, long value) throws RemoteException {
-
+            mReasonerCore.alterPreferenceLong(prefName, value);
         }
 
         @Override
-        public void alterPreferenceDouble(String prefName, double value) throws RemoteException {
-
+        public void alterPreferenceFloat(String prefName, float value) throws RemoteException {
+            mReasonerCore.alterPreferenceFloat(prefName, value);
         }
 
         @Override
         public void alterPreferenceBool(String prefName, boolean value) throws RemoteException {
-
+            mReasonerCore.alterPreferenceBool(prefName, value);
         }
 
         @Override
         public void alterPreferenceString(String prefName, String value) throws RemoteException {
-
-        }
-
-        @Override
-        public void alterPreferenceObject(String prefName, Map values) throws RemoteException {
-
+            mReasonerCore.alterPreferenceString(prefName, value);
         }
     };
 

@@ -46,6 +46,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -77,6 +78,8 @@ public class OntologyManager implements IOntologyManager{
     private HashMap<String, Object> mOntIndividuals;
     private HashMap<String, AggregateRule> mAggregateRules;
     private ContextDB mContextDatabase;
+    private HashMap<String,HashSet<String>> mCurrentPrefContexts;
+    private SharedPreferences mContextSettings;
 
     public OntologyManager(Context context, ContextReasonerCore core, ContextDB db){
         mContext = context;
@@ -98,7 +101,9 @@ public class OntologyManager implements IOntologyManager{
         //Not a completely bad idea to do a GC after loading everything
         System.gc();
 
-        pilotMapper = new ContextMapper(mReasonerCore, this);
+        pilotMapper = new ContextMapper(mReasonerCore, this, mContext);
+        mCurrentPrefContexts = new HashMap<>();
+        mContextSettings = mContext.getSharedPreferences("RulePrefs", 0);
     }
 
     private void startCSPARQL() {
@@ -127,6 +132,37 @@ public class OntologyManager implements IOntologyManager{
         }
 
         return queryResultProxy;
+    }
+
+    public void registerContextPrefAssociation(String context, String prefname) {
+
+        HashSet<String> contexts = mCurrentPrefContexts.get(prefname);
+
+        if (contexts == null) {
+            contexts = new HashSet<>();
+        }
+
+        contexts.add(context);
+
+        mCurrentPrefContexts.put(prefname, contexts);
+    }
+
+    public void unRegisterContextPrefAssociation(String context, String prefname) {
+
+        HashSet<String> contexts = mCurrentPrefContexts.get(prefname);
+
+        if (contexts == null){
+            mLogger.logVerbose(DataLogger.REASONER, "Context Preference name not being used, ignoring");
+            return;
+        }
+
+        if (contexts.remove(context)) {
+            if (contexts.isEmpty()) {
+                mCurrentPrefContexts.remove(prefname);
+            }
+        } else {
+            mLogger.logVerbose(DataLogger.REASONER, "Context Association does not exist, ignoring");
+        }
     }
 
     public CsparqlQueryResultProxy registerCSPARQLQuery(String stream, String query) {
@@ -502,4 +538,45 @@ public class OntologyManager implements IOntologyManager{
         return literal;
     }
 
+    public void alterContextPreference(String prefName, long value) {
+        SharedPreferences.Editor editor = mContextSettings.edit();
+        editor.putLong(prefName, value);
+        editor.commit();
+        restartRunningContextFromPreference(prefName);
+    }
+
+    public void alterContextPreference(String prefName, boolean value) {
+        SharedPreferences.Editor editor = mContextSettings.edit();
+        editor.putBoolean(prefName, value);
+        editor.commit();
+        restartRunningContextFromPreference(prefName);
+    }
+
+    public void alterContextPreference(String prefName, float value) {
+        SharedPreferences.Editor editor = mContextSettings.edit();
+        editor.putFloat(prefName, value);
+        editor.commit();
+        restartRunningContextFromPreference(prefName);
+    }
+
+    public void alterContextPreference(String prefName, String value) {
+        SharedPreferences.Editor editor = mContextSettings.edit();
+        editor.putString(prefName, value);
+        editor.commit();
+        restartRunningContextFromPreference(prefName);
+    }
+
+    public void restartRunningContextFromPreference(String prefName) {
+        HashSet<String> contexts = mCurrentPrefContexts.get(prefName);
+
+        if (contexts != null) {
+            for (String context : contexts) {
+                Map preferences = pilotMapper.mContextParameters.get(context);
+
+                pilotMapper.unregisterContext(context, preferences);
+                pilotMapper.registerContext(context, preferences);
+            }
+        }
+
+    }
 }

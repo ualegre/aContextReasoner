@@ -26,6 +26,7 @@
             <intent-filter>
                 <action android:name="org.poseidon_project.context.IContextReasoner" />
                 <action android:name="org.poseidon_project.context.ILogBackup" />
+                <action android:name="org.poseidon_project.context.IContextPreference" />
             </intent-filter>
         </service>
 

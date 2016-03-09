@@ -16,16 +16,29 @@
     </PreferenceCategory>
 
     <PreferenceCategory
-        android:key=""
+        android:key="pref_weather"
         android:title="@string/weather_settings">
         <EditTextPreference
             android:key="@string/pref_hot"
             android:title="@string/hot_temp"
-            android:inputType="number"/>
+            android:inputType=""/>
         <EditTextPreference
             android:key="@string/pref_cold"
             android:title="@string/cold_temp"
             android:inputType="number"/>
     </PreferenceCategory>
+    <PreferenceCategory
+        android:key="pref_navigation_assist"
+        android:title="@string/nav_settings">
+        <EditTextPreference
+            android:key="@string/pref_max_wait"
+            android:title="@string/max_wait_time"
+            android:inputType="number"/>
+        <EditTextPreference
+            android:key="@string/pref_max_dev"
+            android:title="@string/max_num_dev"
+            android:inputType="number"/>
+    </PreferenceCategory>
+
 
 </PreferenceScreen>

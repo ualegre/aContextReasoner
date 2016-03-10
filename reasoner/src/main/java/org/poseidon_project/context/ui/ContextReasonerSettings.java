@@ -50,6 +50,7 @@ public class ContextReasonerSettings extends Activity implements DialogReturnInt
     private AsyncService mTelluApiService;
     private FragmentManager mFragManager;
     private final static String mTelluApiServiceURL = "https://ri.smarttracker.no/web";
+    private ContextReasonerSettingsFragment mFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,8 +60,10 @@ public class ContextReasonerSettings extends Activity implements DialogReturnInt
 
         mFragManager = getFragmentManager();
 
+        mFragment = new ContextReasonerSettingsFragment();
+
         mFragManager.beginTransaction()
-                .replace(android.R.id.content, new ContextReasonerSettingsFragment())
+                .replace(android.R.id.content, mFragment)
                 .commit();
 
         bindToService();
@@ -102,6 +105,7 @@ public class ContextReasonerSettings extends Activity implements DialogReturnInt
             @Override
             public void onAccountOK(long customerId, String customer) {
                 Toast.makeText(getApplicationContext(), R.string.authyes, Toast.LENGTH_SHORT).show();
+                mFragment.loggedIn();
             }
 
             @Override

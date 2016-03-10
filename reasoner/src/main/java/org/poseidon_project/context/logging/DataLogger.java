@@ -159,7 +159,7 @@ public class DataLogger {
 
             mBackupHour = EARLIEST_BACKUP_HOUR + hourAfterEarliest;
             if (mBackupHour >= 24) {
-                mBackupHour =- 24;
+                mBackupHour -= 24;
             }
 
             mBackupMin = randomGenerator.nextInt(60);

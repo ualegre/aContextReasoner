@@ -61,6 +61,10 @@ public class ContextReasonerSettingsFragment extends PreferenceFragment
     private ContextReasonerSettings mActivity;
     private long mHotTemperature;
     private long mColdTemperature;
+    private Integer mBackupHour;
+    private Integer mBackupMin;
+    private boolean mSetBackupTime = false;
+    private boolean mSetUserIdentifier = true;
     private static final String LOG_TAG = "ContextReasonerSettings";
 
     @Override
@@ -86,6 +90,17 @@ public class ContextReasonerSettingsFragment extends PreferenceFragment
     public void onResume() {
         super.onResume();
         setupLastSychronisedBReceiver();
+    }
+
+    public void loggedIn() {
+
+        if (mSetBackupTime) {
+            setTimePreference(mBackupHour, mBackupMin);
+        }
+
+        if (! mSetUserIdentifier) {
+            setupUserIdentifierPref();
+        }
     }
 
     private void setupMainSettings(){
@@ -152,32 +167,34 @@ public class ContextReasonerSettingsFragment extends PreferenceFragment
 
         if (mLogUserNamePreference != null) {
             int userId = mMainSettings.getInt("userId", -1);
+
+            if (userId == -1) {
+                mSetUserIdentifier = false;
+            }
+
             mLogUserNamePreference.setSummary(String.valueOf(userId));
         }
     }
 
     private void setupTimeToSychonisePref() {
 
-        int backupHour = mMainSettings.getInt("logBackupHour", -1);
-        int backupMin = mMainSettings.getInt("logBackupMin", -1);
+        mBackupHour = mMainSettings.getInt("logBackupHour", -1);
+        mBackupMin = mMainSettings.getInt("logBackupMin", -1);
 
-        if (backupHour < 0 || backupMin < 0) {
+        if (mBackupHour < 0 || mBackupMin < 0) {
             Random randomGenerator = new Random();
 
             int hourAfterEarliest = randomGenerator.nextInt(8);
 
-            backupHour = EARLIEST_BACKUP_HOUR + hourAfterEarliest;
-            if (backupHour >= 24) {
-                backupHour =- 24;
+            mBackupHour = EARLIEST_BACKUP_HOUR + hourAfterEarliest;
+            if (mBackupHour >= 24) {
+                mBackupHour -= 24;
             }
 
-            backupMin = randomGenerator.nextInt(60);
+            mBackupMin = randomGenerator.nextInt(60);
 
-            try {
-                mActivity.mContextService.alterSynchroniseTime(backupHour, backupMin);
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
+            mSetBackupTime = true;
+
         }
 
         OnPreferenceChangeListener timeChangeListerner = new OnPreferenceChangeListener() {
@@ -187,11 +204,8 @@ public class ContextReasonerSettingsFragment extends PreferenceFragment
                 if (newValue != null) {
                     Integer hour = ((ArrayList<Integer>) newValue).get(0);
                     Integer min = ((ArrayList<Integer>) newValue).get(1);
-                    try {
-                        mActivity.mContextService.alterSynchroniseTime(hour, min);
-                    } catch (RemoteException e) {
-                        Log.e(LOG_TAG, e.getMessage());
-                    }
+
+                    setTimePreference(hour, min);
 
                     return true;
                 }
@@ -203,8 +217,16 @@ public class ContextReasonerSettingsFragment extends PreferenceFragment
         mTimeToBackupPreference = (TimePreferenceDialog)
                 findPreference(getString(R.string.pref_backuptime));
 
-        mTimeToBackupPreference.updateTime(backupHour, backupMin);
+        mTimeToBackupPreference.updateTime(mBackupHour, mBackupMin);
         mTimeToBackupPreference.setOnPreferenceChangeListener(timeChangeListerner);
+    }
+
+    private void setTimePreference(Integer backupHour, Integer backupMin) {
+        try {
+            mActivity.mContextService.alterSynchroniseTime(backupHour, backupMin);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
     }
 
     private void setupWeatherSettings() {

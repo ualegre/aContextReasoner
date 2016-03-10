@@ -367,7 +367,7 @@ public class ContextReasonerSettingsFragment extends PreferenceFragment
 
         //deviation
         final String pref_max_dev = getString(R.string.pref_max_dev);
-        long max_dev = mRuleSettings.getInt(pref_max_dev, 2);
+        long max_dev = mRuleSettings.getLong(pref_max_dev, 2);
 
         String max_dev_str = String.valueOf(max_dev);
 

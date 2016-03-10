@@ -111,7 +111,20 @@ public class TimePreferenceDialog extends DialogPreference{
     }
 
     public void updateSummary() {
-        String time = String.valueOf(mHour) + ":" + String.valueOf(mMinute);
+
+        String hour = String.valueOf(mHour);
+
+        if (hour.length() == 1) {
+            hour = "0" + hour;
+        }
+
+        String min = String.valueOf(mMinute);
+
+        if (min.length() == 1) {
+            min = "0" + min;
+        }
+
+        String time = hour + ":" + min;
         setSummary(time);
     }
 }

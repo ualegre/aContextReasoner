@@ -346,12 +346,12 @@ public class ContextMapper {
 
         boolean okExit = true;
 
-        int coldTemp = mRuleSettings.getInt("pref_cold", 15);
+        long coldTemp = mRuleSettings.getLong("pref_cold", 15);
 
         String cold = new String(tempCold);
         cold = cold.replace("$$pref_cold", String.valueOf(coldTemp));
 
-        int hotTemp = mRuleSettings.getInt("pref_hot", 25);
+        long hotTemp = mRuleSettings.getLong("pref_hot", 25);
 
         String hot = new String(tempHot);
         hot = hot.replace("$$pref_hot", String.valueOf(hotTemp));
@@ -526,8 +526,8 @@ public class ContextMapper {
 
     private boolean registerStandstill() {
 
-        int maxTime = mRuleSettings.getInt("pref_max_wait", 5);
-        int maxDistance = maxTime * 4;
+        long maxTime = mRuleSettings.getLong("pref_max_wait", 5);
+        long maxDistance = maxTime * 8;
 
         String standStillLong = new String(isStandstillForLongQuery);
         standStillLong = standStillLong.replace("$$time", String.valueOf(maxTime));
@@ -585,7 +585,7 @@ public class ContextMapper {
 
     private boolean registerNavAssistance() {
 
-        int max_dev = mRuleSettings.getInt("pref_max_dev", 2);
+        long max_dev = mRuleSettings.getLong("pref_max_dev", 2);
 
         String navAssNeeded = new String(navigationAssistNeededQuery);
         navAssNeeded = navAssNeeded.replace("$$pref_max_dev", String.valueOf(max_dev));

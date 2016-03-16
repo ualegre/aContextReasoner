@@ -539,6 +539,18 @@ public class OntologyManager implements IOntologyManager{
     }
 
     public void alterContextPreference(String prefName, long value) {
+
+        long currentValue = mContextSettings.getLong(prefName, Long.MIN_VALUE);
+
+        if (currentValue == Long.MIN_VALUE){
+            mLogger.logVerbose(DataLogger.REASONER, "Preference: " + prefName
+                    + " value set first time to: " + String.valueOf(value));
+        } else {
+            mLogger.logVerbose(DataLogger.REASONER, "Preference: " + prefName
+                    + " value changed from: " + String.valueOf(currentValue)
+                    +  " to: " + String.valueOf(value));
+        }
+
         SharedPreferences.Editor editor = mContextSettings.edit();
         editor.putLong(prefName, value);
         editor.commit();
@@ -546,6 +558,13 @@ public class OntologyManager implements IOntologyManager{
     }
 
     public void alterContextPreference(String prefName, boolean value) {
+
+        boolean currentValue = mContextSettings.getBoolean(prefName, false);
+
+        mLogger.logVerbose(DataLogger.REASONER, "Preference: " + prefName
+                + " value changed from: " + String.valueOf(currentValue)
+                +  " to: " + String.valueOf(value));
+
         SharedPreferences.Editor editor = mContextSettings.edit();
         editor.putBoolean(prefName, value);
         editor.commit();
@@ -553,6 +572,18 @@ public class OntologyManager implements IOntologyManager{
     }
 
     public void alterContextPreference(String prefName, float value) {
+
+        float currentValue = mContextSettings.getFloat(prefName, Float.MIN_VALUE);
+
+        if (currentValue == Float.MIN_VALUE) {
+            mLogger.logVerbose(DataLogger.REASONER, "Preference: " + prefName
+                    + " value set first time to: " + String.valueOf(value));
+        } else {
+            mLogger.logVerbose(DataLogger.REASONER, "Preference: " + prefName
+                    + " value changed from: " + String.valueOf(currentValue)
+                    +  " to: " + String.valueOf(value));
+        }
+
         SharedPreferences.Editor editor = mContextSettings.edit();
         editor.putFloat(prefName, value);
         editor.commit();
@@ -560,6 +591,18 @@ public class OntologyManager implements IOntologyManager{
     }
 
     public void alterContextPreference(String prefName, String value) {
+
+        String currentValue = mContextSettings.getString(prefName, "UnknowN");
+
+        if (currentValue.equals("UnknowN")) {
+            mLogger.logVerbose(DataLogger.REASONER, "Preference: " + prefName
+                    + " value set first time to: " + value);
+        } else {
+            mLogger.logVerbose(DataLogger.REASONER, "Preference: " + prefName
+                    + " value changed from: " + currentValue
+                    +  " to: " + value);
+        }
+
         SharedPreferences.Editor editor = mContextSettings.edit();
         editor.putString(prefName, value);
         editor.commit();

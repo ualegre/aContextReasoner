@@ -97,6 +97,11 @@ public class ContextReasonerService extends Service{
         }
 
         @Override
+        public void alterLearning(boolean mode) throws RemoteException {
+            mReasonerCore.getLogger().alterLearningMode(mode);
+        }
+
+        @Override
         public void alterPreferenceLong(String prefName, long value) throws RemoteException {
             mReasonerCore.alterPreferenceLong(prefName, value);
         }

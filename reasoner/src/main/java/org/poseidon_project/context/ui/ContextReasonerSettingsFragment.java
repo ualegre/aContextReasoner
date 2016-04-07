@@ -23,6 +23,7 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.RemoteException;
+import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
@@ -51,6 +52,7 @@ public class ContextReasonerSettingsFragment extends PreferenceFragment
     private Preference mLogUserNamePreference;
     private Preference mLastSynchronised;
     private TimePreferenceDialog mTimeToBackupPreference;
+    private CheckBoxPreference mLearningPreference;
     private EditTextPreference mHotTemperaturePreference;
     private EditTextPreference mColdTemperaturePreference;
     private EditTextPreference mMaxWaitingPreference;
@@ -107,6 +109,35 @@ public class ContextReasonerSettingsFragment extends PreferenceFragment
         setupLastSychronisedPref();
         setupUserIdentifierPref();
         setupTimeToSychonisePref();
+        setupLearningPref();
+    }
+
+    private void setupLearningPref() {
+        mLearningPreference = (CheckBoxPreference) findPreference(getString(R.string.pref_learning));
+
+        if (mLearningPreference != null) {
+            boolean mode = mMainSettings.getBoolean("learningmode", true);
+            mLearningPreference.setChecked(mode);
+
+            mLearningPreference.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
+                @Override
+                public boolean onPreferenceChange(Preference preference, Object newValue) {
+
+                    if (newValue instanceof Boolean) {
+
+                        try {
+                            mActivity.mContextService.alterLearning((Boolean) newValue);
+                        } catch (RemoteException e) {
+                            Log.e("error", e.getMessage());
+                        }
+
+                        return true;
+                    }
+
+                    return false;
+                }
+            });
+        }
     }
 
     private void setupLastSychronisedBReceiver() {

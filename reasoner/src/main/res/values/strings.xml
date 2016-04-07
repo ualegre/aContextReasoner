@@ -12,6 +12,8 @@
     <string name="user_identifier">User identifier</string>
     <string name="pref_backuptime">pref_backuptime</string>
     <string name="backup_time">Automatic sync time</string>
+    <string name="pref_learning">pref_learning</string>
+    <string name="learning">Understand Performance</string>
 
     <!-- Weather Settings-->
     <string name="weather_settings">Weather settings</string>
@@ -24,6 +26,7 @@
     <string name="hot_unsat">Specified hot temperature must be greater than cold</string>
     <string name="cold_unsat">Specified cold temperature must be less than hot</string>
 
+    <!-- Navigation Settings-->
     <string name="nav_settings">Navigation assistence settings</string>
     <string name="pref_max_wait">pref_max_wait</string>
     <string name="max_wait_time">Max waiting time (minutes)</string>

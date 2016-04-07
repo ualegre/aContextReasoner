@@ -434,4 +434,8 @@ public class DataLogger {
         }
     }
 
+    public void alterLearningMode(boolean mode) {
+
+        mUploader.setLearningMode(mUserID, mode);
+    }
 }

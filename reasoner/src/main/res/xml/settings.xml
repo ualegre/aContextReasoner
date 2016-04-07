@@ -13,6 +13,10 @@
             android:key="@string/pref_backuptime"
             android:title="@string/backup_time"
             android:defaultValue="20:00"/>
+        <CheckBoxPreference
+            android:key="@string/pref_learning"
+            android:title="@string/learning"
+            android:defaultValue="true"/>
     </PreferenceCategory>
 
     <PreferenceCategory

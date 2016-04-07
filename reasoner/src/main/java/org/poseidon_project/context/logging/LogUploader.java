@@ -42,6 +42,7 @@ public class LogUploader implements XMLRPCCallback{
     private static final String SERVER_URL = "";
     private static final String RPC_UPLOAD_FUNCTION = "";
     private static final String RPC_REGISTER_FUNCTION = "";
+    private static final String RPC_SET_LEARNING_FUNCTION = "";
 
     private static final String LOG_TAG = "Log Uploader";
 
@@ -65,6 +66,36 @@ public class LogUploader implements XMLRPCCallback{
             Log.e(LOG_TAG, e.getMessage());
         }
 
+    }
+
+    protected boolean setLearningMode(final Integer userNumber, final Boolean mode) {
+
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    ArrayList params = new ArrayList();
+                    params.add(userNumber);
+                    params.add(mode);
+
+                    Object i = mRPCClient.call(RPC_SET_LEARNING_FUNCTION, params);
+
+
+                } catch (Exception e) {
+                    Log.e(LOG_TAG, e.getMessage());
+                }
+            }
+        });
+
+        t.start();
+
+        try {
+            t.join();
+        } catch (InterruptedException e) {
+            Log.e(LOG_TAG, e.getMessage());
+        }
+
+        return true;
     }
 
     protected boolean registerUser(final Integer userNumber, final String userIdent, final String deviceIdent) {

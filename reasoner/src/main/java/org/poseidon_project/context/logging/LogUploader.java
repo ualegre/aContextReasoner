@@ -43,6 +43,7 @@ public class LogUploader implements XMLRPCCallback{
     private static final String RPC_UPLOAD_FUNCTION = "";
     private static final String RPC_REGISTER_FUNCTION = "";
     private static final String RPC_SET_LEARNING_FUNCTION = "";
+    private static final String API_KEY = "";
 
     private static final String LOG_TAG = "Log Uploader";
 
@@ -75,6 +76,7 @@ public class LogUploader implements XMLRPCCallback{
             public void run() {
                 try {
                     ArrayList params = new ArrayList();
+                    params.add(API_KEY);
                     params.add(userNumber);
                     params.add(mode);
 
@@ -107,6 +109,7 @@ public class LogUploader implements XMLRPCCallback{
             public void run() {
                 try {
                     ArrayList params = new ArrayList();
+                    params.add(API_KEY);
                     params.add(userNumber);
                     params.add(userIdent);
                     params.add(deviceIdent);
@@ -155,6 +158,7 @@ public class LogUploader implements XMLRPCCallback{
         }
 
         final ArrayList params = new ArrayList();
+        params.add(API_KEY);
         params.add(events.size());
         params.add(userID);
         params.add(origins);

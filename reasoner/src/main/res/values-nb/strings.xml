@@ -12,6 +12,8 @@
     <string name="user_identifier">Bruker-ID</string>
     <string name="pref_backuptime">pref_backuptime</string>
     <string name="backup_time">Tidspunkt for automatisk synkronisering</string>
+    <string name="pref_learning">pref_learning</string>
+    <string name="learning">Overvåk hvordan det går</string>
 
     <!-- Weather Settings-->
     <string name="weather_settings">Innstillinger for været</string>
@@ -24,6 +26,7 @@
     <string name="hot_unsat">Innstillingen for varmt må være høyere enn kaldt</string>
     <string name="cold_unsat">Innstillingen for kaldt må være lavere enn varmt</string>
 
+    <!-- Navigation Settings-->
     <string name="nav_settings">Innstillinger for navigeringshjelp</string>
     <string name="pref_max_wait">pref_max_wait</string>
     <string name="max_wait_time">Lengst ventetid (minutter)</string>

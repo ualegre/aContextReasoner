@@ -13,7 +13,7 @@
     <string name="pref_backuptime">pref_backuptime</string>
     <string name="backup_time">Automatic sync time</string>
     <string name="pref_learning">pref_learning</string>
-    <string name="learning">Understand Performance</string>
+    <string name="learning">Monitor Performance</string>
 
     <!-- Weather Settings-->
     <string name="weather_settings">Weather settings</string>

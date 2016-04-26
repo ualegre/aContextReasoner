@@ -18,6 +18,7 @@ package org.poseidon_project.context.management;
 
 import android.util.Log;
 
+import org.poseidon_project.context.logging.DataLogger;
 import org.poseidon_project.contexts.ContextReceiver;
 import org.poseidon_project.contexts.IContextManager;
 import org.poseidon_project.contexts.IOntologyManager;
@@ -37,9 +38,16 @@ import java.util.Map;
 public class POSEIDONReceiver extends ContextReceiver{
 
     private int mCounter = 1 ;
+    private DataLogger mLogger;
 
     public POSEIDONReceiver(IContextManager contextManager, IOntologyManager ontologyManager) {
         super(contextManager, ontologyManager);
+    }
+
+    public POSEIDONReceiver(IContextManager contextManager, IOntologyManager ontologyManager,
+                            DataLogger logger) {
+        super(contextManager, ontologyManager);
+        mLogger = logger;
     }
 
     @Override
@@ -66,6 +74,10 @@ public class POSEIDONReceiver extends ContextReceiver{
            } else if (name.equals("device.distancetravelled")) {
                getOntologyManager().updateValues("user#pu", "user#hasMoved", strValue);
                Log.d("Moved", strValue);
+           } else if (name.equals("CalEvent")) {
+               mLogger.logVerbose(DataLogger.CONTEXT_MANAGER, "CalEvent : " + strValue);
+           } else if (name.equals("CalReminder")) {
+               mLogger.logVerbose(DataLogger.CONTEXT_MANAGER, "CalReminder : " + strValue);
            }
     }
 
@@ -80,7 +92,7 @@ public class POSEIDONReceiver extends ContextReceiver{
         String responseString = name;
         String valueString = String.valueOf(value);
 
-           if (name.equals("sensor.gps_indoor_outdoor")) {
+        if (name.equals("sensor.gps_indoor_outdoor")) {
                responseString = "INDOOROUTDOOR";
                if (value) {
                    valueString = "ISOUTDOORS";
@@ -89,14 +101,17 @@ public class POSEIDONReceiver extends ContextReceiver{
                }
 
                getContextManager().updateContextValue(responseString, valueString);
-           }
 
-
+        } else if (name.equals("NavEnd")) {
+            mLogger.logVerbose(DataLogger.CONTEXT_MANAGER, "NavEnd : " + valueString);
+        }
     }
 
     @Override
     public void newContextValue(String name, String value) {
-
+        if (name.equals("NavStart")) {
+            mLogger.logVerbose(DataLogger.CONTEXT_MANAGER, "NavStart : " + value);
+        }
     }
 
     @Override

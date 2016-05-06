@@ -45,10 +45,12 @@ public class ContextReasonerService extends Service{
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
-        if (IContextReasoner.class.getName().equals(intent.getAction())) {
-            ContextReasonerBootReceiver.completeWakefulIntent(intent);
-        } else if (ILogBackup.class.getName().equals(intent.getAction())){
-            mReasonerCore.getLogger().attemptBackup(intent);
+        if (intent != null) {
+            if (IContextReasoner.class.getName().equals(intent.getAction())) {
+                ContextReasonerBootReceiver.completeWakefulIntent(intent);
+            } else if (ILogBackup.class.getName().equals(intent.getAction())){
+                mReasonerCore.getLogger().attemptBackup(intent);
+            }
         }
 
         return START_STICKY;

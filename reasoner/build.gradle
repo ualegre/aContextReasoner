@@ -2,14 +2,14 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 23
-    buildToolsVersion "23.0.1"
+    buildToolsVersion "23.0.3"
 
     defaultConfig {
         applicationId "org.poseidon_project.context"
         minSdkVersion 16
         targetSdkVersion 21
-        versionCode 17
-        versionName "0.7.0"
+        versionCode 24
+        versionName "0.8.0"
         multiDexEnabled true
     }
 

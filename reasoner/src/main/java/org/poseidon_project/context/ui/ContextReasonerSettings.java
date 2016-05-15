@@ -17,6 +17,7 @@
 package org.poseidon_project.context.ui;
 
 import android.app.Activity;
+import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.ComponentName;
 import android.content.Context;
@@ -92,10 +93,21 @@ public class ContextReasonerSettings extends Activity implements DialogReturnInt
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+        Fragment logindialog = mFragManager.findFragmentByTag("logindialog");
+
+        if (logindialog != null) {
+            LoginDialogFragment df = (LoginDialogFragment) logindialog;
+            df.dismiss();
+        }
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
         LoginDialogFragment loginFrag = LoginDialogFragment.newInstance(R.string.logintitle);
-        loginFrag.show(mFragManager, "dialog");
+        loginFrag.show(mFragManager, "logindialog");
     }
 
     public void authenticateUser(String username, String password) {
@@ -112,7 +124,7 @@ public class ContextReasonerSettings extends Activity implements DialogReturnInt
             public void onAccountError(int code, String message, Exception e) {
                 Toast.makeText(getApplicationContext(), R.string.authno, Toast.LENGTH_SHORT).show();
                 LoginDialogFragment loginFrag = LoginDialogFragment.newInstance(R.string.logintitle);
-                loginFrag.show(mFragManager, "dialog");
+                loginFrag.show(mFragManager, "logindialog");
 
             }
         };

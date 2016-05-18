@@ -74,6 +74,7 @@ public class LoginDialogFragment extends DialogFragment {
 
         View dialogView = mActivity.getLayoutInflater().inflate(R.layout.logindialog, null);
         mDialog.setView(dialogView);
+        setCancelable(false);
 
         mUsername = (EditText) dialogView.findViewById(R.id.txt_username);
         mPassword = (EditText) dialogView.findViewById(R.id.txt_password);

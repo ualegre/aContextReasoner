@@ -30,7 +30,6 @@ import android.util.Log;
 
 import org.poseidon_project.context.BuildConfig;
 import org.poseidon_project.context.database.ContextDB;
-import org.poseidon_project.contexts.hardware.PluggedInContext;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -39,6 +38,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
+
+import uk.ac.mdx.cs.ie.acontextlib.hardware.PluggedInContext;
 
 
 /**

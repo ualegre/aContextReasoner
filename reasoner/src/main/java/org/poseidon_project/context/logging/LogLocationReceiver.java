@@ -21,13 +21,12 @@ import android.location.Location;
 import android.os.Looper;
 import android.util.Log;
 
-import org.poseidon_project.contexts.ContextReceiver;
-import org.poseidon_project.contexts.UIEvent;
-import org.poseidon_project.contexts.hardware.CurrentLocationContext;
-import org.poseidon_project.contexts.hardware.PluggedInContext;
-
 import java.text.DecimalFormat;
 import java.util.Map;
+
+import uk.ac.mdx.cs.ie.acontextlib.IContextReceiver;
+import uk.ac.mdx.cs.ie.acontextlib.hardware.CurrentLocationContext;
+import uk.ac.mdx.cs.ie.acontextlib.hardware.PluggedInContext;
 
 /**
  * Deals with receiving location updates for the logger
@@ -50,11 +49,13 @@ public class LogLocationReceiver {
     private static final int TIME_TO_REFRESH = 1000 * 60 * 10;
 
     public LogLocationReceiver(Context context) {
-        mPluggedInContext = new PluggedInContext(context, mContextListener);
+        mPluggedInContext = new PluggedInContext(context);
+        mPluggedInContext.addContextReceiver(mContextListener);
         mPluggedInContext.addRequiringApp("logger");
         mPluggedInContext.start();
 
-        mLocationContext = new CurrentLocationContext(context, mContextListener, "passive");
+        mLocationContext = new CurrentLocationContext(context, "passive");
+        mLocationContext.addContextReceiver(mContextListener);
         mLocationContext.addRequiringApp("logger");
     }
 
@@ -111,7 +112,7 @@ public class LogLocationReceiver {
         return  mPluggedInContext.stop();
     }
 
-    public ContextReceiver mContextListener = new ContextReceiver() {
+    public IContextReceiver mContextListener = new IContextReceiver() {
         @Override
         public void newContextValue(String name, long value) {
 
@@ -156,9 +157,10 @@ public class LogLocationReceiver {
         }
 
         @Override
-        public void newUIEvent(UIEvent event) {
+        public void newUIEvent(int event) {
 
         }
+
     };
 
 }

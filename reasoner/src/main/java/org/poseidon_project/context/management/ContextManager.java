@@ -24,9 +24,6 @@ import android.util.Log;
 import org.poseidon_project.context.ContextReasonerCore;
 import org.poseidon_project.context.database.ContextDB;
 import org.poseidon_project.context.logging.DataLogger;
-import org.poseidon_project.contexts.ContextObserver;
-import org.poseidon_project.contexts.ContextReceiver;
-import org.poseidon_project.contexts.IContextManager;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -45,6 +42,11 @@ import java.util.List;
 import java.util.Map;
 
 import dalvik.system.DexClassLoader;
+import uk.ac.mdx.cs.ie.acontextlib.ContextObserver;
+import uk.ac.mdx.cs.ie.acontextlib.ContextReceiver;
+import uk.ac.mdx.cs.ie.acontextlib.ContextReceivers;
+import uk.ac.mdx.cs.ie.acontextlib.IContextManager;
+import uk.ac.mdx.cs.ie.acontextlib.IReasonerManager;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -53,13 +55,13 @@ import static android.content.Context.MODE_PRIVATE;
  *
  * @author Dean Kramer <d.kramer@mdx.ac.uk>
  */
-public class ContextManager implements IContextManager{
+public class ContextManager implements IContextManager {
 
     private Context mContext;
     private static final String LOGTAG = "ContextManager";
     private final HashMap<String, ContextObserver> mActiveContexts = new HashMap<>();
     private ContextDB mContextDatabase;
-    private ContextReceiver mContextReceiver;
+    private ContextReceivers mContextReceivers;
     private ExternalContextReceiver mExternalContextReceiver;
     private SimpleDateFormat mDateFormater = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private Calendar mCalendar = Calendar.getInstance();
@@ -73,7 +75,8 @@ public class ContextManager implements IContextManager{
         mReasonerCore = reasonerCore;
         mContextDatabase = db;
         mLogger = reasonerCore.getLogger();
-        mContextReceiver = new POSEIDONReceiver(this, mReasonerCore.getOntologyManager(), mLogger);
+        mContextReceivers = new ContextReceivers();
+        mContextReceivers.add("core", new POSEIDONReceiver(this, mReasonerCore.getReasonerManager(), mLogger));
         loadAllOtherReceiverClasses();
         mExternalContextReceiver = new ExternalContextReceiver(this, mLogger);
         IntentFilter filter = new IntentFilter(mExternalContextReceiver.CONTEXT_INTENT);
@@ -169,15 +172,6 @@ public class ContextManager implements IContextManager{
         }
     }
 
-    public void updateReceiverReference(ContextReceiver newReceiver) {
-
-        for (ContextObserver co : mActiveContexts.values()) {
-            co.setContextReceiver(newReceiver);
-        }
-
-    }
-
-
     public void copyDexFile(String appKey, final String newDex,
                             String[] contexts, String packagename, int permission) {
 
@@ -250,15 +244,15 @@ public class ContextManager implements IContextManager{
                         mContext.getClassLoader());
 
         Class<?> contextObserver  = null;
-        Class<?>[] parameterTypes = { Context.class, ContextReceiver.class };
+        Class<?>[] parameterTypes = { Context.class };
 
         try {
             //Load the Class
             contextObserver = cl.loadClass(packagename.concat("." + componentName));
             Constructor<?> contextConstructor = contextObserver.getConstructor(parameterTypes);
             ContextObserver context = (ContextObserver) contextConstructor
-                    .newInstance(mContext, mContextReceiver);
-
+                    .newInstance(mContext);
+            context.setContextReceivers(mContextReceivers);
             context.addRequiringApp(appId);
 
 
@@ -304,17 +298,16 @@ public class ContextManager implements IContextManager{
                 mContext.getClassLoader());
 
         Class<?> contextReceiver  = null;
-        Class<?>[] parameterTypes = { ContextReceiver.class };
+        Class<?>[] parameterTypes = { IContextManager.class, IReasonerManager.class};
 
         try {
             //Load the Class
             contextReceiver = cl.loadClass(packagename.concat("." + componentName));
             Constructor<?> receiverConstructor = contextReceiver.getConstructor(parameterTypes);
             ContextReceiver receiver = (ContextReceiver) receiverConstructor
-                    .newInstance(mContextReceiver);
+                    .newInstance(this, mReasonerCore.getReasonerManager());
 
-            mContextReceiver = receiver;
-            updateReceiverReference(mContextReceiver);
+            mContextReceivers.add(packagename, receiver);
             mLogger.logVerbose(DataLogger.CONTEXT_MANAGER,
                     LOGTAG, "Loaded Receiver: " + componentName);
 
@@ -369,27 +362,27 @@ public class ContextManager implements IContextManager{
     }
 
     public void newExternalContextValue(String name, long contextValue) {
-        mContextReceiver.newContextValue(name, contextValue);
+        mContextReceivers.newContextValue(name, contextValue);
     }
 
     public void newExternalContextValue(String name, double contextValue) {
-        mContextReceiver.newContextValue(name, contextValue);
+        mContextReceivers.newContextValue(name, contextValue);
     }
 
     public void newExternalContextValue(String name, boolean contextValue) {
-        mContextReceiver.newContextValue(name, contextValue);
+        mContextReceivers.newContextValue(name, contextValue);
     }
 
     public void newExternalContextValue(String name, String contextValue) {
-        mContextReceiver.newContextValue(name, contextValue);
+        mContextReceivers.newContextValue(name, contextValue);
     }
 
     public void newExternalContextValue(String name, Object contextValue) {
-        mContextReceiver.newContextValue(name, contextValue);
+        mContextReceivers.newContextValue(name, contextValue);
     }
 
     public void newExternalContextValue(Map<String, String> values) {
-        mContextReceiver.newContextValues(values);
+        mContextReceivers.newContextValues(values);
     }
 
     public boolean stop() {

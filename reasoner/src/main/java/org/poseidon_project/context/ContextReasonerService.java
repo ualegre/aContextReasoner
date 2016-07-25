@@ -160,17 +160,6 @@ public class ContextReasonerService extends Service{
         }
 
         @Override
-        public void importOntologyURLMappingFile(String appkey, String fileLocation)
-                throws RemoteException {
-            mReasonerCore.importOntologyURLMappingFile(fileLocation);
-        }
-
-        @Override
-        public void useOntologyURLMappingFile(String appkey, String fileLocation) throws RemoteException {
-
-        }
-
-        @Override
         public boolean setContextParameters(String appkey, String observerName, Map parameters) throws RemoteException {
             return mReasonerCore.setContextParameters(appkey, observerName, parameters);
         }

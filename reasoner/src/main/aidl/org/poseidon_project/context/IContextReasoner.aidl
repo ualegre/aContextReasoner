@@ -35,12 +35,6 @@ interface IContextReasoner {
     //***Removes the need for a particular context***
     boolean removeContextRequirement(in String appKey, in String observerName);
 
-    //***Imports Ontology URL-File mappings***
-    void importOntologyURLMappingFile(in String appkey, in String fileLocation);
-
-    //***Use Ontology URL-File mapping for this instance only***
-    void useOntologyURLMappingFile(in String appkey, in String fileLocation);
-
     //***Set internal context parameters***
     boolean setContextParameters(in String appkey, in String observerName, in Map parameters);
 

@@ -24,7 +24,7 @@ import org.poseidon_project.context.database.ContextDBImpl;
 import org.poseidon_project.context.database.ContextResult;
 import org.poseidon_project.context.logging.DataLogger;
 import org.poseidon_project.context.management.ContextManager;
-import org.poseidon_project.context.reasoner.OntologyManager;
+import org.poseidon_project.context.reasoner.ReasonerManager;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -42,7 +42,7 @@ public class ContextReasonerCore {
     private static final String CONTEXT_VALUE = "context_value";
     private ContextDB mContextDatabase;
     private ContextManager mContextManager;
-    private OntologyManager mOntologyManager;
+    private ReasonerManager mReasonerManager;
     private Context mContext;
     public HashMap<String, ContextResult> mContextValues = new HashMap<>();
     private DataLogger mLogger;
@@ -56,7 +56,7 @@ public class ContextReasonerCore {
             public void run() {
                 mContextDatabase = new ContextDBImpl(mContext);
                 mLogger = new DataLogger(mContext, mContextDatabase);
-                mOntologyManager = new OntologyManager(mContext,
+                mReasonerManager = new ReasonerManager(mContext,
                         ContextReasonerCore.this, mContextDatabase);
                 mContextManager = new ContextManager(mContext,
                         ContextReasonerCore.this, mContextDatabase);
@@ -66,7 +66,7 @@ public class ContextReasonerCore {
 
     public DataLogger getLogger() { return mLogger;}
 
-    public OntologyManager getOntologyManager() {return mOntologyManager;}
+    public ReasonerManager getReasonerManager() {return mReasonerManager;}
 
     public ContextManager getContextManager() {return mContextManager;}
 
@@ -76,18 +76,14 @@ public class ContextReasonerCore {
         mContextManager.copyDexFile(appkey, newDex, contexts, packagename, permission);
     }
 
-    public void importOntologyURLMappingFile(String location) {
-        mOntologyManager.parseURLtoFileMappingFile(location);
-    }
-
     public boolean addContextRequirement(String appkey, String observerName) {
         //return mContextManager.addObserverRequirement(appkey, observerName);
-        return mOntologyManager.pilotMapper.registerContext(observerName, null);
+        return mReasonerManager.pilotMapper.registerContext(observerName, null);
     }
 
     public boolean removeContextRequirement(String appkey, String observerName) {
         //return mContextManager.removeObserverRequirement(appkey, observerName);
-        return mOntologyManager.pilotMapper.unregisterContext(observerName, null);
+        return mReasonerManager.pilotMapper.unregisterContext(observerName, null);
     }
 
     public boolean setContextParameters(String appkey, String observerName, Map parameters) {
@@ -115,8 +111,8 @@ public class ContextReasonerCore {
             mContextManager.stop();
         }
 
-        if (mOntologyManager != null) {
-            mOntologyManager.stop();
+        if (mReasonerManager != null) {
+            mReasonerManager.stop();
         }
 
         if (mContextDatabase != null) {
@@ -135,7 +131,7 @@ public class ContextReasonerCore {
 
     public boolean addContextRequirementWithParameters
             (String appkey, String observerName, Map parameters) {
-        return mOntologyManager.pilotMapper.registerContext(observerName, parameters);
+        return mReasonerManager.pilotMapper.registerContext(observerName, parameters);
         //return mContextManager.addObserverRequirementWithParameters(appkey, observerName, parameters);
     }
 
@@ -150,7 +146,7 @@ public class ContextReasonerCore {
 
             if (newContext != null) {
                 mContextValues.put(contextName, newContext);
-                mOntologyManager.fireAggregateRules(contextName);
+                mReasonerManager.fireAggregateRules(contextName);
             }
 
             sendContextResult(contextName, value);
@@ -164,7 +160,7 @@ public class ContextReasonerCore {
 
                 if (newContext != null) {
                     mContextValues.put(contextName, newContext);
-                    mOntologyManager.fireAggregateRules(contextName);
+                    mReasonerManager.fireAggregateRules(contextName);
                 }
 
                 sendContextResult(contextName, value);
@@ -188,18 +184,18 @@ public class ContextReasonerCore {
 
 
     public void alterPreferenceLong(String prefName, long value) {
-        mOntologyManager.alterContextPreference(prefName, value);
+        mReasonerManager.alterContextPreference(prefName, value);
     }
 
     public void alterPreferenceFloat(String prefName, float value) {
-        mOntologyManager.alterContextPreference(prefName, value);
+        mReasonerManager.alterContextPreference(prefName, value);
     }
 
     public void alterPreferenceBool(String prefName, boolean value) {
-        mOntologyManager.alterContextPreference(prefName, value);
+        mReasonerManager.alterContextPreference(prefName, value);
     }
 
     public void alterPreferenceString(String prefName, String value) {
-        mOntologyManager.alterContextPreference(prefName, value);
+        mReasonerManager.alterContextPreference(prefName, value);
     }
 }

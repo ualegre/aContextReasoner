@@ -19,34 +19,34 @@ package org.poseidon_project.context.management;
 import android.util.Log;
 
 import org.poseidon_project.context.logging.DataLogger;
-import org.poseidon_project.contexts.ContextReceiver;
-import org.poseidon_project.contexts.IContextManager;
-import org.poseidon_project.contexts.IOntologyManager;
-import org.poseidon_project.contexts.UIEvent;
-import org.poseidon_project.contexts.envir.weather.source.Precipitation;
-import org.poseidon_project.contexts.envir.weather.source.Temperature;
-import org.poseidon_project.contexts.envir.weather.source.Weather;
-import org.poseidon_project.contexts.envir.weather.source.WeatherPeriod;
 
 import java.util.Map;
+
+import uk.ac.mdx.cs.ie.acontextlib.ContextReceiver;
+import uk.ac.mdx.cs.ie.acontextlib.IContextManager;
+import uk.ac.mdx.cs.ie.acontextlib.IReasonerManager;
+import uk.ac.mdx.cs.ie.acontextlib.envir.weather.source.Precipitation;
+import uk.ac.mdx.cs.ie.acontextlib.envir.weather.source.Temperature;
+import uk.ac.mdx.cs.ie.acontextlib.envir.weather.source.Weather;
+import uk.ac.mdx.cs.ie.acontextlib.envir.weather.source.WeatherPeriod;
 
 /**
  * The Context Receiver to handle built in POSEIDON contexts.
  *
  * @author Dean Kramer <d.kramer@mdx.ac.uk>
  */
-public class POSEIDONReceiver extends ContextReceiver{
+public class POSEIDONReceiver extends ContextReceiver {
 
     private int mCounter = 1 ;
     private DataLogger mLogger;
 
-    public POSEIDONReceiver(IContextManager contextManager, IOntologyManager ontologyManager) {
-        super(contextManager, ontologyManager);
+    public POSEIDONReceiver(IContextManager contextManager, IReasonerManager reasonerManager) {
+        super(contextManager, reasonerManager);
     }
 
-    public POSEIDONReceiver(IContextManager contextManager, IOntologyManager ontologyManager,
+    public POSEIDONReceiver(IContextManager contextManager, IReasonerManager reasonerManager,
                             DataLogger logger) {
-        super(contextManager, ontologyManager);
+        super(contextManager, reasonerManager);
         mLogger = logger;
     }
 
@@ -57,22 +57,22 @@ public class POSEIDONReceiver extends ContextReceiver{
 
            if(name.equals("sensor.battery_level")) {
                Log.d("receiver", "battery Context value: " + String.valueOf(value));
-               getOntologyManager().updateValues("system#device", "batteryRemaining", strValue);
+               getReasonerManager().updateValues("system#device", "batteryRemaining", strValue);
            } else if (name.equals("sensor.light_lumens")) {
                Log.d("receiver", "Light Context value: " + String.valueOf(value));
-               getOntologyManager().updateValues("system#device", "hasLightLevel", strValue);
+               getReasonerManager().updateValues("system#device", "hasLightLevel", strValue);
            } else if (name.equals("NavState")) {
                if (mCounter > 999) {
                    mCounter = 1;
                }
 
-               getOntologyManager().updateValues("user#pu" + mCounter, "user#hasNavigationStatus", strValue);
+               getReasonerManager().updateValues("user#pu" + mCounter, "user#hasNavigationStatus", strValue);
                mCounter++;
            } else if (name.equals("device.stepcounter")) {
-               getOntologyManager().updateValues("user#pu", "user#hasStepped", strValue);
+               getReasonerManager().updateValues("user#pu", "user#hasStepped", strValue);
                Log.d("Steps", strValue);
            } else if (name.equals("device.distancetravelled")) {
-               getOntologyManager().updateValues("user#pu", "user#hasMoved", strValue);
+               getReasonerManager().updateValues("user#pu", "user#hasMoved", strValue);
                Log.d("Moved", strValue);
            } else if (name.equals("CalEvent")) {
                mLogger.logVerbose(DataLogger.CONTEXT_MANAGER, "CalEvent : " + strValue);
@@ -117,9 +117,6 @@ public class POSEIDONReceiver extends ContextReceiver{
     @Override
     public void newContextValue(String name, Object value) {
 
-        IOntologyManager ontologyManager = getOntologyManager();
-
-
         if (name.equals("weather")) {
             Weather current = (Weather) value;
 
@@ -131,19 +128,19 @@ public class POSEIDONReceiver extends ContextReceiver{
                 String iri = "http://ie.cs.mdx.ac.uk/POSEIDON/";
 
                 //WeatherPeriod
-                ontologyManager.updateValues("envir#w1", "envir#hasTemperatureValue", iri + "envir#t1", time);
-                ontologyManager.updateValues("envir#w1", "envir#hasPrecipitationValue", iri + "envir#p1", time);
+                getReasonerManager().updateValues("envir#w1", "envir#hasTemperatureValue", iri + "envir#t1", time);
+                getReasonerManager().updateValues("envir#w1", "envir#hasPrecipitationValue", iri + "envir#p1", time);
 
                 //Temperature - First lets be sure it is in the units we need!
                 Temperature temp = period.getTemperature();
                 temp.setTemperatureUnit(Temperature.UNIT_C);
-                ontologyManager.updateValues("envir#t1", "envir#temperatureValue", temp.getCurrentValue() + "^^http://www.w3.org/2001/XMLSchema#integer", time);
+                getReasonerManager().updateValues("envir#t1", "envir#temperatureValue", temp.getCurrentValue() + "^^http://www.w3.org/2001/XMLSchema#integer", time);
                 //ontologyManager.updateValues("envir#t1", "envir#temperatureUnit", iri + "envir#C", time);
 
                 //Rain - First lets be sure it is in the units we need!
                 Precipitation precip = period.getPrecipitation();
                 precip.setPrecipitationUnit(Precipitation.UNIT_MM);
-                ontologyManager.updateValues("envir#p1", "envir#precipitationValue", precip.getValue() + "^^http://www.w3.org/2001/XMLSchema#float", time);
+                getReasonerManager().updateValues("envir#p1", "envir#precipitationValue", precip.getValue() + "^^http://www.w3.org/2001/XMLSchema#float", time);
                 //ontologyManager.updateValues("envir#p1", "envir#precipitationUnit", iri + "envir#MilliMeter", time);
                 //ontologyManager.updateValues("envir#p1", "envir#precipitationHoursValue", precip.getHours() + "^^http://www.w3.org/2001/XMLSchema#integer", time);
                 //Log.e("test", "temp= " + temp.getCurrentValue() + " precip= " + precip.getValue() + " hours= " + precip.getHours());
@@ -158,7 +155,7 @@ public class POSEIDONReceiver extends ContextReceiver{
     }
 
     @Override
-    public void newUIEvent(UIEvent event) {
+    public void newUIEvent(int event) {
 
     }
 }

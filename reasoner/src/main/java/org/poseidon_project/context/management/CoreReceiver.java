@@ -31,21 +31,21 @@ import uk.ac.mdx.cs.ie.acontextlib.envir.weather.source.Weather;
 import uk.ac.mdx.cs.ie.acontextlib.envir.weather.source.WeatherPeriod;
 
 /**
- * The Context Receiver to handle built in POSEIDON contexts.
+ * The Context Receiver to handle built in context observers.
  *
  * @author Dean Kramer <d.kramer@mdx.ac.uk>
  */
-public class POSEIDONReceiver extends ContextReceiver {
+public class CoreReceiver extends ContextReceiver {
 
     private int mCounter = 1 ;
     private DataLogger mLogger;
 
-    public POSEIDONReceiver(IContextManager contextManager, IReasonerManager reasonerManager) {
+    public CoreReceiver(IContextManager contextManager, IReasonerManager reasonerManager) {
         super(contextManager, reasonerManager);
     }
 
-    public POSEIDONReceiver(IContextManager contextManager, IReasonerManager reasonerManager,
-                            DataLogger logger) {
+    public CoreReceiver(IContextManager contextManager, IReasonerManager reasonerManager,
+                        DataLogger logger) {
         super(contextManager, reasonerManager);
         mLogger = logger;
     }

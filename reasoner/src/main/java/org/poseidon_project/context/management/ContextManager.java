@@ -76,7 +76,7 @@ public class ContextManager implements IContextManager {
         mContextDatabase = db;
         mLogger = reasonerCore.getLogger();
         mContextReceivers = new ContextReceivers();
-        mContextReceivers.add("core", new POSEIDONReceiver(this, mReasonerCore.getReasonerManager(), mLogger));
+        mContextReceivers.add("core", new CoreReceiver(this, mReasonerCore.getReasonerManager(), mLogger));
         loadAllOtherReceiverClasses();
         mExternalContextReceiver = new ExternalContextReceiver(this, mLogger);
         IntentFilter filter = new IntentFilter(mExternalContextReceiver.CONTEXT_INTENT);

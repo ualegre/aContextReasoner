@@ -153,9 +153,4 @@ public class CoreReceiver extends ContextReceiver {
     public void newContextValues(Map<String, String> values) {
 
     }
-
-    @Override
-    public void newUIEvent(int event) {
-
-    }
 }

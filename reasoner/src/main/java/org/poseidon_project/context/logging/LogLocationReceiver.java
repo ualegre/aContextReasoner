@@ -156,10 +156,6 @@ public class LogLocationReceiver {
 
         }
 
-        @Override
-        public void newUIEvent(int event) {
-
-        }
 
     };
 

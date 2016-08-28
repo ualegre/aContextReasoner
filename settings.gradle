@@ -1,2 +1,1 @@
-include ':reasoner'
-include ':libs:POSEIDON-Contexts:library'
+include ':reasoner', ':server'

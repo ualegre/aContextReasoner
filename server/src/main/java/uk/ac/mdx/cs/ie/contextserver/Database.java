@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 POSEIDON Project
+ * Copyright 2016 Middlesex University
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,24 @@
  * limitations under the License.
  */
 
-package org.poseidon_project.contexts;
+package uk.ac.mdx.cs.ie.contextserver;
+
+
+import java.sql.SQLException;
+import java.util.List;
 
 /**
- * An class interface to more easily deal with POSEIDON Context Manager method invocation.
+ * General DB Interface
  *
  * @author Dean Kramer <d.kramer@mdx.ac.uk>
  */
-public interface IContextManager {
+public interface Database {
 
-    public void sendContextUpdate(String contextName, String contextValue);
-    public void updateContextValue(String contextName, String value);
+    int logEvents(int user, int rows, List<Integer> origins, List<String> locations,
+                         List<Long> dates, List<String> texts) throws SQLException;
+
+    int registerUser(int user, String username, String device) throws SQLException;
+
+    int setLearning(int user, boolean mode);
 
 }

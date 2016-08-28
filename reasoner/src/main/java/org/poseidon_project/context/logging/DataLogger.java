@@ -89,7 +89,7 @@ public class DataLogger {
     public DataLogger(Context context, ContextDB db) {
         mContextDB = db;
         mContext = context;
-        mUploader = new LogUploader(mContext, mContextDB, this);
+        mUploader = new ProtoBufLogUploader(mContext, mContextDB, this);
         mLocationReceiver = new LogLocationReceiver(mContext);
         mSettings = mContext.getSharedPreferences(CONTEXT_PREFS, 0);
 

@@ -52,11 +52,12 @@ public class LogLocationReceiver {
         mPluggedInContext = new PluggedInContext(context);
         mPluggedInContext.addContextReceiver(mContextListener);
         mPluggedInContext.addRequiringApp("logger");
-        mPluggedInContext.start();
 
         mLocationContext = new CurrentLocationContext(context, "passive");
         mLocationContext.addContextReceiver(mContextListener);
         mLocationContext.addRequiringApp("logger");
+
+        mPluggedInContext.start();
     }
 
     public synchronized String getLocationString() {

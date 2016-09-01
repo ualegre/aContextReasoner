@@ -50,15 +50,11 @@ public class XmlRpcLogUploader implements LogUploader, XMLRPCCallback{
 
     private XMLRPCClient mRPCClient;
     private ContextDB mContextDB;
-    private Context mContext;
     private DataLogger mLogger;
-    private long registerID;
-    private long uploadID;
 
 
     public XmlRpcLogUploader(Context context, ContextDB db, DataLogger logger) {
 
-        mContext = context;
         mContextDB = db;
         mLogger = logger;
         Bundle metadata = context.getApplicationInfo().metaData;
@@ -173,7 +169,7 @@ public class XmlRpcLogUploader implements LogUploader, XMLRPCCallback{
         new Thread(new Runnable() {
             @Override
             public void run() {
-                uploadID = mRPCClient.callAsync(XmlRpcLogUploader.this, RPC_UPLOAD_FUNCTION, params);
+                mRPCClient.callAsync(XmlRpcLogUploader.this, RPC_UPLOAD_FUNCTION, params);
             }
         }).start();
     }

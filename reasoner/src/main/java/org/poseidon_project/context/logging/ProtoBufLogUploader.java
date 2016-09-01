@@ -44,14 +44,12 @@ public class ProtoBufLogUploader implements LogUploader {
     private String SERVER_URL;
     private static final int SERVER_PORT = 8080;
     private ContextDB mContextDB;
-    private Context mContext;
     private DataLogger mLogger;
     private String API_KEY;
     private static final String LOG_TAG = "Protobuf Log Uploader";
 
 
     public ProtoBufLogUploader(Context context, ContextDB db, DataLogger logger) {
-        mContext = context;
         mContextDB = db;
         mLogger = logger;
         Bundle metadata = context.getApplicationInfo().metaData;

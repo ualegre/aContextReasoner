@@ -20,6 +20,7 @@ package uk.ac.mdx.cs.ie.contextserver;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -51,17 +52,24 @@ public class MySQLDatabase implements Database{
     private static final String NEW_USER_STRING =
             "INSERT INTO user (user_id, device_id) VALUES (?,?);";
 
+    private static final String UPDATE_USER_LEARNING_STRING =
+            "UPDATE user SET learning=? WHERE id=?;";
+
+    private static final String GET_USER_ID_STRING =
+            "SELECT id from user WHERE device_id=?;";
+
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-    public Connection newConnection() {
-
+    public MySQLDatabase() {
         try {
             mConnection = (Connection) DriverManager.getConnection(DB_URL, DB_USER, DB_PASS);
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println(e.getMessage());
         }
+    }
 
-        return mConnection;
+    public void close() throws SQLException {
+        mConnection.close();
     }
 
     @Override
@@ -108,8 +116,6 @@ public class MySQLDatabase implements Database{
             if (updateUser != null) {
                 updateUser.close();
             }
-
-            mConnection.close();
         }
 
         return 1;
@@ -140,6 +146,8 @@ public class MySQLDatabase implements Database{
 
             mConnection.commit();
 
+            user = getUserId(device);
+
         } catch (SQLException e) {
             System.err.println(e.getMessage());
             mConnection.rollback();
@@ -154,11 +162,49 @@ public class MySQLDatabase implements Database{
             }
         }
 
-        return 0;
+        return user;
     }
 
     @Override
-    public int setLearning(int user, boolean mode) {
-        return 0;
+    public int setLearning(int user, boolean mode) throws SQLException {
+
+        int dbresponse = -1;
+
+        PreparedStatement updateUserLearning = null;
+        try {
+            updateUserLearning = mConnection
+                    .prepareStatement(UPDATE_USER_LEARNING_STRING);
+
+            updateUserLearning.setBoolean(1, mode);
+            updateUserLearning.setInt(2, user);
+
+            if(updateUserLearning.execute()) {
+                dbresponse = 1;
+            }
+
+        } catch (SQLException e) {
+            System.err.println(e.getMessage());
+        } finally {
+            if (updateUserLearning != null) {
+                updateUserLearning.close();
+            }
+        }
+
+        return dbresponse;
+    }
+
+    @Override
+    public int getUserId(String device) throws SQLException {
+
+        PreparedStatement selectUser = mConnection.prepareStatement(GET_USER_ID_STRING);
+        selectUser.setString(1, device);
+        ResultSet rs = selectUser.executeQuery();
+        int user = -1;
+
+        while (rs.next()) {
+            user = rs.getInt(1);
+        }
+
+        return user;
     }
 }

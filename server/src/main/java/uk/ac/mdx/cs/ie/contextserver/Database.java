@@ -32,6 +32,10 @@ public interface Database {
 
     int registerUser(int user, String username, String device) throws SQLException;
 
-    int setLearning(int user, boolean mode);
+    int setLearning(int user, boolean mode) throws SQLException;
+
+    int getUserId(String device) throws SQLException;
+
+    void close () throws SQLException;
 
 }

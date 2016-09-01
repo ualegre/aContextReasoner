@@ -17,6 +17,7 @@
 package uk.ac.mdx.cs.ie.contextserver;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.logging.Logger;
 
 import io.grpc.Server;
@@ -32,6 +33,7 @@ public class ContextServer {
 
     private static final Logger logger = Logger.getLogger(ContextServer.class.getName());
     private Database mDatabase;
+    private static final String API_KEY = "";
 
     private static final int PORT = 8080;
     private Server mServer;
@@ -57,6 +59,12 @@ public class ContextServer {
 
     private void stop() {
         if (mServer != null) {
+            try {
+                mDatabase.close();
+            } catch (SQLException e) {
+                System.err.println(e.getMessage());
+            }
+
             mServer.shutdown();
         }
     }
@@ -78,50 +86,63 @@ public class ContextServer {
         @Override
         public void logEvents(LogEventRequest req, StreamObserver<ServiceResponse> responseObserver) {
 
-            int dbresponse = -1;
+            if (req.getApikey().equals(API_KEY)) {
 
-            //try {
-                /*dbresponse = mDatabase.logEvents(req.getUserid(), req.getOriginCount(),
+                int dbresponse = -1;
+
+                try {
+
+                    dbresponse = mDatabase.logEvents(req.getUserid(), req.getOriginCount(),
                         req.getOriginList(), req.getLocationList(),
                         req.getDateList(), req.getTextList());
-                */
-
-            logger.info("user " + req.getUserid() + " with " + req.getOriginCount() + " Events");
+                } catch (SQLException e) {
+                    System.err.println(e.getMessage());
+                }
 
                 ServiceResponse reply = ServiceResponse.newBuilder().setResponse(dbresponse).build();
                 responseObserver.onNext(reply);
                 responseObserver.onCompleted();
-
-           // } catch (SQLException e) {
-           //     System.err.println(e.getMessage());
-           // }
+            }
         }
+
 
         @Override
         public void registerUser(RegisterUserRequest req, StreamObserver<ServiceResponse> responseObserver) {
-            int dbresponse = -1;
 
-            //try {
-               // dbresponse = mDatabase.registerUser(req.getUserid(), req.getUsername(), req.getDeviceid());
-            logger.info("user " + req.getUserid());
+            if (req.getApikey().equals(API_KEY)) {
+
+                int dbresponse = -1;
+
+                try {
+                    dbresponse = mDatabase.registerUser(req.getUserid(), req.getUsername(), req.getDeviceid());
+                } catch (SQLException e) {
+                    System.err.println(e.getMessage());
+                }
 
                 ServiceResponse reply = ServiceResponse.newBuilder().setResponse(dbresponse).build();
                 responseObserver.onNext(reply);
                 responseObserver.onCompleted();
 
-            //} catch (SQLException e) {
-            //    System.err.println(e.getMessage());
-            //}
+            }
         }
 
         @Override
         public void setLearning(SetLearningRequest req, StreamObserver<ServiceResponse> responseObserver) {
-            int dbresponse = -1;
-            logger.info("user " + req.getUserid() + " LM " + req.getLearning());
 
-            ServiceResponse reply = ServiceResponse.newBuilder().setResponse(dbresponse).build();
-            responseObserver.onNext(reply);
-            responseObserver.onCompleted();
+            if (req.getApikey().equals(API_KEY)) {
+
+                int dbresponse = -1;
+
+                try {
+                    dbresponse = mDatabase.setLearning(req.getUserid(), req.getLearning());
+                } catch (SQLException e) {
+                    System.err.println(e.getMessage());
+                }
+
+                ServiceResponse reply = ServiceResponse.newBuilder().setResponse(dbresponse).build();
+                responseObserver.onNext(reply);
+                responseObserver.onCompleted();
+            }
         }
     }
 }

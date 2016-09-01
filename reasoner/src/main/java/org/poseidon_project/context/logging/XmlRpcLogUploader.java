@@ -17,6 +17,7 @@
 package org.poseidon_project.context.logging;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.util.Log;
 
 import org.poseidon_project.context.database.ContextDB;
@@ -39,11 +40,11 @@ import de.timroes.axmlrpc.XMLRPCServerException;
 public class XmlRpcLogUploader implements LogUploader, XMLRPCCallback{
 
     //The RPC Server address
-    private static final String SERVER_URL = "";
-    private static final String RPC_UPLOAD_FUNCTION = "";
-    private static final String RPC_REGISTER_FUNCTION = "";
-    private static final String RPC_SET_LEARNING_FUNCTION = "";
-    private static final String API_KEY = "";
+    private String SERVER_URL;
+    private static final String RPC_UPLOAD_FUNCTION = "poseidon.logEvents";
+    private static final String RPC_REGISTER_FUNCTION = "poseidon.registerUser";
+    private static final String RPC_SET_LEARNING_FUNCTION = "poseidon.setLearning";
+    private String API_KEY;
 
     private static final String LOG_TAG = "XMLRPC Log Uploader";
 
@@ -60,6 +61,9 @@ public class XmlRpcLogUploader implements LogUploader, XMLRPCCallback{
         mContext = context;
         mContextDB = db;
         mLogger = logger;
+        Bundle metadata = context.getApplicationInfo().metaData;
+        API_KEY = metadata.getString("contextService_ApiKey", "");
+        SERVER_URL = "http://" + metadata.getString("contextService_Host", "") + "/rpc/rpc.php";
 
         try {
             mRPCClient = new XMLRPCClient(new URL(SERVER_URL));

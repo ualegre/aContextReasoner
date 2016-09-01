@@ -17,6 +17,7 @@
 package org.poseidon_project.context.logging;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.util.Log;
 
 import org.poseidon_project.context.database.ContextDB;
@@ -40,11 +41,12 @@ import uk.ac.mdx.cs.ie.contextserver.SetLearningRequest;
  */
 public class ProtoBufLogUploader implements LogUploader {
 
-    private static final String SERVER_URL = "";
+    private String SERVER_URL;
     private static final int SERVER_PORT = 8080;
     private ContextDB mContextDB;
     private Context mContext;
     private DataLogger mLogger;
+    private String API_KEY;
     private static final String LOG_TAG = "Protobuf Log Uploader";
 
 
@@ -52,6 +54,9 @@ public class ProtoBufLogUploader implements LogUploader {
         mContext = context;
         mContextDB = db;
         mLogger = logger;
+        Bundle metadata = context.getApplicationInfo().metaData;
+        API_KEY = metadata.getString("contextService_ApiKey", "");
+        SERVER_URL = metadata.getString("contextService_Host", "");
     }
 
 
@@ -70,6 +75,7 @@ public class ProtoBufLogUploader implements LogUploader {
                             ContextServiceGrpc.newBlockingStub(channel);
 
                     SetLearningRequest message = SetLearningRequest.newBuilder()
+                            .setApikey(API_KEY)
                             .setUserid(userNumber)
                             .setLearning(mode)
                             .build();
@@ -101,6 +107,7 @@ public class ProtoBufLogUploader implements LogUploader {
                             ContextServiceGrpc.newBlockingStub(channel);
 
                     RegisterUserRequest message = RegisterUserRequest.newBuilder()
+                            .setApikey(API_KEY)
                             .setUserid(userNumber)
                             .setUsername(userIdent)
                             .setDeviceid(deviceIdent)
@@ -121,7 +128,7 @@ public class ProtoBufLogUploader implements LogUploader {
     }
 
     @Override
-    public void uploadLogToServer(int userID) {
+    public void uploadLogToServer(final int userID) {
 
         List<LogEvent> events = mContextDB.getAllEvents();
 
@@ -149,6 +156,8 @@ public class ProtoBufLogUploader implements LogUploader {
                             ContextServiceGrpc.newBlockingStub(channel);
 
                     LogEventRequest message = LogEventRequest.newBuilder()
+                            .setApikey(API_KEY)
+                            .setUserid(userID)
                             .addAllOrigin(origins)
                             .addAllLocation(locations)
                             .addAllDate(dates)

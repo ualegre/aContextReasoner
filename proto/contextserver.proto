@@ -30,22 +30,25 @@ service ContextService {
 }
 
 message LogEventRequest {
-    int32 userid = 1;
-    repeated int32 origin = 2;
-    repeated string location = 3;
-    repeated int64 date = 4;
-    repeated string text = 5;
+    string apikey = 1;
+    int32 userid = 2;
+    repeated int32 origin = 3;
+    repeated string location = 4;
+    repeated int64 date = 5;
+    repeated string text = 6;
 }
 
 message RegisterUserRequest {
-    int32 userid = 1;
-    string username = 2;
-    string deviceid = 3;
+    string apikey = 1;
+    int32 userid = 2;
+    string username = 3;
+    string deviceid = 4;
 }
 
 message SetLearningRequest {
-    int32 userid = 1;
-    bool learning = 2;
+    string apikey = 1;
+    int32 userid = 2;
+    bool learning = 3;
 }
 
 message ServiceResponse {

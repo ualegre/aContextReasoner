@@ -17,6 +17,7 @@
 package org.poseidon_project.context.logging;
 
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -47,39 +48,46 @@ public class ProtoBufLogUploader implements LogUploader {
     private DataLogger mLogger;
     private String API_KEY;
     private static final String LOG_TAG = "Protobuf Log Uploader";
+    private ManagedChannel mChannel;
+    private ContextServiceGrpc.ContextServiceBlockingStub mStub;
 
 
     public ProtoBufLogUploader(Context context, ContextDB db, DataLogger logger) {
         mContextDB = db;
         mLogger = logger;
-        Bundle metadata = context.getApplicationInfo().metaData;
+        Bundle metadata = null;
+
+        try {
+            metadata = context.getPackageManager().getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA).metaData;
+        } catch (PackageManager.NameNotFoundException e) {
+            Log.e(LOG_TAG, e.getMessage());
+        }
+
         API_KEY = metadata.getString("contextService_ApiKey", "");
         SERVER_URL = metadata.getString("contextService_Host", "");
+
+        mChannel = ManagedChannelBuilder.forAddress(SERVER_URL, SERVER_PORT)
+                .usePlaintext(true)
+                .build();
+
+        mStub = ContextServiceGrpc.newBlockingStub(mChannel).withDeadlineAfter(10, TimeUnit.SECONDS);
     }
 
 
     @Override
-    public boolean setLearningMode(final Integer userNumber, final Boolean mode) {
+    public boolean setLearningMode(final int userNumber, final boolean mode) {
 
         new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
-                    ManagedChannel channel = ManagedChannelBuilder.forAddress(SERVER_URL, SERVER_PORT)
-                            .usePlaintext(true)
-                            .build();
-
-                    ContextServiceGrpc.ContextServiceBlockingStub stub =
-                            ContextServiceGrpc.newBlockingStub(channel);
-
                     SetLearningRequest message = SetLearningRequest.newBuilder()
                             .setApikey(API_KEY)
                             .setUserid(userNumber)
                             .setLearning(mode)
                             .build();
 
-                    ServiceResponse response = stub.setLearning(message);
-                    channel.shutdown().awaitTermination(1, TimeUnit.SECONDS);
+                    ServiceResponse response = mStub.setLearning(message);
 
                 } catch (Exception e) {
                     Log.e(LOG_TAG, e.getMessage());
@@ -91,18 +99,14 @@ public class ProtoBufLogUploader implements LogUploader {
     }
 
     @Override
-    public boolean registerUser(final Integer userNumber, final String userIdent, final String deviceIdent) {
+    public boolean registerUser(final int userNumber, final String userIdent, final String deviceIdent) {
 
-        new Thread(new Runnable() {
+        final boolean[] success = {false};
+
+        Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
-                    ManagedChannel channel = ManagedChannelBuilder.forAddress(SERVER_URL, SERVER_PORT)
-                            .usePlaintext(true)
-                            .build();
-
-                    ContextServiceGrpc.ContextServiceBlockingStub stub =
-                            ContextServiceGrpc.newBlockingStub(channel);
 
                     RegisterUserRequest message = RegisterUserRequest.newBuilder()
                             .setApikey(API_KEY)
@@ -111,18 +115,26 @@ public class ProtoBufLogUploader implements LogUploader {
                             .setDeviceid(deviceIdent)
                             .build();
 
-                    ServiceResponse response = stub.registerUser(message);
+                    ServiceResponse response = mStub.registerUser(message);
                     mLogger.newUserID(response.getResponse());
 
-                    channel.shutdown().awaitTermination(1, TimeUnit.SECONDS);
+                    success[0] = true;
 
                 } catch (Exception e) {
                     Log.e(LOG_TAG, e.getMessage());
                 }
             }
-        }).start();
+        });
 
-        return false;
+        t.start();
+
+        try {
+            t.join();
+        } catch (InterruptedException e) {
+            Log.e(LOG_TAG, e.getMessage());
+        }
+
+        return success[0];
     }
 
     @Override
@@ -146,12 +158,6 @@ public class ProtoBufLogUploader implements LogUploader {
             @Override
             public void run() {
                 try {
-                    ManagedChannel channel = ManagedChannelBuilder.forAddress(SERVER_URL, SERVER_PORT)
-                          .usePlaintext(true)
-                            .build();
-
-                    ContextServiceGrpc.ContextServiceBlockingStub stub =
-                            ContextServiceGrpc.newBlockingStub(channel);
 
                     LogEventRequest message = LogEventRequest.newBuilder()
                             .setApikey(API_KEY)
@@ -162,7 +168,7 @@ public class ProtoBufLogUploader implements LogUploader {
                             .addAllText(text)
                             .build();
 
-                    ServiceResponse response = stub.logEvents(message);
+                    ServiceResponse response = mStub.logEvents(message);
 
                     if (response.getResponse() == 1) {
                         mLogger.completedBackup();
@@ -170,13 +176,20 @@ public class ProtoBufLogUploader implements LogUploader {
                         mLogger.incompleteBackup();
                     }
 
-                    channel.shutdown().awaitTermination(1, TimeUnit.SECONDS);
-
                 } catch (Exception e) {
                     Log.e(LOG_TAG, e.getMessage());
                     mLogger.incompleteBackup();
                 }
             }
         }).start();
+    }
+
+    @Override
+    public void stop() {
+        try {
+            mChannel.shutdown().awaitTermination(1, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            Log.e(LOG_TAG, e.getMessage());
+        }
     }
 }

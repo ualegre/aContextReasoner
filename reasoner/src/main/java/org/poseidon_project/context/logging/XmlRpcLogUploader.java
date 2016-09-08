@@ -17,6 +17,7 @@
 package org.poseidon_project.context.logging;
 
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -57,9 +58,16 @@ public class XmlRpcLogUploader implements LogUploader, XMLRPCCallback{
 
         mContextDB = db;
         mLogger = logger;
-        Bundle metadata = context.getApplicationInfo().metaData;
+        Bundle metadata = null;
+
+        try {
+            metadata = context.getPackageManager().getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA).metaData;
+        } catch (PackageManager.NameNotFoundException e) {
+            Log.e(LOG_TAG, e.getMessage());
+        }
+
         API_KEY = metadata.getString("contextService_ApiKey", "");
-        SERVER_URL = "http://" + metadata.getString("contextService_Host", "") + "/rpc/rpc.php";
+        SERVER_URL = "https://" + metadata.getString("contextService_Host", "") + "/rpc/rpc.php";
 
         try {
             mRPCClient = new XMLRPCClient(new URL(SERVER_URL));
@@ -69,7 +77,8 @@ public class XmlRpcLogUploader implements LogUploader, XMLRPCCallback{
 
     }
 
-    public boolean setLearningMode(final Integer userNumber, final Boolean mode) {
+    @Override
+    public boolean setLearningMode(final int userNumber, final boolean mode) {
 
         Thread t = new Thread(new Runnable() {
             @Override
@@ -100,7 +109,8 @@ public class XmlRpcLogUploader implements LogUploader, XMLRPCCallback{
         return true;
     }
 
-    public boolean registerUser(final Integer userNumber, final String userIdent, final String deviceIdent) {
+    @Override
+    public boolean registerUser(final int userNumber, final String userIdent, final String deviceIdent) {
 
         final boolean[] success = {false};
 
@@ -141,6 +151,7 @@ public class XmlRpcLogUploader implements LogUploader, XMLRPCCallback{
         return success[0];
     }
 
+    @Override
     public void uploadLogToServer(int userID) {
 
         List<LogEvent> events = mContextDB.getAllEvents();
@@ -172,6 +183,11 @@ public class XmlRpcLogUploader implements LogUploader, XMLRPCCallback{
                 mRPCClient.callAsync(XmlRpcLogUploader.this, RPC_UPLOAD_FUNCTION, params);
             }
         }).start();
+    }
+
+    @Override
+    public void stop() {
+
     }
 
     @Override

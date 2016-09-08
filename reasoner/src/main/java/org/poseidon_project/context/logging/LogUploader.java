@@ -24,7 +24,8 @@ package org.poseidon_project.context.logging;
  */
 public interface LogUploader {
 
-    boolean setLearningMode(final Integer userNumber, final Boolean mode);
-    boolean registerUser(final Integer userNumber, final String userIdent, final String deviceIdent);
+    boolean setLearningMode(int userNumber, boolean mode);
+    boolean registerUser(int userNumber, final String userIdent, final String deviceIdent);
     void uploadLogToServer(int userID);
+    void stop();
 }

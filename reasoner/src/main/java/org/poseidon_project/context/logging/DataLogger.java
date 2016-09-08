@@ -376,6 +376,7 @@ public class DataLogger {
     public boolean stop() {
 
         mLocationReceiver.stop();
+        mUploader.stop();
 
         if (mEventsArraySize != 0) {
             return persist();

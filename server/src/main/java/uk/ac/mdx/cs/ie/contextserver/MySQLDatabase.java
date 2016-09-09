@@ -77,7 +77,7 @@ public class MySQLDatabase implements Database{
                          List<Long> dates, List<String> texts) throws SQLException {
 
         PreparedStatement addEvent = null;
-        PreparedStatement updateUser = null;
+        PreparedStatement updateUserSync = null;
 
         try {
             mConnection.setAutoCommit(false);
@@ -95,12 +95,7 @@ public class MySQLDatabase implements Database{
 
             addEvent.executeBatch();
 
-            updateUser = mConnection.prepareStatement(UPDATE_USER_STRING);
-
-            updateUser.setString(1, sdf.format(new Date()));
-            updateUser.setInt(2, user);
-
-            updateUser.execute();
+            updateUserSync = updateSyncTime(user);
 
             mConnection.commit();
 
@@ -113,12 +108,24 @@ public class MySQLDatabase implements Database{
                 addEvent.close();
             }
 
-            if (updateUser != null) {
-                updateUser.close();
+            if (updateUserSync != null) {
+                updateUserSync.close();
             }
         }
 
         return 1;
+    }
+
+    private PreparedStatement updateSyncTime(int user) throws SQLException {
+
+        PreparedStatement updateUserSync = mConnection.prepareStatement(UPDATE_USER_STRING);
+
+        updateUserSync.setString(1, sdf.format(new Date()));
+        updateUserSync.setInt(2, user);
+
+        updateUserSync.execute();
+
+        return updateUserSync;
     }
 
     @Override
@@ -126,27 +133,35 @@ public class MySQLDatabase implements Database{
 
         PreparedStatement updateUser = null;
         PreparedStatement newUser = null;
+        PreparedStatement updateUserSync = null;
 
         try {
 
             mConnection.setAutoCommit(false);
 
             if (user == -1) {
-                newUser = mConnection.prepareStatement(NEW_USER_STRING);
-                newUser.setString(1, username);
-                newUser.setString(2, device);
-                newUser.execute();
+                user = getUserId(device);
+                if(user == -1) {
+                    newUser = mConnection.prepareStatement(NEW_USER_STRING);
+                    newUser.setString(1, username);
+                    newUser.setString(2, device);
+                    newUser.execute();
+                }
             } else {
                 updateUser = mConnection.prepareStatement(UPDATE_USER_INFO_STRING);
                 updateUser.setInt(1, user);
                 updateUser.setString(2, username);
                 updateUser.setString(3, device);
                 updateUser.execute();
+
+                updateUserSync = updateSyncTime(user);
             }
 
             mConnection.commit();
 
-            user = getUserId(device);
+            if (user == -1) {
+                user = getUserId(device);
+            }
 
         } catch (SQLException e) {
             System.err.println(e.getMessage());
@@ -160,6 +175,10 @@ public class MySQLDatabase implements Database{
             if (newUser != null) {
                 newUser.close();
             }
+
+            if (updateUserSync != null) {
+                updateUserSync.close();
+            }
         }
 
         return user;
@@ -171,15 +190,23 @@ public class MySQLDatabase implements Database{
         int dbresponse = -1;
 
         PreparedStatement updateUserLearning = null;
+        PreparedStatement updateUserSync = null;
+
         try {
             updateUserLearning = mConnection
                     .prepareStatement(UPDATE_USER_LEARNING_STRING);
 
-            updateUserLearning.setBoolean(1, mode);
+            if (mode) {
+                updateUserLearning.setInt(1, 1);
+            } else {
+                updateUserLearning.setInt(1, 0);
+            }
+
             updateUserLearning.setInt(2, user);
 
-            if(updateUserLearning.execute()) {
+            if (updateUserLearning.executeUpdate() == 1) {
                 dbresponse = 1;
+                updateUserSync = updateSyncTime(user);
             }
 
         } catch (SQLException e) {
@@ -187,6 +214,10 @@ public class MySQLDatabase implements Database{
         } finally {
             if (updateUserLearning != null) {
                 updateUserLearning.close();
+            }
+
+            if (updateUserSync != null) {
+                updateUserSync.close();
             }
         }
 

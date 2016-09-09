@@ -49,7 +49,6 @@ public class ProtoBufLogUploader implements LogUploader {
     private String API_KEY;
     private static final String LOG_TAG = "Protobuf Log Uploader";
     private ManagedChannel mChannel;
-    private ContextServiceGrpc.ContextServiceBlockingStub mStub;
 
 
     public ProtoBufLogUploader(Context context, ContextDB db, DataLogger logger) {
@@ -70,7 +69,6 @@ public class ProtoBufLogUploader implements LogUploader {
                 .usePlaintext(true)
                 .build();
 
-        mStub = ContextServiceGrpc.newBlockingStub(mChannel).withDeadlineAfter(10, TimeUnit.SECONDS);
     }
 
 
@@ -81,13 +79,18 @@ public class ProtoBufLogUploader implements LogUploader {
             @Override
             public void run() {
                 try {
+
+                    ContextServiceGrpc.ContextServiceBlockingStub stub =
+                            ContextServiceGrpc.
+                                    newBlockingStub(mChannel).withDeadlineAfter(10, TimeUnit.SECONDS);
+
                     SetLearningRequest message = SetLearningRequest.newBuilder()
                             .setApikey(API_KEY)
                             .setUserid(userNumber)
                             .setLearning(mode)
                             .build();
 
-                    ServiceResponse response = mStub.setLearning(message);
+                    ServiceResponse response = stub.setLearning(message);
 
                 } catch (Exception e) {
                     Log.e(LOG_TAG, e.getMessage());
@@ -108,6 +111,10 @@ public class ProtoBufLogUploader implements LogUploader {
             public void run() {
                 try {
 
+                    ContextServiceGrpc.ContextServiceBlockingStub stub =
+                            ContextServiceGrpc.
+                                    newBlockingStub(mChannel).withDeadlineAfter(10, TimeUnit.SECONDS);
+
                     RegisterUserRequest message = RegisterUserRequest.newBuilder()
                             .setApikey(API_KEY)
                             .setUserid(userNumber)
@@ -115,7 +122,7 @@ public class ProtoBufLogUploader implements LogUploader {
                             .setDeviceid(deviceIdent)
                             .build();
 
-                    ServiceResponse response = mStub.registerUser(message);
+                    ServiceResponse response = stub.registerUser(message);
                     mLogger.newUserID(response.getResponse());
 
                     success[0] = true;
@@ -159,6 +166,10 @@ public class ProtoBufLogUploader implements LogUploader {
             public void run() {
                 try {
 
+                    ContextServiceGrpc.ContextServiceBlockingStub stub =
+                            ContextServiceGrpc.
+                                    newBlockingStub(mChannel).withDeadlineAfter(10, TimeUnit.SECONDS);
+
                     LogEventRequest message = LogEventRequest.newBuilder()
                             .setApikey(API_KEY)
                             .setUserid(userID)
@@ -168,7 +179,7 @@ public class ProtoBufLogUploader implements LogUploader {
                             .addAllText(text)
                             .build();
 
-                    ServiceResponse response = mStub.logEvents(message);
+                    ServiceResponse response = stub.logEvents(message);
 
                     if (response.getResponse() == 1) {
                         mLogger.completedBackup();

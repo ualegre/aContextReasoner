@@ -61,15 +61,28 @@ public class MySQLDatabase implements Database{
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     public MySQLDatabase() {
+        getConnection();
+    }
+
+    private Connection getConnection() {
         try {
-            mConnection = (Connection) DriverManager.getConnection(DB_URL, DB_USER, DB_PASS);
+
+            if (mConnection == null || ! mConnection.isValid(1)) {
+                mConnection = (Connection) DriverManager.getConnection(DB_URL, DB_USER, DB_PASS);
+            }
+
         } catch (SQLException e) {
             System.err.println(e.getMessage());
+            mConnection = null;
         }
+
+        return mConnection;
     }
 
     public void close() throws SQLException {
-        mConnection.close();
+        if (mConnection == null || ! mConnection.isValid(1)) {
+            mConnection.close();
+        }
     }
 
     @Override
@@ -79,9 +92,16 @@ public class MySQLDatabase implements Database{
         PreparedStatement addEvent = null;
         PreparedStatement updateUserSync = null;
 
+        Connection con = getConnection();
+
+        if (con == null) {
+            System.err.println("Cannot get connection");
+            return -1000;
+        }
+
         try {
-            mConnection.setAutoCommit(false);
-            addEvent = mConnection.prepareStatement(ADD_EVENT_STRING);
+            con.setAutoCommit(false);
+            addEvent = con.prepareStatement(ADD_EVENT_STRING);
 
             for (int i = 0; i < rows; i++) {
 
@@ -95,13 +115,13 @@ public class MySQLDatabase implements Database{
 
             addEvent.executeBatch();
 
-            updateUserSync = updateSyncTime(user);
+            updateUserSync = updateSyncTime(con, user);
 
-            mConnection.commit();
+            con.commit();
 
         } catch (SQLException e) {
             System.err.println(e.getMessage());
-            mConnection.rollback();
+            con.rollback();
         } finally {
 
             if (addEvent != null) {
@@ -116,9 +136,9 @@ public class MySQLDatabase implements Database{
         return 1;
     }
 
-    private PreparedStatement updateSyncTime(int user) throws SQLException {
+    private PreparedStatement updateSyncTime(Connection con, int user) throws SQLException {
 
-        PreparedStatement updateUserSync = mConnection.prepareStatement(UPDATE_USER_STRING);
+        PreparedStatement updateUserSync = con.prepareStatement(UPDATE_USER_STRING);
 
         updateUserSync.setString(1, sdf.format(new Date()));
         updateUserSync.setInt(2, user);
@@ -135,29 +155,36 @@ public class MySQLDatabase implements Database{
         PreparedStatement newUser = null;
         PreparedStatement updateUserSync = null;
 
+        Connection con = getConnection();
+
+        if (con == null) {
+            System.err.println("Cannot get connection");
+            return -1000;
+        }
+
         try {
 
-            mConnection.setAutoCommit(false);
+            con.setAutoCommit(false);
 
             if (user == -1) {
                 user = getUserId(device);
                 if(user == -1) {
-                    newUser = mConnection.prepareStatement(NEW_USER_STRING);
+                    newUser = con.prepareStatement(NEW_USER_STRING);
                     newUser.setString(1, username);
                     newUser.setString(2, device);
                     newUser.execute();
                 }
             } else {
-                updateUser = mConnection.prepareStatement(UPDATE_USER_INFO_STRING);
+                updateUser = con.prepareStatement(UPDATE_USER_INFO_STRING);
                 updateUser.setInt(1, user);
                 updateUser.setString(2, username);
                 updateUser.setString(3, device);
                 updateUser.execute();
 
-                updateUserSync = updateSyncTime(user);
+                updateUserSync = updateSyncTime(con, user);
             }
 
-            mConnection.commit();
+            con.commit();
 
             if (user == -1) {
                 user = getUserId(device);
@@ -165,7 +192,7 @@ public class MySQLDatabase implements Database{
 
         } catch (SQLException e) {
             System.err.println(e.getMessage());
-            mConnection.rollback();
+            con.rollback();
 
         } finally {
             if (updateUser != null) {
@@ -192,8 +219,15 @@ public class MySQLDatabase implements Database{
         PreparedStatement updateUserLearning = null;
         PreparedStatement updateUserSync = null;
 
+        Connection con = getConnection();
+
+        if (con == null) {
+            System.err.println("Cannot get connection");
+            return -1000;
+        }
+
         try {
-            updateUserLearning = mConnection
+            updateUserLearning = con
                     .prepareStatement(UPDATE_USER_LEARNING_STRING);
 
             if (mode) {
@@ -206,7 +240,7 @@ public class MySQLDatabase implements Database{
 
             if (updateUserLearning.executeUpdate() == 1) {
                 dbresponse = 1;
-                updateUserSync = updateSyncTime(user);
+                updateUserSync = updateSyncTime(con, user);
             }
 
         } catch (SQLException e) {
@@ -227,7 +261,14 @@ public class MySQLDatabase implements Database{
     @Override
     public int getUserId(String device) throws SQLException {
 
-        PreparedStatement selectUser = mConnection.prepareStatement(GET_USER_ID_STRING);
+        Connection con = getConnection();
+
+        if (con == null) {
+            System.err.println("Cannot get connection");
+            return -1000;
+        }
+
+        PreparedStatement selectUser = con.prepareStatement(GET_USER_ID_STRING);
         selectUser.setString(1, device);
         ResultSet rs = selectUser.executeQuery();
         int user = -1;

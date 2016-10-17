@@ -18,6 +18,7 @@ package org.poseidon_project.context;
 
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 
 import org.poseidon_project.context.database.ContextDB;
 import org.poseidon_project.context.database.ContextDBImpl;
@@ -25,7 +26,12 @@ import org.poseidon_project.context.database.ContextResult;
 import org.poseidon_project.context.logging.DataLogger;
 import org.poseidon_project.context.management.ContextManager;
 import org.poseidon_project.context.reasoner.ReasonerManager;
+import org.poseidon_project.context.utility.ClassPackage;
+import org.poseidon_project.context.utility.ContextPackage;
+import org.poseidon_project.context.utility.FileOperations;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -70,11 +76,39 @@ public class ContextReasonerCore {
 
     public ContextManager getContextManager() {return mContextManager;}
 
+    public void importContextPackage(String appkey, String filename) {
 
-    public void importDexFile(String appkey, final String newDex,
+        try {
+            String newfolder = FileOperations.unzip(filename);
+
+            if (! newfolder.equals("")) {
+                return;
+            }
+
+            ContextPackage contextPackage = ContextPackage.parseMeta(newfolder +
+                    File.separator + "meta.json");
+
+            if ((! contextPackage.mClassPackageMeta.isEmpty()) && (! contextPackage.mClassPackage.isEmpty())) {
+                ClassPackage classPackage = ClassPackage.parseClassPackage(newfolder +
+                    File.separator + contextPackage.mClassPackageMeta);
+            }
+
+            if (! contextPackage.mRules.isEmpty()) {
+
+            }
+
+            Log.e("test", "test");
+
+        } catch (IOException e) {
+            Log.e(LOGTAG, e.toString());
+        }
+    }
+
+
+    /*public void importDexFile(String appkey, final String newDex,
                                  String[] contexts, String packagename, int permission) {
         mContextManager.copyDexFile(appkey, newDex, contexts, packagename, permission);
-    }
+    }*/
 
     public boolean addContextRequirement(String appkey, String observerName) {
         //return mContextManager.addObserverRequirement(appkey, observerName);
@@ -88,6 +122,10 @@ public class ContextReasonerCore {
 
     public boolean setContextParameters(String appkey, String observerName, Map parameters) {
         return mContextManager.setContextParameters(appkey, observerName, parameters);
+    }
+
+    public boolean hasOwnerImported(String appkey) {
+        return false;
     }
 
     public void sendContextResult(String contextName, String contextValue) {
@@ -182,6 +220,9 @@ public class ContextReasonerCore {
         mLogger.setBackupTime(hour, min);
     }
 
+    public void alterPreferenceInt(String prefName, int value) {
+        mReasonerManager.alterContextPreference(prefName, value);
+    }
 
     public void alterPreferenceLong(String prefName, long value) {
         mReasonerManager.alterContextPreference(prefName, value);

@@ -104,6 +104,11 @@ public class ContextReasonerService extends Service{
         }
 
         @Override
+        public void alterPreferenceInt(String prefName, int value) throws RemoteException {
+            mReasonerCore.alterPreferenceInt(prefName, value);
+        }
+
+        @Override
         public void alterPreferenceLong(String prefName, long value) throws RemoteException {
             mReasonerCore.alterPreferenceLong(prefName, value);
         }
@@ -135,10 +140,10 @@ public class ContextReasonerService extends Service{
 
     public final IContextReasoner.Stub mContextBinder = new IContextReasoner.Stub() {
 
+
         @Override
-        public void importDexFile(String appKey, String newDex, String[] contexts,
-                                  String packageName, int permission) throws RemoteException {
-            mReasonerCore.importDexFile(appKey, newDex, contexts, packageName, permission);
+        public void importContextPackage(String appKey, String filename) throws RemoteException {
+            mReasonerCore.importContextPackage(appKey,filename);
         }
 
         @Override
@@ -167,6 +172,11 @@ public class ContextReasonerService extends Service{
         @Override
         public void registerUserIdentifier(String userIdentifier) throws RemoteException {
             mReasonerCore.getLogger().registerUser(userIdentifier);
+        }
+
+        @Override
+        public boolean hasOwnerImported(String appkey) throws RemoteException {
+            return mReasonerCore.hasOwnerImported(appkey);
         }
 
     };

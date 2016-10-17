@@ -61,8 +61,8 @@ public class ContextReasonerSettingsFragment extends PreferenceFragment
     private SharedPreferences mMainSettings;
     private SharedPreferences mRuleSettings;
     private ContextReasonerSettings mActivity;
-    private long mHotTemperature;
-    private long mColdTemperature;
+    private int mHotTemperature;
+    private int mColdTemperature;
     private Integer mBackupHour;
     private Integer mBackupMin;
     private boolean mSetBackupTime = false;
@@ -265,8 +265,8 @@ public class ContextReasonerSettingsFragment extends PreferenceFragment
         final String pref_hot = getString(R.string.pref_hot);
         final String pref_cold = getString(R.string.pref_cold);
 
-        mHotTemperature = mRuleSettings.getLong(pref_hot, 25);
-        mColdTemperature = mRuleSettings.getLong(pref_cold, 15);
+        mHotTemperature = mRuleSettings.getInt(pref_hot, 25);
+        mColdTemperature = mRuleSettings.getInt(pref_cold, 15);
 
         mHotTemperaturePreference = (EditTextPreference)
                 findPreference(pref_hot);
@@ -281,11 +281,11 @@ public class ContextReasonerSettingsFragment extends PreferenceFragment
 
                 if (newValue != null) {
 
-                    long newValueint = Long.parseLong((String) newValue);
+                    int newValueint = Integer.parseInt((String) newValue);
 
                     if (temperatureSatisfible(newValueint, mColdTemperature)) {
                         try {
-                            mActivity.mContextService.alterPreferenceLong(pref_hot, newValueint);
+                            mActivity.mContextService.alterPreferenceInt(pref_hot, newValueint);
                         } catch (RemoteException e) {
                             Log.e(LOG_TAG, e.getMessage());
                         }
@@ -321,11 +321,11 @@ public class ContextReasonerSettingsFragment extends PreferenceFragment
 
                 if (newValue != null) {
 
-                    long newValueint = Long.parseLong((String) newValue);
+                    int newValueint = Integer.parseInt((String) newValue);
 
                     if (temperatureSatisfible(mHotTemperature, newValueint)) {
                         try {
-                            mActivity.mContextService.alterPreferenceLong(pref_cold, newValueint);
+                            mActivity.mContextService.alterPreferenceInt(pref_cold, newValueint);
                         } catch (RemoteException e) {
                             Log.e(LOG_TAG, e.getMessage());
                         }
@@ -362,7 +362,7 @@ public class ContextReasonerSettingsFragment extends PreferenceFragment
         //max wait
         final String pref_max_wait = getString(R.string.pref_max_wait);
 
-        long max_wait = mRuleSettings.getLong(pref_max_wait, 5);
+        int max_wait = mRuleSettings.getInt(pref_max_wait, 5);
 
         String max_wait_str = String.valueOf(max_wait);
 
@@ -378,10 +378,10 @@ public class ContextReasonerSettingsFragment extends PreferenceFragment
 
                 if (newValue != null) {
 
-                    long newValueint = Long.parseLong((String) newValue);
+                    int newValueint = Integer.parseInt((String) newValue);
 
                     try {
-                        mActivity.mContextService.alterPreferenceLong(pref_max_wait, newValueint);
+                        mActivity.mContextService.alterPreferenceInt(pref_max_wait, newValueint);
                     } catch (RemoteException e) {
                         Log.e(LOG_TAG, e.getMessage());
                     }
@@ -398,7 +398,7 @@ public class ContextReasonerSettingsFragment extends PreferenceFragment
 
         //deviation
         final String pref_max_dev = getString(R.string.pref_max_dev);
-        long max_dev = mRuleSettings.getLong(pref_max_dev, 2);
+        int max_dev = mRuleSettings.getInt(pref_max_dev, 2);
 
         String max_dev_str = String.valueOf(max_dev);
 
@@ -414,10 +414,10 @@ public class ContextReasonerSettingsFragment extends PreferenceFragment
 
                 if (newValue != null) {
 
-                    long newValueint = Long.parseLong((String) newValue);
+                    int newValueint = Integer.parseInt((String) newValue);
 
                     try {
-                        mActivity.mContextService.alterPreferenceLong(pref_max_dev, newValueint);
+                        mActivity.mContextService.alterPreferenceInt(pref_max_dev, newValueint);
                     } catch (RemoteException e) {
                         Log.e(LOG_TAG, e.getMessage());
                     }

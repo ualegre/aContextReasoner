@@ -346,6 +346,25 @@ public class ReasonerManager implements IReasonerManager{
         return literal;
     }
 
+    public void alterContextPreference(String prefName, int value) {
+
+        int currentValue = mContextSettings.getInt(prefName, Integer.MIN_VALUE);
+
+        if (currentValue == Long.MIN_VALUE){
+            mLogger.logVerbose(DataLogger.REASONER, "Preference: " + prefName
+                    + " value set first time to: " + String.valueOf(value));
+        } else {
+            mLogger.logVerbose(DataLogger.REASONER, "Preference: " + prefName
+                    + " value changed from: " + String.valueOf(currentValue)
+                    +  " to: " + String.valueOf(value));
+        }
+
+        SharedPreferences.Editor editor = mContextSettings.edit();
+        editor.putInt(prefName, value);
+        editor.commit();
+        restartRunningContextFromPreference(prefName);
+    }
+
     public void alterContextPreference(String prefName, long value) {
 
         long currentValue = mContextSettings.getLong(prefName, Long.MIN_VALUE);

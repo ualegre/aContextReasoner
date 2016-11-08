@@ -24,6 +24,8 @@ import org.poseidon_project.context.ContextReasonerCore;
 import org.poseidon_project.context.database.ContextDB;
 import org.poseidon_project.context.database.ContextResult;
 import org.poseidon_project.context.logging.DataLogger;
+import org.poseidon_project.context.management.PreferenceSyncClient;
+import org.poseidon_project.context.management.TelluSyncClient;
 import org.poseidon_project.context.utility.Prefs;
 import org.prop4j.Literal;
 import org.prop4j.Node;
@@ -36,6 +38,8 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import eu.larkc.csparql.core.engine.CsparqlEngine;
 import eu.larkc.csparql.core.engine.CsparqlEngineImpl;
@@ -64,6 +68,9 @@ public class ReasonerManager implements IReasonerManager{
     private ContextDB mContextDatabase;
     private HashMap<String,HashSet<String>> mCurrentPrefContexts;
     private SharedPreferences mContextSettings;
+    private Timer mSyncTimer;
+    private static final int PREF_SYNC_INTERVAL = 600000;
+    private TelluSyncClient mSyncClient;
 
     public ReasonerManager(Context context, ContextReasonerCore core, ContextDB db){
         mContext = context;
@@ -80,6 +87,32 @@ public class ReasonerManager implements IReasonerManager{
         pilotMapper = new ContextMapper(mReasonerCore, this, mContext);
         mCurrentPrefContexts = new HashMap<>();
         mContextSettings = mContext.getSharedPreferences(Prefs.RULE_PREFS, 0);
+        setupPrefSyncClients();
+    }
+
+    private void setupPrefSyncClients() {
+
+        mSyncClient = new TelluSyncClient(this, mContextSettings);
+        mSyncClient.authenticate();
+
+        mSyncTimer = new Timer();
+
+        mSyncTimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                mSyncClient.synchronisePreferences(new PreferenceSyncClient.Callback() {
+                    @Override
+                    public void onSuccessful() {
+
+                    }
+
+                    @Override
+                    public void onFail(String error) {
+                        Log.e(LOGTAG, error);
+                    }
+                });
+            }
+        }, System.currentTimeMillis(), PREF_SYNC_INTERVAL);
     }
 
     private void startCSPARQL() {
@@ -207,6 +240,10 @@ public class ReasonerManager implements IReasonerManager{
     public void stop() {
         mAggregateRules.clear();
         mCsparqlEngine.destroy();
+
+        if (mSyncTimer != null) {
+            mSyncTimer.cancel();
+        }
     }
 
     public void registerAggregateRule(String name, String rule) {
@@ -360,10 +397,13 @@ public class ReasonerManager implements IReasonerManager{
                     +  " to: " + String.valueOf(value));
         }
 
-        SharedPreferences.Editor editor = mContextSettings.edit();
-        editor.putInt(prefName, value);
-        editor.commit();
-        restartRunningContextFromPreference(prefName);
+        if (value != currentValue) {
+            SharedPreferences.Editor editor = mContextSettings.edit();
+            editor.putInt(prefName, value);
+            editor.putLong(Prefs.RULE_PREF_LASTUPATE, System.currentTimeMillis());
+            editor.commit();
+            restartRunningContextFromPreference(prefName);
+        }
     }
 
     public void alterContextPreference(String prefName, long value) {
@@ -379,10 +419,13 @@ public class ReasonerManager implements IReasonerManager{
                     +  " to: " + String.valueOf(value));
         }
 
-        SharedPreferences.Editor editor = mContextSettings.edit();
-        editor.putLong(prefName, value);
-        editor.commit();
-        restartRunningContextFromPreference(prefName);
+        if(value != currentValue) {
+            SharedPreferences.Editor editor = mContextSettings.edit();
+            editor.putLong(prefName, value);
+            editor.putLong(Prefs.RULE_PREF_LASTUPATE, System.currentTimeMillis());
+            editor.commit();
+            restartRunningContextFromPreference(prefName);
+        }
     }
 
     public void alterContextPreference(String prefName, boolean value) {
@@ -393,10 +436,13 @@ public class ReasonerManager implements IReasonerManager{
                 + " value changed from: " + String.valueOf(currentValue)
                 +  " to: " + String.valueOf(value));
 
-        SharedPreferences.Editor editor = mContextSettings.edit();
-        editor.putBoolean(prefName, value);
-        editor.commit();
-        restartRunningContextFromPreference(prefName);
+        if (value != currentValue) {
+            SharedPreferences.Editor editor = mContextSettings.edit();
+            editor.putBoolean(prefName, value);
+            editor.putLong(Prefs.RULE_PREF_LASTUPATE, System.currentTimeMillis());
+            editor.commit();
+            restartRunningContextFromPreference(prefName);
+        }
     }
 
     public void alterContextPreference(String prefName, float value) {
@@ -412,10 +458,13 @@ public class ReasonerManager implements IReasonerManager{
                     +  " to: " + String.valueOf(value));
         }
 
-        SharedPreferences.Editor editor = mContextSettings.edit();
-        editor.putFloat(prefName, value);
-        editor.commit();
-        restartRunningContextFromPreference(prefName);
+        if (value != currentValue) {
+            SharedPreferences.Editor editor = mContextSettings.edit();
+            editor.putFloat(prefName, value);
+            editor.putLong(Prefs.RULE_PREF_LASTUPATE, System.currentTimeMillis());
+            editor.commit();
+            restartRunningContextFromPreference(prefName);
+        }
     }
 
     public void alterContextPreference(String prefName, String value) {
@@ -431,10 +480,13 @@ public class ReasonerManager implements IReasonerManager{
                     +  " to: " + value);
         }
 
-        SharedPreferences.Editor editor = mContextSettings.edit();
-        editor.putString(prefName, value);
-        editor.commit();
-        restartRunningContextFromPreference(prefName);
+        if (! value.equals(currentValue)) {
+            SharedPreferences.Editor editor = mContextSettings.edit();
+            editor.putString(prefName, value);
+            editor.putLong(Prefs.RULE_PREF_LASTUPATE, System.currentTimeMillis());
+            editor.commit();
+            restartRunningContextFromPreference(prefName);
+        }
     }
 
     public void restartRunningContextFromPreference(String prefName) {

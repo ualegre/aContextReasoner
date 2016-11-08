@@ -29,7 +29,7 @@ public class OpenDbHelper extends SQLiteOpenHelper {
     public static final String CONTEXTTABLE = "usable_contexts";
     public static final String RECEIVERTABLE = "usable_receivers";
     public static final String DEBUGEVENTSTABLE = "events_data";
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 3;
     private static final String DB_NAME = "contextDB";
     private static final String CONTEXTTABLE_CREATE = "create table usable_contexts (_id integer primary key autoincrement, "
             + "packagename text,"
@@ -109,7 +109,7 @@ public class OpenDbHelper extends SQLiteOpenHelper {
         db.execSQL("insert into usable_contexts values (11, 'uk.ac.mdx.cs.ie.acontextlib.hardware', 'DistanceTravelledContext', 'contextengine', 0, 'classes.dex')");
         db.execSQL("insert into usable_contexts values (12, 'uk.ac.mdx.cs.ie.acontextlib.hardware', 'PluggedInContext', 'contextengine', 0, 'classes.dex')");
         db.execSQL("insert into usable_contexts values (13, 'uk.ac.mdx.cs.ie.acontextlib.hardware', 'CurrentLocationContext', 'contextengine', 0, 'classes.dex')");
-        db.execSQL("insert into usable_contexts values (13, 'uk.ac.mdx.cs.ie.acontextlib.personal', 'HeartRateMonitor', 'contextengine', 0, 'classes.dex')");
+        db.execSQL("insert into usable_contexts values (14, 'uk.ac.mdx.cs.ie.acontextlib.personal', 'HeartRateMonitor', 'contextengine', 0, 'classes.dex')");
         //Context Receiver DB
         //Example
         //db.execSQL("insert into usable_receivers values (1, 'org.poseidon_project.context.management', 'CoreReceiver', 'contextengine', 'classes.dex')");

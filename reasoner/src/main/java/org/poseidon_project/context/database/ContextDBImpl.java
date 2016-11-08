@@ -103,12 +103,12 @@ public class ContextDBImpl implements ContextDB{
     }
 
     @Override
-    public String getDexFile(String componentName) {
+    public String getDexFile(String observerName) {
         try {
             SQLiteDatabase sqlite = dbHelper.getReadableDatabase();
             Cursor crsr = sqlite.rawQuery(
                     "Select dex_file from usable_contexts where name='"
-                            + componentName + "';", null);
+                            + observerName + "';", null);
             crsr.moveToFirst();
 
             int numRows = crsr.getCount();
@@ -125,12 +125,12 @@ public class ContextDBImpl implements ContextDB{
     }
 
     @Override
-    public int getPermission(String componentName) {
+    public int getPermission(String observerName) {
         try {
             SQLiteDatabase sqlite = dbHelper.getReadableDatabase();
             Cursor crsr = sqlite.rawQuery(
                     "Select permission from usable_contexts where name='"
-                            + componentName + "';", null);
+                            + observerName + "';", null);
             crsr.moveToFirst();
 
             int numRows = crsr.getCount();
@@ -147,7 +147,7 @@ public class ContextDBImpl implements ContextDB{
     }
 
     @Override
-    public boolean insertComponent(String packageName, String name,
+    public boolean insertObserver(String packageName, String name,
                                    String owner, int permission, String dex_file) {
         try {
             SQLiteDatabase sqlite = dbHelper.getWritableDatabase();
@@ -169,9 +169,9 @@ public class ContextDBImpl implements ContextDB{
     }
 
     @Override
-    public boolean removeComponent(String name, String owner) {
+    public boolean removeObserver(String name, String owner) {
         try {
-            List<String> component = getLoadComponentInfo(owner, name);
+            List<String> component = getLoadObserverInfo(owner, name);
             if (component.size() == 0 || component == null) {
                 return false;
             } else {
@@ -191,12 +191,12 @@ public class ContextDBImpl implements ContextDB{
     }
 
     @Override
-    public String getPackageName(String componentName) {
+    public String getPackageName(String observerName) {
         try {
             SQLiteDatabase sqlite = dbHelper.getReadableDatabase();
             Cursor crsr = sqlite.rawQuery(
                     "Select packageName from usable_contexts where name='"
-                            + componentName + "';", null);
+                            + observerName + "';", null);
             crsr.moveToFirst();
 
             int numRows = crsr.getCount();
@@ -213,15 +213,15 @@ public class ContextDBImpl implements ContextDB{
     }
 
     @Override
-    public List<String> getLoadComponentInfo(String applicationId,
-                                             String componentName) {
+    public List<String> getLoadObserverInfo(String applicationId,
+                                             String observerName) {
         List<String> returnValues = new Vector<String>();
         try {
             SQLiteDatabase sqlite = dbHelper.getReadableDatabase();
             Cursor crsr = sqlite
                     .rawQuery(
                             "Select dex_file, packageName, owner, permission from usable_contexts where name='"
-                                    + componentName + "';", null);
+                                    + observerName + "';", null);
             crsr.moveToFirst();
 
             int numRows = crsr.getCount();

@@ -31,18 +31,18 @@ public interface ContextDB {
 
     List<String> getAppContextList(String applicationId);
 
-    String getDexFile(String componentName);
+    String getDexFile(String observerName);
 
-    int getPermission(String componenName);
+    int getPermission(String observerName);
 
-    String getPackageName(String componentName);
+    String getPackageName(String observerName);
 
-    boolean insertComponent(String packageName, String name, String owner,
+    boolean insertObserver(String packageName, String name, String owner,
                             int permission, String dex_file);
 
-    boolean removeComponent(String name, String owner);
+    boolean removeObserver(String name, String owner);
 
-    List<String> getLoadComponentInfo(String applicationId, String componentName);
+    List<String> getLoadObserverInfo(String applicationId, String observerName);
 
     boolean newEvents(List<LogEvent> events);
 

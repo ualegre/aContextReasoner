@@ -27,7 +27,7 @@ import org.poseidon_project.context.R;
 import java.util.ArrayList;
 
 /**
- * A Time Picker Preference that can be reused for multiple preferences
+ * A Time Picker Prefs that can be reused for multiple preferences
  *
  * @author Dean Kramer <d.kramer@mdx.ac.uk>
  */

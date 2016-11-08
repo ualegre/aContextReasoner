@@ -30,6 +30,7 @@ import android.util.Log;
 
 import org.poseidon_project.context.BuildConfig;
 import org.poseidon_project.context.database.ContextDB;
+import org.poseidon_project.context.utility.Prefs;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -71,7 +72,6 @@ public class DataLogger {
     private static final String LOG_TAG = "Context Middleware";
     private Context mContext;
     private LogUploader mUploader;
-    public static final String CONTEXT_PREFS = "ContextPrefs";
     private Intent mAlarmIntent = null;
     private LogLocationReceiver mLocationReceiver;
     private PluggedInContext mPluggedInContext;
@@ -91,7 +91,7 @@ public class DataLogger {
         mContext = context;
         mUploader = new ProtoBufLogUploader(mContext, mContextDB, this);
         mLocationReceiver = new LogLocationReceiver(mContext);
-        mSettings = mContext.getSharedPreferences(CONTEXT_PREFS, 0);
+        mSettings = mContext.getSharedPreferences(Prefs.REASONER_PREFS, 0);
 
         checkBackupSettings();
         setupBackupAlarm();
@@ -144,13 +144,13 @@ public class DataLogger {
 
     private void checkBackupSettings() {
 
-        int backupHour = mSettings.getInt("logBackupHour", -1);
-        int backupMin = mSettings.getInt("logBackupMin", -1);
+        int backupHour = mSettings.getInt(Prefs.REASONER_BACKUPHOUR, -1);
+        int backupMin = mSettings.getInt(Prefs.REASONER_BACKUPMIN, -1);
 
         if (needsNewID(mSettings)) {
             mUserID = -1;
         } else {
-            mUserID = mSettings.getInt("userId", -1);
+            mUserID = mSettings.getInt(Prefs.REASONER_USERID, -1);
         }
 
         if (backupHour < 0 || backupMin < 0) {
@@ -166,8 +166,8 @@ public class DataLogger {
             mBackupMin = randomGenerator.nextInt(60);
 
             SharedPreferences.Editor editor = mSettings.edit();
-            editor.putInt("logBackupHour", mBackupHour);
-            editor.putInt("logBackupMin", mBackupMin);
+            editor.putInt(Prefs.REASONER_BACKUPHOUR, mBackupHour);
+            editor.putInt(Prefs.REASONER_BACKUPMIN, mBackupMin);
             editor.commit();
         } else {
             mBackupHour = backupHour;
@@ -181,8 +181,8 @@ public class DataLogger {
         mBackupMin = mins;
 
         SharedPreferences.Editor editor = mSettings.edit();
-        editor.putInt("logBackupHour", mBackupHour);
-        editor.putInt("logBackupMin", mBackupMin);
+        editor.putInt(Prefs.REASONER_BACKUPHOUR, mBackupHour);
+        editor.putInt(Prefs.REASONER_BACKUPMIN, mBackupMin);
         editor.commit();
 
         setupBackupAlarm();
@@ -190,7 +190,7 @@ public class DataLogger {
 
     private boolean needsNewID(SharedPreferences prefs) {
 
-        int lastIDVersion = prefs.getInt("userIdVersion", -1);
+        int lastIDVersion = prefs.getInt(Prefs.REASONER_USERVERSION, -1);
 
         if (lastIDVersion < 16) {
             return true;
@@ -259,7 +259,7 @@ public class DataLogger {
         mBackupTime += NEXT_BACKUP_TIME;
 
         SharedPreferences.Editor editor = mSettings.edit();
-        editor.putLong("logLastBackup", System.currentTimeMillis());
+        editor.putLong(Prefs.REASONER_LASTBACKUP, System.currentTimeMillis());
         editor.commit();
         mContextDB.emptyEvents();
 
@@ -415,16 +415,16 @@ public class DataLogger {
         if (userID > 0) {
             mUserID = userID;
             SharedPreferences.Editor editor = mSettings.edit();
-            editor.putInt("userId", userID);
-            editor.putString("deviceId", mDeviceID);
-            editor.putInt("userIdVersion", BuildConfig.VERSION_CODE);
+            editor.putInt(Prefs.REASONER_USERID, userID);
+            editor.putString(Prefs.REASONER_DEVICEID, mDeviceID);
+            editor.putInt(Prefs.REASONER_USERVERSION, BuildConfig.VERSION_CODE);
             editor.commit();
         }
     }
 
     private boolean needsForcedBackup () {
 
-        long lastBackupMS = mSettings.getLong("logLastBackup", -1);
+        long lastBackupMS = mSettings.getLong(Prefs.REASONER_LASTBACKUP, -1);
         long diffMS = System.currentTimeMillis() - lastBackupMS;
 
         if (diffMS > FORCE_BACKUP_TIME) {

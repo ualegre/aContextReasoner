@@ -24,6 +24,7 @@ import org.poseidon_project.context.ContextReasonerCore;
 import org.poseidon_project.context.database.ContextDB;
 import org.poseidon_project.context.database.ContextResult;
 import org.poseidon_project.context.logging.DataLogger;
+import org.poseidon_project.context.utility.Prefs;
 import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.prop4j.SatSolver;
@@ -78,7 +79,7 @@ public class ReasonerManager implements IReasonerManager{
 
         pilotMapper = new ContextMapper(mReasonerCore, this, mContext);
         mCurrentPrefContexts = new HashMap<>();
-        mContextSettings = mContext.getSharedPreferences("RulePrefs", 0);
+        mContextSettings = mContext.getSharedPreferences(Prefs.RULE_PREFS, 0);
     }
 
     private void startCSPARQL() {
@@ -127,7 +128,7 @@ public class ReasonerManager implements IReasonerManager{
         HashSet<String> contexts = mCurrentPrefContexts.get(prefname);
 
         if (contexts == null){
-            mLogger.logVerbose(DataLogger.REASONER, "Context Preference name not being used, ignoring");
+            mLogger.logVerbose(DataLogger.REASONER, "Context Prefs name not being used, ignoring");
             return;
         }
 
@@ -351,10 +352,10 @@ public class ReasonerManager implements IReasonerManager{
         int currentValue = mContextSettings.getInt(prefName, Integer.MIN_VALUE);
 
         if (currentValue == Long.MIN_VALUE){
-            mLogger.logVerbose(DataLogger.REASONER, "Preference: " + prefName
+            mLogger.logVerbose(DataLogger.REASONER, "Prefs: " + prefName
                     + " value set first time to: " + String.valueOf(value));
         } else {
-            mLogger.logVerbose(DataLogger.REASONER, "Preference: " + prefName
+            mLogger.logVerbose(DataLogger.REASONER, "Prefs: " + prefName
                     + " value changed from: " + String.valueOf(currentValue)
                     +  " to: " + String.valueOf(value));
         }
@@ -370,10 +371,10 @@ public class ReasonerManager implements IReasonerManager{
         long currentValue = mContextSettings.getLong(prefName, Long.MIN_VALUE);
 
         if (currentValue == Long.MIN_VALUE){
-            mLogger.logVerbose(DataLogger.REASONER, "Preference: " + prefName
+            mLogger.logVerbose(DataLogger.REASONER, "Prefs: " + prefName
                     + " value set first time to: " + String.valueOf(value));
         } else {
-            mLogger.logVerbose(DataLogger.REASONER, "Preference: " + prefName
+            mLogger.logVerbose(DataLogger.REASONER, "Prefs: " + prefName
                     + " value changed from: " + String.valueOf(currentValue)
                     +  " to: " + String.valueOf(value));
         }
@@ -388,7 +389,7 @@ public class ReasonerManager implements IReasonerManager{
 
         boolean currentValue = mContextSettings.getBoolean(prefName, false);
 
-        mLogger.logVerbose(DataLogger.REASONER, "Preference: " + prefName
+        mLogger.logVerbose(DataLogger.REASONER, "Prefs: " + prefName
                 + " value changed from: " + String.valueOf(currentValue)
                 +  " to: " + String.valueOf(value));
 
@@ -403,10 +404,10 @@ public class ReasonerManager implements IReasonerManager{
         float currentValue = mContextSettings.getFloat(prefName, Float.MIN_VALUE);
 
         if (currentValue == Float.MIN_VALUE) {
-            mLogger.logVerbose(DataLogger.REASONER, "Preference: " + prefName
+            mLogger.logVerbose(DataLogger.REASONER, "Prefs: " + prefName
                     + " value set first time to: " + String.valueOf(value));
         } else {
-            mLogger.logVerbose(DataLogger.REASONER, "Preference: " + prefName
+            mLogger.logVerbose(DataLogger.REASONER, "Prefs: " + prefName
                     + " value changed from: " + String.valueOf(currentValue)
                     +  " to: " + String.valueOf(value));
         }
@@ -422,10 +423,10 @@ public class ReasonerManager implements IReasonerManager{
         String currentValue = mContextSettings.getString(prefName, "UnknowN");
 
         if (currentValue.equals("UnknowN")) {
-            mLogger.logVerbose(DataLogger.REASONER, "Preference: " + prefName
+            mLogger.logVerbose(DataLogger.REASONER, "Prefs: " + prefName
                     + " value set first time to: " + value);
         } else {
-            mLogger.logVerbose(DataLogger.REASONER, "Preference: " + prefName
+            mLogger.logVerbose(DataLogger.REASONER, "Prefs: " + prefName
                     + " value changed from: " + currentValue
                     +  " to: " + value);
         }

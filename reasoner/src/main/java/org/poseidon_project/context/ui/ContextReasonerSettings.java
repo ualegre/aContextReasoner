@@ -23,14 +23,17 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.RemoteException;
 import android.util.Log;
 import android.widget.Toast;
 
 import org.poseidon_project.context.IContextPreference;
 import org.poseidon_project.context.R;
 import org.poseidon_project.context.utility.ExplicitIntentGenerator;
+import org.poseidon_project.context.utility.Prefs;
 
 import no.tellu.findit.client.api.AsyncService;
 import no.tellu.findit.client.api.AsyncServiceImpl;
@@ -52,12 +55,17 @@ public class ContextReasonerSettings extends Activity implements DialogReturnInt
     private FragmentManager mFragManager;
     private final static String mTelluApiServiceURL = "https://ri.smarttracker.no/web";
     private ContextReasonerSettingsFragment mFragment;
+    private SharedPreferences mMainSettings;
+    private SharedPreferences mRuleSettings;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         mContext = getApplicationContext();
+
+        mMainSettings = getSharedPreferences(Prefs.REASONER_PREFS, 0);
+        mRuleSettings = getSharedPreferences(Prefs.RULE_PREFS, 0);
 
         mFragManager = getFragmentManager();
 
@@ -110,7 +118,7 @@ public class ContextReasonerSettings extends Activity implements DialogReturnInt
         loginFrag.show(mFragManager, "logindialog");
     }
 
-    public void authenticateUser(String username, String password) {
+    public void authenticateUser(final String username, final String password) {
         mTelluApiService = new AsyncServiceImpl(mTelluApiServiceURL);
 
         AsyncService.AccountCallback callback = new AsyncService.AccountCallback() {
@@ -118,6 +126,13 @@ public class ContextReasonerSettings extends Activity implements DialogReturnInt
             public void onAccountOK(long customerId, String customer) {
                 Toast.makeText(getApplicationContext(), R.string.authyes, Toast.LENGTH_SHORT).show();
                 mFragment.loggedIn();
+
+                try {
+                    mContextService.alterPreferenceString(Prefs.TELLU_USER, username);
+                    mContextService.alterPreferenceString(Prefs.TELLU_PASS, password);
+                } catch (RemoteException e) {
+                    Log.e("POSEIDON-Context", e.getMessage());
+                }
             }
 
             @Override

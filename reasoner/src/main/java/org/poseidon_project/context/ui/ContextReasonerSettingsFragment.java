@@ -34,6 +34,7 @@ import android.widget.Toast;
 
 import org.poseidon_project.context.R;
 import org.poseidon_project.context.logging.DataLogger;
+import org.poseidon_project.context.utility.Prefs;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -75,8 +76,8 @@ public class ContextReasonerSettingsFragment extends PreferenceFragment
 
         mActivity = (ContextReasonerSettings) getActivity();
 
-        mMainSettings = mActivity.getSharedPreferences("ContextPrefs", 0);
-        mRuleSettings = mActivity.getSharedPreferences("RulePrefs", 0);
+        mMainSettings = mActivity.getSharedPreferences(Prefs.REASONER_PREFS, 0);
+        mRuleSettings = mActivity.getSharedPreferences(Prefs.RULE_PREFS, 0);
 
         addPreferencesFromResource(R.xml.settings);
 
@@ -116,7 +117,7 @@ public class ContextReasonerSettingsFragment extends PreferenceFragment
         mLearningPreference = (CheckBoxPreference) findPreference(getString(R.string.pref_learning));
 
         if (mLearningPreference != null) {
-            boolean mode = mMainSettings.getBoolean("learningmode", true);
+            boolean mode = mMainSettings.getBoolean(Prefs.REASONER_LEARNING, true);
             mLearningPreference.setChecked(mode);
 
             mLearningPreference.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
@@ -178,7 +179,7 @@ public class ContextReasonerSettingsFragment extends PreferenceFragment
         mLastSynchronised = (Preference) findPreference(getString(R.string.pref_sync));
 
         if (mLastSynchronised != null) {
-            long lastBackupMS = mMainSettings.getLong("logLastBackup", 0);
+            long lastBackupMS = mMainSettings.getLong(Prefs.REASONER_LASTBACKUP, 0);
 
             if (lastBackupMS > 0) {
                 Calendar time = Calendar.getInstance();
@@ -197,7 +198,7 @@ public class ContextReasonerSettingsFragment extends PreferenceFragment
         mLogUserNamePreference = (Preference) findPreference(getString(R.string.pref_userid));
 
         if (mLogUserNamePreference != null) {
-            int userId = mMainSettings.getInt("userId", -1);
+            int userId = mMainSettings.getInt(Prefs.REASONER_USERID, -1);
 
             if (userId == -1) {
                 mSetUserIdentifier = false;
@@ -209,8 +210,8 @@ public class ContextReasonerSettingsFragment extends PreferenceFragment
 
     private void setupTimeToSychonisePref() {
 
-        mBackupHour = mMainSettings.getInt("logBackupHour", -1);
-        mBackupMin = mMainSettings.getInt("logBackupMin", -1);
+        mBackupHour = mMainSettings.getInt(Prefs.REASONER_BACKUPHOUR, -1);
+        mBackupMin = mMainSettings.getInt(Prefs.REASONER_BACKUPMIN, -1);
 
         if (mBackupHour < 0 || mBackupMin < 0) {
             Random randomGenerator = new Random();
@@ -262,11 +263,11 @@ public class ContextReasonerSettingsFragment extends PreferenceFragment
 
     private void setupWeatherSettings() {
 
-        final String pref_hot = getString(R.string.pref_hot);
-        final String pref_cold = getString(R.string.pref_cold);
+        mHotTemperature = mRuleSettings.getInt(Prefs.WEATHER_HOT, 25);
+        mColdTemperature = mRuleSettings.getInt(Prefs.WEATHER_COLD, 15);
 
-        mHotTemperature = mRuleSettings.getInt(pref_hot, 25);
-        mColdTemperature = mRuleSettings.getInt(pref_cold, 15);
+        String pref_hot = getString(R.string.pref_hot);
+        String pref_cold = getString(R.string.pref_cold);
 
         mHotTemperaturePreference = (EditTextPreference)
                 findPreference(pref_hot);
@@ -285,7 +286,7 @@ public class ContextReasonerSettingsFragment extends PreferenceFragment
 
                     if (temperatureSatisfible(newValueint, mColdTemperature)) {
                         try {
-                            mActivity.mContextService.alterPreferenceInt(pref_hot, newValueint);
+                            mActivity.mContextService.alterPreferenceInt(Prefs.WEATHER_COLD, newValueint);
                         } catch (RemoteException e) {
                             Log.e(LOG_TAG, e.getMessage());
                         }
@@ -325,7 +326,7 @@ public class ContextReasonerSettingsFragment extends PreferenceFragment
 
                     if (temperatureSatisfible(mHotTemperature, newValueint)) {
                         try {
-                            mActivity.mContextService.alterPreferenceInt(pref_cold, newValueint);
+                            mActivity.mContextService.alterPreferenceInt(Prefs.WEATHER_HOT, newValueint);
                         } catch (RemoteException e) {
                             Log.e(LOG_TAG, e.getMessage());
                         }
@@ -362,7 +363,7 @@ public class ContextReasonerSettingsFragment extends PreferenceFragment
         //max wait
         final String pref_max_wait = getString(R.string.pref_max_wait);
 
-        int max_wait = mRuleSettings.getInt(pref_max_wait, 5);
+        int max_wait = mRuleSettings.getInt(Prefs.NAVASSIST_MAXWAIT, 5);
 
         String max_wait_str = String.valueOf(max_wait);
 
@@ -381,7 +382,7 @@ public class ContextReasonerSettingsFragment extends PreferenceFragment
                     int newValueint = Integer.parseInt((String) newValue);
 
                     try {
-                        mActivity.mContextService.alterPreferenceInt(pref_max_wait, newValueint);
+                        mActivity.mContextService.alterPreferenceInt(Prefs.NAVASSIST_MAXWAIT, newValueint);
                     } catch (RemoteException e) {
                         Log.e(LOG_TAG, e.getMessage());
                     }
@@ -398,7 +399,7 @@ public class ContextReasonerSettingsFragment extends PreferenceFragment
 
         //deviation
         final String pref_max_dev = getString(R.string.pref_max_dev);
-        int max_dev = mRuleSettings.getInt(pref_max_dev, 2);
+        int max_dev = mRuleSettings.getInt(Prefs.NAVASSIST_MAXDEV, 2);
 
         String max_dev_str = String.valueOf(max_dev);
 
@@ -417,7 +418,7 @@ public class ContextReasonerSettingsFragment extends PreferenceFragment
                     int newValueint = Integer.parseInt((String) newValue);
 
                     try {
-                        mActivity.mContextService.alterPreferenceInt(pref_max_dev, newValueint);
+                        mActivity.mContextService.alterPreferenceInt(Prefs.NAVASSIST_MAXDEV, newValueint);
                     } catch (RemoteException e) {
                         Log.e(LOG_TAG, e.getMessage());
                     }

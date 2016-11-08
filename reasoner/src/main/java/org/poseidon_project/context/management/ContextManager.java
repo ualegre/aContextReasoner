@@ -18,12 +18,13 @@ package org.poseidon_project.context.management;
 import android.content.Context;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.os.Environment;
 import android.util.Log;
 
 import org.poseidon_project.context.ContextReasonerCore;
 import org.poseidon_project.context.database.ContextDB;
 import org.poseidon_project.context.logging.DataLogger;
+import org.poseidon_project.context.utility.ClassPackage;
+import org.poseidon_project.context.utility.Prefs;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -65,7 +66,6 @@ public class ContextManager implements IContextManager {
     private ExternalContextReceiver mExternalContextReceiver;
     private SimpleDateFormat mDateFormater = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private Calendar mCalendar = Calendar.getInstance();
-    public static final String CONTEXT_PREFS = "ContextPrefs";
     private ContextReasonerCore mReasonerCore;
     private DataLogger mLogger;
 
@@ -133,7 +133,6 @@ public class ContextManager implements IContextManager {
                     if (! observer.start()) {
                         observer.removeAllRequiringApps();
                         mActiveContexts.remove(observerName);
-                        observer = null;
                         return false;
                     } else {
                         return true;
@@ -161,7 +160,6 @@ public class ContextManager implements IContextManager {
                     observer.stop();
                 }
                 mActiveContexts.remove(observerName);
-                observer = null;
             }
 
             return true;
@@ -172,7 +170,7 @@ public class ContextManager implements IContextManager {
         }
     }
 
-    public void copyDexFile(String appKey, final String newDex,
+    /*public void copyDexFile(String appKey, final String newDex,
                             String[] contexts, String packagename, int permission) {
 
         File dexInternalStoragePath = new File(mContext.getDir("dex",
@@ -211,10 +209,63 @@ public class ContextManager implements IContextManager {
             Log.e(LOGTAG, ioe.getStackTrace().toString());
 
         }
+    }*/
+
+    public void copyDexFile(String appKey, String classpackage, String classpackagemeta) {
+
+        File newDexFile = new File(classpackage);
+
+        String newDexFileName = newDexFile.getName();
+
+        File dexInternalStoragePath = new File(mContext.getDir("dex",
+                Context.MODE_PRIVATE), newDexFileName);
+
+        BufferedInputStream bis = null;
+        OutputStream dexWriter = null;
+
+        final int BUF_SIZE = 4096;
+
+        try {
+
+            bis = new BufferedInputStream(new FileInputStream(newDexFile));
+            dexWriter = new BufferedOutputStream(new FileOutputStream(
+                    dexInternalStoragePath));
+
+            byte[] buf = new byte[BUF_SIZE];
+            int len;
+            while ((len = bis.read(buf, 0, BUF_SIZE)) > 0 ) {
+                dexWriter.write(buf, 0, len);
+            }
+            dexWriter.close();
+            bis.close();
+
+            ClassPackage classPackage = ClassPackage.parseClassPackage(classpackagemeta);
+
+            int size = classPackage.mObservers.length;
+
+            if (size == classPackage.mObserverPermissions.length) {
+
+                for (int i=0; i < size; i++) {
+
+                    String fullpath = classPackage.mObservers[i];
+                    String classname = fullpath.substring(fullpath.lastIndexOf("."));
+                    String packagename = fullpath.replace(classname, "");
+
+                    mContextDatabase.insertObserver(packagename, classname, appKey, classPackage.mObserverPermissions[i], newDexFileName);
+                }
+            }
+
+            mLogger.logVerbose(DataLogger.CONTEXT_MANAGER,
+                    LOGTAG, "Added dex file: " + classpackage);
+
+        } catch (IOException ioe) {
+            Log.e(LOGTAG, ioe.getStackTrace().toString());
+
+        }
     }
 
     protected ContextObserver loadContextClass(String appId, String componentName) {
-        List<String> componentInfo = mContextDatabase.getLoadComponentInfo(appId,
+        List<String> componentInfo = mContextDatabase.getLoadObserverInfo(appId,
                 componentName);
 
         if (componentInfo != null) {
@@ -325,7 +376,7 @@ public class ContextManager implements IContextManager {
 
     public boolean needHouseClearing(){
 
-        SharedPreferences settings = mContext.getSharedPreferences(CONTEXT_PREFS, 0);
+        SharedPreferences settings = mContext.getSharedPreferences(Prefs.REASONER_PREFS, 0);
         String lastDateString = settings.getString("lastclearing", "");
 
         if (! lastDateString.equals("") ) {
@@ -354,7 +405,7 @@ public class ContextManager implements IContextManager {
 
 
 
-        SharedPreferences settings = mContext.getSharedPreferences(CONTEXT_PREFS, 0);
+        SharedPreferences settings = mContext.getSharedPreferences(Prefs.REASONER_PREFS, 0);
         SharedPreferences.Editor editor = settings.edit();
         editor.putString("lastclearing", mDateFormater.format(mCalendar.getTime()));
         editor.commit();
@@ -431,7 +482,6 @@ public class ContextManager implements IContextManager {
                 if (! observer.start()) {
                     observer.removeAllRequiringApps();
                     mActiveContexts.remove(observerName);
-                    observer = null;
                     return false;
                 } else {
                     return true;

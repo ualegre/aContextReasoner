@@ -22,6 +22,7 @@ import android.content.SharedPreferences;
 import org.poseidon_project.context.ContextReasonerCore;
 import org.poseidon_project.context.logging.DataLogger;
 import org.poseidon_project.context.management.ContextManager;
+import org.poseidon_project.context.utility.Prefs;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -302,7 +303,7 @@ public class ContextMapper {
 
         mReasonerCore = crc;
         mContext = con;
-        mRuleSettings = con.getSharedPreferences("RulePrefs", 0);
+        mRuleSettings = con.getSharedPreferences(Prefs.RULE_PREFS, 0);
         mLogger = crc.getLogger();
         mContextManager = crc.getContextManager();
         mReasonerManager = rm;
@@ -346,12 +347,12 @@ public class ContextMapper {
 
         boolean okExit = true;
 
-        int coldTemp = mRuleSettings.getInt("pref_cold", 15);
+        int coldTemp = mRuleSettings.getInt(Prefs.WEATHER_COLD, 15);
 
         String cold = new String(tempCold);
         cold = cold.replace("$$pref_cold", String.valueOf(coldTemp));
 
-        int hotTemp = mRuleSettings.getInt("pref_hot", 25);
+        int hotTemp = mRuleSettings.getInt(Prefs.WEATHER_HOT, 25);
 
         String hot = new String(tempHot);
         hot = hot.replace("$$pref_hot", String.valueOf(hotTemp));
@@ -414,8 +415,8 @@ public class ContextMapper {
         mReasonerManager.registerAggregateRule("weathercold", newWeatherCOLD);
         mReasonerManager.registerAggregateRule("weatherhot", newWeatherHOT);
 
-        mReasonerManager.registerContextPrefAssociation("weather", "pref_cold");
-        mReasonerManager.registerContextPrefAssociation("weather", "pref_hot");
+        mReasonerManager.registerContextPrefAssociation("weather", Prefs.WEATHER_COLD);
+        mReasonerManager.registerContextPrefAssociation("weather", Prefs.WEATHER_HOT);
 
         mLogger.logVerbose(DataLogger.REASONER, LOGTAG, "Registered weather");
 
@@ -515,8 +516,8 @@ public class ContextMapper {
         mReasonerCore.removeContextValue("TEMP");
         mReasonerCore.removeContextValue("PRECIP");
 
-        mReasonerManager.unRegisterContextPrefAssociation("weather", "pref_cold");
-        mReasonerManager.unRegisterContextPrefAssociation("weather", "pref_hot");
+        mReasonerManager.unRegisterContextPrefAssociation("weather", Prefs.WEATHER_COLD);
+        mReasonerManager.unRegisterContextPrefAssociation("weather", Prefs.WEATHER_HOT);
 
         mLogger.logVerbose(DataLogger.REASONER, LOGTAG, "Unregistered weather");
 
@@ -526,7 +527,7 @@ public class ContextMapper {
 
     private boolean registerStandstill() {
 
-        int maxTime = mRuleSettings.getInt("pref_max_wait", 5);
+        int maxTime = mRuleSettings.getInt(Prefs.NAVASSIST_MAXWAIT, 5);
         int maxDistance = maxTime * 8;
 
         String standStillLong = new String(isStandstillForLongQuery);
@@ -576,7 +577,7 @@ public class ContextMapper {
         }
 
         mReasonerCore.removeContextValue("STANDSTILL");
-        mReasonerManager.unRegisterContextPrefAssociation("standstill", "pref_max_wait");
+        mReasonerManager.unRegisterContextPrefAssociation("standstill", Prefs.NAVASSIST_MAXWAIT);
         mLogger.logVerbose(DataLogger.REASONER, LOGTAG, "Unregistered standstill");
 
         return okExit;
@@ -585,7 +586,7 @@ public class ContextMapper {
 
     private boolean registerNavAssistance() {
 
-        int max_dev = mRuleSettings.getInt("pref_max_dev", 2);
+        int max_dev = mRuleSettings.getInt(Prefs.NAVASSIST_MAXDEV, 2);
 
         String navAssNeeded = new String(navigationAssistNeededQuery);
         navAssNeeded = navAssNeeded.replace("$$pref_max_dev", String.valueOf(max_dev));
@@ -614,7 +615,7 @@ public class ContextMapper {
                     "navigationAssistNotNeededQuery couldn't register");
         }
 
-        mReasonerManager.registerContextPrefAssociation("navassistance", "pref_max_dev");
+        mReasonerManager.registerContextPrefAssociation("navassistance", Prefs.NAVASSIST_MAXDEV);
         mLogger.logVerbose(DataLogger.REASONER, LOGTAG, "Registered navassistance");
 
 
@@ -644,7 +645,7 @@ public class ContextMapper {
                     "navigationAssistNeededQuery was not registered");
         }
 
-        mReasonerManager.unRegisterContextPrefAssociation("navassistance", "pref_max_dev");
+        mReasonerManager.unRegisterContextPrefAssociation("navassistance", Prefs.NAVASSIST_MAXDEV);
         mReasonerCore.removeContextValue("NAV");
         mLogger.logVerbose(DataLogger.REASONER, LOGTAG, "Unregistered navassistance");
 

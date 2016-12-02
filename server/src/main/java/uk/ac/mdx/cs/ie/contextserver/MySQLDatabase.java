@@ -108,7 +108,7 @@ public class MySQLDatabase implements Database{
                 addEvent.setInt(1, user);
                 addEvent.setInt(2, origins.get(i));
                 addEvent.setString(3, locations.get(i));
-                addEvent.setString(4, sdf.format(new Date(dates.get(i))));
+                addEvent.setString(4, sdf.format(new Date(dates.get(i) * 1000)));
                 addEvent.setString(5, texts.get(i));
                 addEvent.addBatch();
             }

@@ -296,7 +296,7 @@ public class ContextDBImpl implements ContextDB{
                 int id = crsr.getInt(0);
                 int origin = crsr.getInt(1);
                 String location = crsr.getString(2);
-                String dateTime = crsr.getString(3);
+                long dateTime = crsr.getLong(3);
                 String text = crsr.getString(4);
                 events.add(new LogEvent(id,origin, location, dateTime, text));
             }

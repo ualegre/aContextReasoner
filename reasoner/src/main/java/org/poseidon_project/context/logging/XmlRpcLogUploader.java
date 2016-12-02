@@ -164,7 +164,7 @@ public class XmlRpcLogUploader implements LogUploader, XMLRPCCallback{
         for (LogEvent event : events) {
             origins.add(event.getOrigin());
             locations.add(event.getLocation());
-            dates.add(event.getDate());
+            dates.add(mLogger.mDateFormater.format(event.getDate() * 1000));
             text.add(event.getText());
         }
 

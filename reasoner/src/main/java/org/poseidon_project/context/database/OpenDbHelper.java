@@ -43,9 +43,9 @@ public class OpenDbHelper extends SQLiteOpenHelper {
             + "owner text,"
             + "dex_file text);";
     private static final String DEBUGEVENTSTABLE_CREATE = "create table events_data (_id integer primary key autoincrement, "
-            + "eventOrigin smallint,"
+            + "eventOrigin integer,"
             + "eventLocation text,"
-            + "eventDateTime text,"
+            + "eventDateTime integer,"
             + "eventText text);";
 
     private static final String CONTEXTRESULT_CREATE = "create table context_result (_id integer primary key autoincrement, "

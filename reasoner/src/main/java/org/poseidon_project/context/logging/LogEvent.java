@@ -26,10 +26,10 @@ public class LogEvent {
     private int event_id;
     private int event_origin;
     private String event_location;
-    private String event_date;
+    private long event_date;
     private String event_text;
 
-    public LogEvent(int origin, String location, String date, String text) {
+    public LogEvent(int origin, String location, long date, String text) {
 
         event_origin = origin;
         event_location = location;
@@ -37,7 +37,7 @@ public class LogEvent {
         event_text = text;
     }
 
-    public LogEvent(int id, int origin, String location, String date, String text) {
+    public LogEvent(int id, int origin, String location, long date, String text) {
 
         event_id = id;
         event_origin = origin;
@@ -56,7 +56,7 @@ public class LogEvent {
         return event_location;
     }
 
-    public String getDate() {
+    public long getDate() {
         return event_date;
     }
 

@@ -35,7 +35,6 @@ import org.poseidon_project.context.utility.Prefs;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
@@ -68,7 +67,7 @@ public class DataLogger {
     private ContextDB mContextDB;
     private List<LogEvent> mEventsArray = new ArrayList<>(ARRAY_CAPACITY);
     private int mEventsArraySize = 0;
-    private SimpleDateFormat mDateFormater = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    public SimpleDateFormat mDateFormater = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private static final String LOG_TAG = "Context Middleware";
     private Context mContext;
     private LogUploader mUploader;
@@ -336,10 +335,8 @@ public class DataLogger {
                 setupBackupAlarm();
             }
 
-            String dateTime = mDateFormater.format(new Date());
-
             LogEvent logEvent = new LogEvent(origin, mLocationReceiver.getLocationString(),
-                    dateTime, event);
+                    System.currentTimeMillis()/1000, event);
 
             mEventsArray.add(logEvent);
             mEventsArraySize++;

@@ -28,9 +28,9 @@ import java.text.SimpleDateFormat;
 import java.util.Map;
 
 import no.tellu.findit.client.api.AsyncService;
-import no.tellu.findit.client.api.AsyncServiceImpl;
 import no.tellu.findit.client.api.GetTransaction;
 import no.tellu.findit.client.api.PostTransaction;
+import no.tellu.findit.client.api.QueueAsyncServiceImpl;
 import no.tellu.findit.client.api.Resources;
 
 /**
@@ -72,7 +72,7 @@ public class TelluSyncClient extends PreferenceSyncClient {
             }
         };
 
-        mTelluApiService = new AsyncServiceImpl(SERVICE_URL);
+        mTelluApiService = new QueueAsyncServiceImpl(SERVICE_URL);
         mTelluApiService.initiate(username, password, callback);
 
         return true;
@@ -128,15 +128,15 @@ public class TelluSyncClient extends PreferenceSyncClient {
                                 newProp.put(propAlteration);
                             } else {
                                 if (value instanceof Integer) {
-                                    mReasoner.alterContextPreference(name, (Integer) value);
+                                    mReasoner.alterContextPreference(name, (Integer) value, updated);
                                 } else if (value instanceof Long) {
-                                    mReasoner.alterContextPreference(name, (Long) value);
+                                    mReasoner.alterContextPreference(name, (Long) value, updated);
                                 } else if (value instanceof String) {
-                                    mReasoner.alterContextPreference(name, (String) value);
+                                    mReasoner.alterContextPreference(name, (String) value, updated);
                                 } else if (value instanceof Boolean) {
-                                    mReasoner.alterContextPreference(name, (Boolean) value);
+                                    mReasoner.alterContextPreference(name, (Boolean) value, updated);
                                 } else if (value instanceof Float) {
-                                    mReasoner.alterContextPreference(name, (Float) value);
+                                    mReasoner.alterContextPreference(name, (Float) value, updated);
                                 }
                             }
                         }

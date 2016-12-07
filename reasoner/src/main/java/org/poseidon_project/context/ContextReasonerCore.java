@@ -33,6 +33,7 @@ import org.poseidon_project.context.utility.FileOperations;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -173,7 +174,44 @@ public class ContextReasonerCore {
         //return mContextManager.addObserverRequirementWithParameters(appkey, observerName, parameters);
     }
 
-    public void updateContextValue(String contextName, String value) {
+    public void updateAtomicContext(final String contextName, final String value) {
+
+        if (updateContextValue(contextName, value)) {
+            sendContextResult(contextName, value);
+            mLogger.logVerbose(DataLogger.REASONER,
+                    LOGTAG, "Context: " + contextName + " set to " + value);
+
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    mReasonerManager.fireAggregateRules(contextName);
+                }
+            }).start();
+
+        }
+
+    }
+
+    public void updateAggregateContexts(List<String> contextNames, List<String> values) {
+
+        int size = contextNames.size();
+
+        for (int i = 0; i < size; i++) {
+
+            String contextName = contextNames.get(i);
+            String contextValue = values.get(i);
+
+            if (updateContextValue(contextName, contextValue)) {
+
+                sendContextResult(contextName, contextValue);
+                mLogger.logVerbose(DataLogger.REASONER,
+                        LOGTAG, "Context: " + contextName + " set to " + contextValue);
+            }
+        }
+
+    }
+
+    private boolean updateContextValue(String contextName, String value) {
 
         ContextResult previous = mContextValues.get(contextName);
 
@@ -184,12 +222,9 @@ public class ContextReasonerCore {
 
             if (newContext != null) {
                 mContextValues.put(contextName, newContext);
-                mReasonerManager.fireAggregateRules(contextName);
             }
 
-            sendContextResult(contextName, value);
-            mLogger.logVerbose(DataLogger.REASONER,
-                    LOGTAG, "Context: " + contextName + " set to " + value);
+            return true;
         } else {
             if(! value.equals(previous.getContextValue())) {
                 //sendBroadcast
@@ -198,14 +233,13 @@ public class ContextReasonerCore {
 
                 if (newContext != null) {
                     mContextValues.put(contextName, newContext);
-                    mReasonerManager.fireAggregateRules(contextName);
                 }
 
-                sendContextResult(contextName, value);
-                mLogger.logVerbose(DataLogger.REASONER,
-                        LOGTAG, "Context: " + contextName + " set to " + value);
+                return true;
             }
         }
+
+        return false;
     }
 
     public void removeContextValue(String contextName) {

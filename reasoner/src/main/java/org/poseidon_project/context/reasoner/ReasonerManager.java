@@ -33,6 +33,7 @@ import org.prop4j.SatSolver;
 import org.sat4j.specs.TimeoutException;
 
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -71,6 +72,8 @@ public class ReasonerManager implements IReasonerManager{
     private Timer mSyncTimer;
     private static final int PREF_SYNC_INTERVAL = 600000;
     private TelluSyncClient mSyncClient;
+    private List<String> mUpdatedContextNames = new ArrayList<>();
+    private List<String> mUpdatedContextValues = new ArrayList<>();
 
     public ReasonerManager(Context context, ContextReasonerCore core, ContextDB db){
         mContext = context;
@@ -81,13 +84,14 @@ public class ReasonerManager implements IReasonerManager{
 
         startCSPARQL();
 
-        //Not a completely bad idea to do a GC after loading everything
-        System.gc();
-
         pilotMapper = new ContextMapper(mReasonerCore, this, mContext);
         mCurrentPrefContexts = new HashMap<>();
         mContextSettings = mContext.getSharedPreferences(Prefs.RULE_PREFS, 0);
+        Prefs.setupFirstTime(mContext);
         setupPrefSyncClients();
+
+        //Not a completely bad idea to do a GC after loading everything
+        System.gc();
     }
 
     private void setupPrefSyncClients() {
@@ -102,8 +106,7 @@ public class ReasonerManager implements IReasonerManager{
             public void run() {
                 mSyncClient.synchronisePreferences(new PreferenceSyncClient.Callback() {
                     @Override
-                    public void onSuccessful() {
-
+                    public void onSuccessful() { Log.v(LOGTAG, "Successful Sync with Tellu");
                     }
 
                     @Override
@@ -114,6 +117,7 @@ public class ReasonerManager implements IReasonerManager{
             }
         }, System.currentTimeMillis(), PREF_SYNC_INTERVAL);
     }
+
 
     private void startCSPARQL() {
 
@@ -290,6 +294,8 @@ public class ReasonerManager implements IReasonerManager{
     public synchronized void fireAggregateRules(String newContextValue) {
 
         long mCurrentTime = System.currentTimeMillis();
+        mUpdatedContextNames.clear();
+        mUpdatedContextValues.clear();
 
         //Might be better to hold/check a local Map (context type-list of agg contexts) instead of
         //checking each rule separately.
@@ -298,6 +304,10 @@ public class ReasonerManager implements IReasonerManager{
             if (rule.isAffectedBy(newContextValue)) {
                 fireRule(rule, mCurrentTime);
             }
+        }
+
+        if (! mUpdatedContextNames.isEmpty()) {
+            mReasonerCore.updateAggregateContexts(mUpdatedContextNames, mUpdatedContextValues);
         }
     }
 
@@ -339,12 +349,14 @@ public class ReasonerManager implements IReasonerManager{
             SatSolver solver = new SatSolver(rule.getPropNodes(), TIMEOUT);
 
             if (solver.isSatisfiable(literalValues)) {
-                mReasonerCore.updateContextValue(rule.getContextName(),
-                        (String) rule.getStateLiteral().var);
+
+                mUpdatedContextNames.add(rule.getContextName());
+                mUpdatedContextValues.add((String) rule.getStateLiteral().var);
+
             }
 
         } catch (TimeoutException exception) {
-            exception.printStackTrace();
+            Log.e(LOGTAG, exception.getMessage());
         }
     }
 
@@ -385,6 +397,26 @@ public class ReasonerManager implements IReasonerManager{
     }
 
     public void alterContextPreference(String prefName, int value) {
+        alterContextPreference(prefName,value,System.currentTimeMillis());
+    }
+
+    public void alterContextPreference(String prefName, long value) {
+        alterContextPreference(prefName,value,System.currentTimeMillis());
+    }
+
+    public void alterContextPreference(String prefName, boolean value) {
+        alterContextPreference(prefName,value,System.currentTimeMillis());
+    }
+
+    public void alterContextPreference(String prefName, float value) {
+        alterContextPreference(prefName,value,System.currentTimeMillis());
+    }
+
+    public void alterContextPreference(String prefName, String value) {
+        alterContextPreference(prefName,value,System.currentTimeMillis());
+    }
+
+    public void alterContextPreference(String prefName, int value, long timestamp) {
 
         int currentValue = mContextSettings.getInt(prefName, Integer.MIN_VALUE);
 
@@ -400,13 +432,13 @@ public class ReasonerManager implements IReasonerManager{
         if (value != currentValue) {
             SharedPreferences.Editor editor = mContextSettings.edit();
             editor.putInt(prefName, value);
-            editor.putLong(Prefs.RULE_PREF_LASTUPATE, System.currentTimeMillis());
+            editor.putLong(Prefs.RULE_PREF_LASTUPATE, timestamp);
             editor.commit();
             restartRunningContextFromPreference(prefName);
         }
     }
 
-    public void alterContextPreference(String prefName, long value) {
+    public void alterContextPreference(String prefName, long value, long timestamp) {
 
         long currentValue = mContextSettings.getLong(prefName, Long.MIN_VALUE);
 
@@ -422,13 +454,13 @@ public class ReasonerManager implements IReasonerManager{
         if(value != currentValue) {
             SharedPreferences.Editor editor = mContextSettings.edit();
             editor.putLong(prefName, value);
-            editor.putLong(Prefs.RULE_PREF_LASTUPATE, System.currentTimeMillis());
+            editor.putLong(Prefs.RULE_PREF_LASTUPATE, timestamp);
             editor.commit();
             restartRunningContextFromPreference(prefName);
         }
     }
 
-    public void alterContextPreference(String prefName, boolean value) {
+    public void alterContextPreference(String prefName, boolean value, long timestamp) {
 
         boolean currentValue = mContextSettings.getBoolean(prefName, false);
 
@@ -445,7 +477,7 @@ public class ReasonerManager implements IReasonerManager{
         }
     }
 
-    public void alterContextPreference(String prefName, float value) {
+    public void alterContextPreference(String prefName, float value, long timestamp) {
 
         float currentValue = mContextSettings.getFloat(prefName, Float.MIN_VALUE);
 
@@ -461,13 +493,13 @@ public class ReasonerManager implements IReasonerManager{
         if (value != currentValue) {
             SharedPreferences.Editor editor = mContextSettings.edit();
             editor.putFloat(prefName, value);
-            editor.putLong(Prefs.RULE_PREF_LASTUPATE, System.currentTimeMillis());
+            editor.putLong(Prefs.RULE_PREF_LASTUPATE, timestamp);
             editor.commit();
             restartRunningContextFromPreference(prefName);
         }
     }
 
-    public void alterContextPreference(String prefName, String value) {
+    public void alterContextPreference(String prefName, String value, long timestamp) {
 
         String currentValue = mContextSettings.getString(prefName, "UnknowN");
 
@@ -483,7 +515,7 @@ public class ReasonerManager implements IReasonerManager{
         if (! value.equals(currentValue)) {
             SharedPreferences.Editor editor = mContextSettings.edit();
             editor.putString(prefName, value);
-            editor.putLong(Prefs.RULE_PREF_LASTUPATE, System.currentTimeMillis());
+            editor.putLong(Prefs.RULE_PREF_LASTUPATE, timestamp);
             editor.commit();
             restartRunningContextFromPreference(prefName);
         }

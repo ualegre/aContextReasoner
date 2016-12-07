@@ -497,6 +497,6 @@ public class ContextManager implements IContextManager {
 
     @Override
     public void updateContextValue(String contextName, String value) {
-        mReasonerCore.updateContextValue(contextName, value);
+        mReasonerCore.updateAtomicContext(contextName, value);
     }
 }

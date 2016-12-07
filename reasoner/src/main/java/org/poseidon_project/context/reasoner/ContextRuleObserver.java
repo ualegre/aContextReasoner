@@ -49,7 +49,7 @@ public class ContextRuleObserver extends ResultFormatter {
             context = context.substring(context.indexOf("\"") + 1, context.lastIndexOf("\""));
             String contextName = context.substring(0, context.indexOf("_"));
             String contextValue = context.replace(contextName + "_", "");
-            mEngineCore.updateContextValue(contextName, contextValue);
+            mEngineCore.updateAtomicContext(contextName, contextValue);
 
         }
 

@@ -23,6 +23,7 @@ import android.util.Log;
 
 import org.poseidon_project.context.database.ContextDB;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -111,6 +112,14 @@ public class ProtoBufLogUploader implements LogUploader {
             public void run() {
                 try {
 
+                    try {
+                        if (!isConnected()) {
+                            return;
+                        }
+                    } catch (Exception e) {
+                        return;
+                    }
+
                     ContextServiceGrpc.ContextServiceBlockingStub stub =
                             ContextServiceGrpc.
                                     newBlockingStub(mChannel).withDeadlineAfter(10, TimeUnit.SECONDS);
@@ -166,6 +175,16 @@ public class ProtoBufLogUploader implements LogUploader {
             public void run() {
                 try {
 
+                    try {
+                        if (!isConnected()) {
+                            mLogger.incompleteBackup();
+                            return;
+                        }
+                    } catch (Exception e) {
+                        mLogger.incompleteBackup();
+                        return;
+                    }
+
                     ContextServiceGrpc.ContextServiceBlockingStub stub =
                             ContextServiceGrpc.
                                     newBlockingStub(mChannel).withDeadlineAfter(10, TimeUnit.SECONDS);
@@ -202,5 +221,10 @@ public class ProtoBufLogUploader implements LogUploader {
         } catch (InterruptedException e) {
             Log.e(LOG_TAG, e.getMessage());
         }
+    }
+
+    public boolean isConnected() throws InterruptedException, IOException {
+        String command = "ping -c 1 google.com";
+        return (Runtime.getRuntime().exec(command).waitFor() == 0);
     }
 }

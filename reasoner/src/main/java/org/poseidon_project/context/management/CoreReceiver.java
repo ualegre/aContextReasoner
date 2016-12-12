@@ -78,12 +78,19 @@ public class CoreReceiver extends ContextReceiver {
                mLogger.logVerbose(DataLogger.CONTEXT_MANAGER, "CalEvent : " + strValue);
            } else if (name.equals("CalReminder")) {
                mLogger.logVerbose(DataLogger.CONTEXT_MANAGER, "CalReminder : " + strValue);
+           } else if (name.equals("Activity")) {
+               mLogger.logVerbose(DataLogger.CONTEXT_MANAGER, "Activity : " + strValue);
            }
     }
 
     @Override
     public void newContextValue(String name, double value) {
 
+        String strValue = String.valueOf(value) + "^^http://www.w3.org/2001/XMLSchema#double";
+
+        if (name.equals("Weight")) {
+            mLogger.logVerbose(DataLogger.CONTEXT_MANAGER, "Weight : " + strValue);
+        }
     }
 
     @Override

@@ -106,7 +106,8 @@ public class ReasonerManager implements IReasonerManager{
             public void run() {
                 mSyncClient.synchronisePreferences(new PreferenceSyncClient.Callback() {
                     @Override
-                    public void onSuccessful() { Log.v(LOGTAG, "Successful Sync with Tellu");
+                    public void onSuccessful() {
+                        Log.v(LOGTAG, "Successful Sync with Tellu");
                     }
 
                     @Override

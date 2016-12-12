@@ -57,25 +57,28 @@ public class TelluSyncClient extends PreferenceSyncClient {
         String username = mPrefs.getString(Prefs.TELLU_USER, "");
         String password = mPrefs.getString(Prefs.TELLU_PASS, "");
 
+        if (username.isEmpty()) {
+            return false;
+        } else {
+            AsyncService.AccountCallback callback = new AsyncService.AccountCallback() {
 
-        AsyncService.AccountCallback callback = new AsyncService.AccountCallback() {
+                @Override
+                public void onAccountOK(long l, String s) {
+                    mHasToken = 1;
+                }
 
-            @Override
-            public void onAccountOK(long l, String s) {
-                mHasToken = 1;
-            }
+                @Override
+                public void onAccountError(int i, String s, Exception e) {
+                    Log.e(LOG_TAG, "Failed with code: " + i + " " + e.getMessage());
+                    mHasToken = -1;
+                }
+            };
 
-            @Override
-            public void onAccountError(int i, String s, Exception e) {
-                Log.e(LOG_TAG, "Failed with code: " + i + " " + e.getMessage());
-                mHasToken = -1;
-            }
-        };
+            mTelluApiService = new QueueAsyncServiceImpl(SERVICE_URL);
+            mTelluApiService.initiate(username, password, callback);
 
-        mTelluApiService = new QueueAsyncServiceImpl(SERVICE_URL);
-        mTelluApiService.initiate(username, password, callback);
-
-        return true;
+            return true;
+        }
     }
 
     @Override

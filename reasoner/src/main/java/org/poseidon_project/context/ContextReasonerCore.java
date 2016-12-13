@@ -61,10 +61,14 @@ public class ContextReasonerCore {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                mContextDatabase = new ContextDBImpl(mContext);
-                mLogger = new DataLogger(mContext, mContextDatabase);
+                //Dispatch first as C-SPARQL takes longer to start
                 mReasonerManager = new ReasonerManager(mContext,
                         ContextReasonerCore.this, mContextDatabase);
+
+                mContextDatabase = new ContextDBImpl(mContext);
+                mLogger = new DataLogger(mContext, mContextDatabase);
+                //Now we can add the datalogger to the reasoner
+                mReasonerManager.setLogger(mLogger);
                 mContextManager = new ContextManager(mContext,
                         ContextReasonerCore.this, mContextDatabase);
             }

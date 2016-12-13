@@ -70,28 +70,35 @@ public class ReasonerManager implements IReasonerManager{
     private HashMap<String,HashSet<String>> mCurrentPrefContexts;
     private SharedPreferences mContextSettings;
     private Timer mSyncTimer;
-    private static final int PREF_SYNC_INTERVAL = 600000;
+    private static final int PREF_SYNC_INTERVAL = 1200000;
     private TelluSyncClient mSyncClient;
     private List<String> mUpdatedContextNames = new ArrayList<>();
     private List<String> mUpdatedContextValues = new ArrayList<>();
 
     public ReasonerManager(Context context, ContextReasonerCore core, ContextDB db){
-        mContext = context;
         mReasonerCore = core;
-        mLogger = core.getLogger();
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                startCSPARQL();
+                System.gc();
+            }
+        }).start();
+
+        mContext = context;
         mAggregateRules = new HashMap<>();
         mContextDatabase = db;
-
-        startCSPARQL();
-
         pilotMapper = new ContextMapper(mReasonerCore, this, mContext);
         mCurrentPrefContexts = new HashMap<>();
         mContextSettings = mContext.getSharedPreferences(Prefs.RULE_PREFS, 0);
         Prefs.setupFirstTime(mContext);
         setupPrefSyncClients();
 
-        //Not a completely bad idea to do a GC after loading everything
-        System.gc();
+    }
+
+    public void setLogger(DataLogger logger) {
+        mLogger = logger;
     }
 
     private void setupPrefSyncClients() {

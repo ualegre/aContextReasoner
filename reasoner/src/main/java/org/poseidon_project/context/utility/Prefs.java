@@ -58,7 +58,7 @@ public class Prefs {
 
         if (! setup) {
             SharedPreferences.Editor editor = reasoner.edit();
-            editor.putInt(REASONER_SETUPDONE, 1);
+            editor.putBoolean(REASONER_SETUPDONE, true);
             editor.commit();
 
             SharedPreferences rules = context.getSharedPreferences(RULE_PREFS, 0);
@@ -70,9 +70,5 @@ public class Prefs {
             editor.putBoolean(REASONER_LEARNING, true);
             editor.commit();
         }
-
-        SharedPreferences.Editor editor = reasoner.edit();
-
-        editor.putBoolean(REASONER_SETUPDONE, true);
     }
 }

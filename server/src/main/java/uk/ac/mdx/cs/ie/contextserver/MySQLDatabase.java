@@ -34,7 +34,7 @@ import java.util.List;
  */
 public class MySQLDatabase implements Database{
 
-    private static final String DB_URL = "";
+    private static final String DB_URL = "jdbc:mysql://localhost:3306/poseidon_log?autoReconnect=true";
     private static final String DB_USER = "";
     private static final String DB_PASS = "";
     private Connection mConnection;
@@ -47,7 +47,7 @@ public class MySQLDatabase implements Database{
             "UPDATE user SET last_sync= ? WHERE id = ?;";
 
     private static final String UPDATE_USER_INFO_STRING =
-            "UPDATE user SET user_id=? WHERE id=? AND device_id=?;";
+            "UPDATE user SET user_id=? WHERE id=?;";
 
     private static final String NEW_USER_STRING =
             "INSERT INTO user (user_id, device_id) VALUES (?,?);";
@@ -176,9 +176,8 @@ public class MySQLDatabase implements Database{
                 }
             } else {
                 updateUser = con.prepareStatement(UPDATE_USER_INFO_STRING);
-                updateUser.setInt(1, user);
-                updateUser.setString(2, username);
-                updateUser.setString(3, device);
+                updateUser.setString(1, username);
+                updateUser.setInt(2, user);
                 updateUser.execute();
 
                 updateUserSync = updateSyncTime(con, user);

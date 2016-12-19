@@ -2,7 +2,7 @@ apply plugin: 'java'
 apply plugin: 'com.google.protobuf'
 
 
-def grpcVersion = '1.0.0'
+def grpcVersion = '1.0.2'
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
@@ -12,6 +12,8 @@ dependencies {
     compile "io.grpc:grpc-netty:${grpcVersion}"
     compile "io.grpc:grpc-protobuf:${grpcVersion}"
     compile "io.grpc:grpc-stub:${grpcVersion}"
+    compile 'io.netty:netty-tcnative-boringssl-static:1.1.33.Fork23:linux-x86_64'
+    compile 'org.bouncycastle:bcprov-jdk15on:1.55'
 }
 
 sourceSets {
@@ -52,8 +54,8 @@ protobuf {
 //        // Not using generatedSourceDirs because of
         // https://discuss.gradle.org/t/support-for-intellij-2016/15294/8
 //       sourceDirs += file("${projectDir}/build/generated/source/proto/main/java");
-//        sourceDirs += file("${projectDir}/build/generated/source/proto/main/grpc");
-//    }
+//       sourceDirs += file("${projectDir}/build/generated/source/proto/main/grpc");
+//   }
 //}
 
 apply plugin: 'application'

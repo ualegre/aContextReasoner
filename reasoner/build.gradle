@@ -1,6 +1,8 @@
 apply plugin: 'com.android.application'
 apply plugin: 'com.google.protobuf'
 
+def grpcVersion = '1.0.2'
+
 android {
     compileSdkVersion 23
     buildToolsVersion "23.0.3"
@@ -9,8 +11,8 @@ android {
         applicationId "org.poseidon_project.context"
         minSdkVersion 16
         targetSdkVersion 21
-        versionCode 27
-        versionName "0.9.0"
+        versionCode 28
+        versionName "0.9.1"
         multiDexEnabled true
     }
 
@@ -65,7 +67,7 @@ protobuf {
             artifact = "com.google.protobuf:protoc-gen-javalite:3.0.0"
         }
         grpc {
-            artifact = 'io.grpc:protoc-gen-grpc-java:1.0.0' // CURRENT_GRPC_VERSION
+            artifact = "io.grpc:protoc-gen-grpc-java:${grpcVersion}"
         }
     }
     generateProtoTasks {
@@ -88,8 +90,8 @@ dependencies {
     compile 'de.timroes:aXMLRPC:1.8.0'
     compile 'uk.ac.mdx.cs.ie:acontextlib:0.9.8'
 
-    compile 'io.grpc:grpc-okhttp:1.0.0' // CURRENT_GRPC_VERSION
-    compile 'io.grpc:grpc-protobuf-lite:1.0.0' // CURRENT_GRPC_VERSION
-    compile 'io.grpc:grpc-stub:1.0.0' // CURRENT_GRPC_VERSION
+    compile "io.grpc:grpc-okhttp:${grpcVersion}"
+    compile "io.grpc:grpc-protobuf-lite:${grpcVersion}"
+    compile "io.grpc:grpc-stub:${grpcVersion}"
     compile 'javax.annotation:javax.annotation-api:1.2'
 }

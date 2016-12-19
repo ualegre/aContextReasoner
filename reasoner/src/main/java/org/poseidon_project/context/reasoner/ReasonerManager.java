@@ -428,16 +428,17 @@ public class ReasonerManager implements IReasonerManager{
 
         int currentValue = mContextSettings.getInt(prefName, Integer.MIN_VALUE);
 
-        if (currentValue == Long.MIN_VALUE){
-            mLogger.logVerbose(DataLogger.REASONER, "Prefs: " + prefName
-                    + " value set first time to: " + String.valueOf(value));
-        } else {
-            mLogger.logVerbose(DataLogger.REASONER, "Prefs: " + prefName
-                    + " value changed from: " + String.valueOf(currentValue)
-                    +  " to: " + String.valueOf(value));
-        }
-
         if (value != currentValue) {
+
+            if (currentValue == Long.MIN_VALUE){
+                mLogger.logVerbose(DataLogger.REASONER, "Prefs: " + prefName
+                        + " value set first time to: " + String.valueOf(value));
+            } else {
+                mLogger.logVerbose(DataLogger.REASONER, "Prefs: " + prefName
+                        + " value changed from: " + String.valueOf(currentValue)
+                        +  " to: " + String.valueOf(value));
+            }
+
             SharedPreferences.Editor editor = mContextSettings.edit();
             editor.putInt(prefName, value);
             editor.putLong(Prefs.RULE_PREF_LASTUPATE, timestamp);
@@ -450,16 +451,17 @@ public class ReasonerManager implements IReasonerManager{
 
         long currentValue = mContextSettings.getLong(prefName, Long.MIN_VALUE);
 
-        if (currentValue == Long.MIN_VALUE){
-            mLogger.logVerbose(DataLogger.REASONER, "Prefs: " + prefName
-                    + " value set first time to: " + String.valueOf(value));
-        } else {
-            mLogger.logVerbose(DataLogger.REASONER, "Prefs: " + prefName
-                    + " value changed from: " + String.valueOf(currentValue)
-                    +  " to: " + String.valueOf(value));
-        }
-
         if(value != currentValue) {
+
+            if (currentValue == Long.MIN_VALUE){
+                mLogger.logVerbose(DataLogger.REASONER, "Prefs: " + prefName
+                        + " value set first time to: " + String.valueOf(value));
+            } else {
+                mLogger.logVerbose(DataLogger.REASONER, "Prefs: " + prefName
+                        + " value changed from: " + String.valueOf(currentValue)
+                        +  " to: " + String.valueOf(value));
+            }
+
             SharedPreferences.Editor editor = mContextSettings.edit();
             editor.putLong(prefName, value);
             editor.putLong(Prefs.RULE_PREF_LASTUPATE, timestamp);
@@ -472,11 +474,12 @@ public class ReasonerManager implements IReasonerManager{
 
         boolean currentValue = mContextSettings.getBoolean(prefName, false);
 
-        mLogger.logVerbose(DataLogger.REASONER, "Prefs: " + prefName
-                + " value changed from: " + String.valueOf(currentValue)
-                +  " to: " + String.valueOf(value));
-
         if (value != currentValue) {
+
+            mLogger.logVerbose(DataLogger.REASONER, "Prefs: " + prefName
+                    + " value changed from: " + String.valueOf(currentValue)
+                    +  " to: " + String.valueOf(value));
+
             SharedPreferences.Editor editor = mContextSettings.edit();
             editor.putBoolean(prefName, value);
             editor.putLong(Prefs.RULE_PREF_LASTUPATE, System.currentTimeMillis());
@@ -489,16 +492,17 @@ public class ReasonerManager implements IReasonerManager{
 
         float currentValue = mContextSettings.getFloat(prefName, Float.MIN_VALUE);
 
-        if (currentValue == Float.MIN_VALUE) {
-            mLogger.logVerbose(DataLogger.REASONER, "Prefs: " + prefName
-                    + " value set first time to: " + String.valueOf(value));
-        } else {
-            mLogger.logVerbose(DataLogger.REASONER, "Prefs: " + prefName
-                    + " value changed from: " + String.valueOf(currentValue)
-                    +  " to: " + String.valueOf(value));
-        }
-
         if (value != currentValue) {
+
+            if (currentValue == Float.MIN_VALUE) {
+                mLogger.logVerbose(DataLogger.REASONER, "Prefs: " + prefName
+                        + " value set first time to: " + String.valueOf(value));
+            } else {
+                mLogger.logVerbose(DataLogger.REASONER, "Prefs: " + prefName
+                        + " value changed from: " + String.valueOf(currentValue)
+                        +  " to: " + String.valueOf(value));
+            }
+
             SharedPreferences.Editor editor = mContextSettings.edit();
             editor.putFloat(prefName, value);
             editor.putLong(Prefs.RULE_PREF_LASTUPATE, timestamp);
@@ -511,16 +515,17 @@ public class ReasonerManager implements IReasonerManager{
 
         String currentValue = mContextSettings.getString(prefName, "UnknowN");
 
-        if (currentValue.equals("UnknowN")) {
-            mLogger.logVerbose(DataLogger.REASONER, "Prefs: " + prefName
-                    + " value set first time to: " + value);
-        } else {
-            mLogger.logVerbose(DataLogger.REASONER, "Prefs: " + prefName
-                    + " value changed from: " + currentValue
-                    +  " to: " + value);
-        }
-
         if (! value.equals(currentValue)) {
+
+            if (currentValue.equals("UnknowN")) {
+                mLogger.logVerbose(DataLogger.REASONER, "Prefs: " + prefName
+                        + " value set first time to: " + value);
+            } else {
+                mLogger.logVerbose(DataLogger.REASONER, "Prefs: " + prefName
+                        + " value changed from: " + currentValue
+                        +  " to: " + value);
+            }
+
             SharedPreferences.Editor editor = mContextSettings.edit();
             editor.putString(prefName, value);
             editor.putLong(Prefs.RULE_PREF_LASTUPATE, timestamp);

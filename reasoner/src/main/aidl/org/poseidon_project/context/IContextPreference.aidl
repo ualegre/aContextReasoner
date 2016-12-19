@@ -30,4 +30,5 @@ interface IContextPreference {
     void alterPreferenceFloat(in String prefName, float value);
     void alterPreferenceBool(in String prefName, boolean value);
     void alterPreferenceString(in String prefName, in String value);
+    void registerUserIdentifier(in String userID);
 }

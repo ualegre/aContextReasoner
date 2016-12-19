@@ -127,6 +127,11 @@ public class ContextReasonerService extends Service{
         public void alterPreferenceString(String prefName, String value) throws RemoteException {
             mReasonerCore.alterPreferenceString(prefName, value);
         }
+
+        @Override
+        public void registerUserIdentifier(String userIdentifier) throws RemoteException {
+            mReasonerCore.getLogger().registerUser(userIdentifier);
+        }
     };
 
     public final ILogBackup.Stub mLogBackupBinder = new ILogBackup.Stub() {

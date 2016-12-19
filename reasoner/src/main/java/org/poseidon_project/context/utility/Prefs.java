@@ -33,6 +33,7 @@ public class Prefs {
     public static final String RULE_PREFS = "RulePrefs";
     public static final String REASONER_LASTBACKUP = "logLastBackup";
     public static final String REASONER_USERID = "userId";
+    public static final String REASONER_USERNAME = "username";
     public static final String REASONER_USERVERSION = "userIdVersion";
     public static final String REASONER_DEVICEID = "deviceId";
     public static final String REASONER_BACKUPHOUR = "logBackupHour";

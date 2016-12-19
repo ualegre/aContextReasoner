@@ -25,7 +25,7 @@ import android.content.SharedPreferences;
 import android.os.BatteryManager;
 import android.os.Build;
 import android.os.PowerManager;
-import android.telephony.TelephonyManager;
+import android.provider.Settings.Secure;
 import android.util.Log;
 
 import org.poseidon_project.context.BuildConfig;
@@ -66,6 +66,7 @@ public class DataLogger {
 
     private ContextDB mContextDB;
     private List<LogEvent> mEventsArray = new ArrayList<>(ARRAY_CAPACITY);
+    private List<LogEvent> mEventsCache = new ArrayList<>(ARRAY_CAPACITY);
     private int mEventsArraySize = 0;
     public SimpleDateFormat mDateFormater = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private static final String LOG_TAG = "Context Middleware";
@@ -76,6 +77,7 @@ public class DataLogger {
     private PluggedInContext mPluggedInContext;
     private boolean mForcedBackup = false;
     private String mDeviceID;
+    private String mUsername;
     private SharedPreferences mSettings;
 
     public static final String BROADCAST_INTENT = "org.poseidon_project.context.NEEDS_BAT_OP_SET_OFF";
@@ -152,6 +154,8 @@ public class DataLogger {
             mUserID = mSettings.getInt(Prefs.REASONER_USERID, -1);
         }
 
+        mUsername = mSettings.getString(Prefs.REASONER_USERNAME, "");
+
         if (backupHour < 0 || backupMin < 0) {
             Random randomGenerator = new Random();
 
@@ -216,13 +220,7 @@ public class DataLogger {
     }
 
     private String getDeviceID() {
-
-        final String deviceId = ((TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE)).getDeviceId();
-        if (deviceId != null) {
-            return "p:" + deviceId;
-        } else {
-            return "s:" + android.os.Build.SERIAL;
-        }
+        return "s:" + Secure.getString(mContext.getContentResolver(), Secure.ANDROID_ID);
     }
 
     public void attemptBackup(Intent intent) {
@@ -325,7 +323,7 @@ public class DataLogger {
 
     private void log(int origin, String event) {
 
-        if (mEventsArraySize == 50)  {
+        if (mEventsArraySize == ARRAY_CAPACITY)  {
             persist();
         }
 
@@ -383,23 +381,41 @@ public class DataLogger {
     }
 
     private synchronized List<LogEvent> copyCache() {
-        List<LogEvent> temp = mEventsArray;
 
-        mEventsArray = new ArrayList<>(ARRAY_CAPACITY);
+        mEventsCache.addAll(mEventsArray);
+
+        mEventsArray.clear();
         mEventsArraySize = 0;
 
-        return temp;
+        return mEventsCache;
     }
 
     private boolean persist() {
 
         List<LogEvent> temp = copyCache();
 
-        return mContextDB.newEvents(temp);
+        if (mContextDB.newEvents(temp)) {
+            temp.clear();
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public boolean registerUser(String userIdent, String deviceIdent) {
-        return mUploader.registerUser(new Integer(mUserID), userIdent, deviceIdent);
+
+        if (mUploader.registerUser(new Integer(mUserID), userIdent, deviceIdent)) {
+
+            mUsername = userIdent;
+            SharedPreferences.Editor editor = mSettings.edit();
+            editor.putString(Prefs.REASONER_USERNAME, mUsername);
+            editor.commit();
+
+            return true;
+
+        } else {
+            return false;
+        }
     }
 
     public boolean registerUser(String userIdent) {

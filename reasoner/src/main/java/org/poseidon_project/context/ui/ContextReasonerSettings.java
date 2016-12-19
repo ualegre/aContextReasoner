@@ -130,6 +130,7 @@ public class ContextReasonerSettings extends Activity implements DialogReturnInt
                 try {
                     mContextService.alterPreferenceString(Prefs.TELLU_USER, username);
                     mContextService.alterPreferenceString(Prefs.TELLU_PASS, password);
+                    mContextService.registerUserIdentifier(username);
                 } catch (RemoteException e) {
                     Log.e("POSEIDON-Context", e.getMessage());
                 }

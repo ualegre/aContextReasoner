@@ -50,7 +50,7 @@ public class MySQLDatabase implements Database{
             "UPDATE user SET user_id=? WHERE id=?;";
 
     private static final String NEW_USER_STRING =
-            "INSERT INTO user (user_id, device_id) VALUES (?,?);";
+            "INSERT INTO user (user_id, device_id, last_sync) VALUES (?,?,?);";
 
     private static final String UPDATE_USER_LEARNING_STRING =
             "UPDATE user SET learning=? WHERE id=?;";
@@ -172,6 +172,7 @@ public class MySQLDatabase implements Database{
                     newUser = con.prepareStatement(NEW_USER_STRING);
                     newUser.setString(1, username);
                     newUser.setString(2, device);
+                    newUser.setString(3, sdf.format(new Date()));
                     newUser.execute();
                 }
             } else {

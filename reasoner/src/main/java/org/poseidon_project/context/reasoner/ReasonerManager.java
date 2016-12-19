@@ -482,7 +482,7 @@ public class ReasonerManager implements IReasonerManager{
 
             SharedPreferences.Editor editor = mContextSettings.edit();
             editor.putBoolean(prefName, value);
-            editor.putLong(Prefs.RULE_PREF_LASTUPATE, System.currentTimeMillis());
+            editor.putLong(Prefs.RULE_PREF_LASTUPATE, timestamp);
             editor.commit();
             restartRunningContextFromPreference(prefName);
         }

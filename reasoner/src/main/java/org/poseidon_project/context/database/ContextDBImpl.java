@@ -36,11 +36,13 @@ import java.util.Vector;
 public class ContextDBImpl implements ContextDB{
 
     private OpenDbHelper dbHelper;
+    private SQLiteDatabase mDb;
     public static final String CONTEXTTABLE = "usable_contexts";
     public static final String DEBUGEVENTSTABLE = "events_data";
 
     public ContextDBImpl(Context context) {
         dbHelper = new OpenDbHelper(context);
+        mDb = dbHelper.getWritableDatabase();
     }
 
     public void getDB(Context context) {
@@ -48,6 +50,7 @@ public class ContextDBImpl implements ContextDB{
     }
 
     public void closeDB() {
+        mDb.close();
         dbHelper.close();
     }
 
@@ -57,13 +60,14 @@ public class ContextDBImpl implements ContextDB{
         HashMap<Integer, String> result = new HashMap<Integer, String>();
 
         try {
-            SQLiteDatabase sqlite = dbHelper.getReadableDatabase();
-            Cursor crsr = sqlite.rawQuery(
+            Cursor crsr = mDb.rawQuery(
                     "Select _id, owner from usable_contexts;",
                     null);
             crsr.moveToFirst();
 
             int numRows = crsr.getCount();
+
+            crsr.close();
         } catch (Exception sqlerror) {
             Log.v("Table read error", sqlerror.getMessage());
         }
@@ -76,8 +80,7 @@ public class ContextDBImpl implements ContextDB{
         List<String> contexts = new Vector<String>();
 
         try {
-            SQLiteDatabase sqlite = dbHelper.getReadableDatabase();
-            Cursor crsr = sqlite.rawQuery(
+            Cursor crsr = mDb.rawQuery(
                     "Select name, owner, permission from usable_contexts;",
                     null);
             crsr.moveToFirst();
@@ -94,6 +97,8 @@ public class ContextDBImpl implements ContextDB{
                 crsr.moveToNext();
             }
 
+            crsr.close();
+
         } catch (Exception sqlerror) {
             Log.v("Table read error", sqlerror.getMessage());
 
@@ -104,62 +109,66 @@ public class ContextDBImpl implements ContextDB{
 
     @Override
     public String getDexFile(String observerName) {
+
+        String result = "";
+
         try {
-            SQLiteDatabase sqlite = dbHelper.getReadableDatabase();
-            Cursor crsr = sqlite.rawQuery(
+            Cursor crsr = mDb.rawQuery(
                     "Select dex_file from usable_contexts where name='"
                             + observerName + "';", null);
             crsr.moveToFirst();
 
             int numRows = crsr.getCount();
             if (numRows > 0) {
-                return crsr.getString(0);
+                result = crsr.getString(0);
             }
 
+            crsr.close();
         } catch (Exception sqlerror) {
             Log.v("Table read error", sqlerror.getMessage());
 
         }
 
-        return "";
+        return result;
     }
 
     @Override
     public int getPermission(String observerName) {
+
+        int result = 1;
+
         try {
-            SQLiteDatabase sqlite = dbHelper.getReadableDatabase();
-            Cursor crsr = sqlite.rawQuery(
+            Cursor crsr = mDb.rawQuery(
                     "Select permission from usable_contexts where name='"
                             + observerName + "';", null);
             crsr.moveToFirst();
 
             int numRows = crsr.getCount();
             if (numRows > 0) {
-                return crsr.getInt(0);
+                result = crsr.getInt(0);
             }
+
+            crsr.close();
 
         } catch (Exception sqlerror) {
             Log.v("Table read error", sqlerror.getMessage());
 
         }
 
-        return 1;
+        return result;
     }
 
     @Override
     public boolean insertObserver(String packageName, String name,
                                    String owner, int permission, String dex_file) {
         try {
-            SQLiteDatabase sqlite = dbHelper.getWritableDatabase();
-
             ContentValues initialValues = new ContentValues();
             initialValues.put("packagename", packageName);
             initialValues.put("name", name);
             initialValues.put("owner", owner);
             initialValues.put("permission", permission);
             initialValues.put("dex_file", dex_file);
-            sqlite.insert(CONTEXTTABLE, null, initialValues);
-            sqlite.close();
+            mDb.insert(CONTEXTTABLE, null, initialValues);
             return true;
 
         } catch (Exception sqlerror) {
@@ -176,8 +185,7 @@ public class ContextDBImpl implements ContextDB{
                 return false;
             } else {
                 if (component.get(2).equalsIgnoreCase(owner)) {
-                    SQLiteDatabase sqlite = dbHelper.getWritableDatabase();
-                    sqlite.delete(CONTEXTTABLE, "name = ?", new String[] {name});
+                    mDb.delete(CONTEXTTABLE, "name = ?", new String[] {name});
                     return true;
                 }
                 return false;
@@ -192,24 +200,28 @@ public class ContextDBImpl implements ContextDB{
 
     @Override
     public String getPackageName(String observerName) {
+
+        String result = "";
+
         try {
-            SQLiteDatabase sqlite = dbHelper.getReadableDatabase();
-            Cursor crsr = sqlite.rawQuery(
+            Cursor crsr = mDb.rawQuery(
                     "Select packageName from usable_contexts where name='"
                             + observerName + "';", null);
             crsr.moveToFirst();
 
             int numRows = crsr.getCount();
             if (numRows > 0) {
-                return crsr.getString(0);
+                result = crsr.getString(0);
             }
+
+            crsr.close();
 
         } catch (Exception sqlerror) {
             Log.v("Table read error", sqlerror.getMessage());
 
         }
 
-        return "";
+        return result;
     }
 
     @Override
@@ -217,8 +229,7 @@ public class ContextDBImpl implements ContextDB{
                                              String observerName) {
         List<String> returnValues = new Vector<String>();
         try {
-            SQLiteDatabase sqlite = dbHelper.getReadableDatabase();
-            Cursor crsr = sqlite
+            Cursor crsr = mDb
                     .rawQuery(
                             "Select dex_file, packageName, owner, permission from usable_contexts where name='"
                                     + observerName + "';", null);
@@ -244,6 +255,8 @@ public class ContextDBImpl implements ContextDB{
 
             }
 
+            crsr.close();
+
         } catch (Exception sqlerror) {
             Log.v("Table read error", sqlerror.getMessage());
             return null;
@@ -255,9 +268,8 @@ public class ContextDBImpl implements ContextDB{
     @Override
     public boolean newEvents(List<LogEvent> events) {
 
-        SQLiteDatabase sqlite = dbHelper.getWritableDatabase();
         try {
-            sqlite.beginTransaction();
+            mDb.beginTransaction();
 
             for (LogEvent event : events) {
                 ContentValues initialValues = new ContentValues();
@@ -265,16 +277,16 @@ public class ContextDBImpl implements ContextDB{
                 initialValues.put("eventLocation", event.getLocation());
                 initialValues.put("eventDateTime", event.getDate());
                 initialValues.put("eventText", event.getText());
-                sqlite.insert(DEBUGEVENTSTABLE, null, initialValues);
+                mDb.insert(DEBUGEVENTSTABLE, null, initialValues);
             }
 
-            sqlite.setTransactionSuccessful();
+            mDb.setTransactionSuccessful();
 
         } catch (Exception sqlerror) {
             Log.v("Table insert error", sqlerror.getMessage());
             return false;
         } finally {
-            sqlite.endTransaction();
+            mDb.endTransaction();
         }
 
         return true;
@@ -286,8 +298,7 @@ public class ContextDBImpl implements ContextDB{
 
         try {
 
-            SQLiteDatabase sqlite = dbHelper.getReadableDatabase();
-            Cursor crsr = sqlite
+            Cursor crsr = mDb
                     .rawQuery(
                             "Select _id, eventOrigin, eventLocation, eventDateTime, " +
                                     "eventText from events_data;", null);
@@ -301,6 +312,8 @@ public class ContextDBImpl implements ContextDB{
                 events.add(new LogEvent(id,origin, location, dateTime, text));
             }
 
+            crsr.close();
+
         } catch (Exception sqlerror) {
             Log.v("Table read error", sqlerror.getMessage());
         }
@@ -311,8 +324,7 @@ public class ContextDBImpl implements ContextDB{
     public boolean emptyEvents() {
 
         try {
-            SQLiteDatabase sqlite = dbHelper.getWritableDatabase();
-            sqlite.delete(OpenDbHelper.DEBUGEVENTSTABLE, null, null);
+            mDb.delete(OpenDbHelper.DEBUGEVENTSTABLE, null, null);
         } catch (Exception sqlerror) {
             Log.v("Table delete error", sqlerror.getMessage());
             return false;
@@ -330,8 +342,7 @@ public class ContextDBImpl implements ContextDB{
     public List<String> getContextReceiver(long id) {
         List<String> returnValues = new Vector<String>();
         try {
-            SQLiteDatabase sqlite = dbHelper.getReadableDatabase();
-            Cursor crsr = sqlite
+            Cursor crsr = mDb
                     .rawQuery(
                             "Select dex_file, packageName, name from usable_contexts where id='"
                                     + String.valueOf(id) + "';", null);
@@ -346,6 +357,8 @@ public class ContextDBImpl implements ContextDB{
 
             }
 
+            crsr.close();
+
         } catch (Exception sqlerror) {
             Log.v("Table read error", sqlerror.getMessage());
             return null;
@@ -359,8 +372,7 @@ public class ContextDBImpl implements ContextDB{
         List<String> contexts = new Vector<String>();
 
         try {
-            SQLiteDatabase sqlite = dbHelper.getReadableDatabase();
-            Cursor crsr = sqlite.rawQuery(
+            Cursor crsr = mDb.rawQuery(
                     "Select name from usable_contexts where owner ='"
                             + applicationId + "';", null);
             crsr.moveToFirst();
@@ -370,6 +382,8 @@ public class ContextDBImpl implements ContextDB{
                 contexts.add(crsr.getString(i));
                 crsr.moveToNext();
             }
+
+            crsr.close();
 
         } catch (Exception sqlerror) {
             Log.v("Table read error", sqlerror.getMessage());
@@ -382,11 +396,10 @@ public class ContextDBImpl implements ContextDB{
     @Override
     public ContextResult newContextValue(ContextResult previousContextValue, String context, long time) {
 
-        SQLiteDatabase sqlite = dbHelper.getWritableDatabase();
 
         if (previousContextValue == null) {
             try {
-                return insertNewContextValue(sqlite, context, time);
+                return insertNewContextValue(mDb, context, time);
             } catch (Exception sqlerror) {
                 Log.v("Table insert error", sqlerror.getMessage());
                 return null;
@@ -394,22 +407,22 @@ public class ContextDBImpl implements ContextDB{
         } else {
             ContextResult result = null;
             try {
-                sqlite.beginTransaction();
+                mDb.beginTransaction();
 
                 ContentValues args = new ContentValues();
                 args.put("totime", time);
 
                 long id = previousContextValue.getId();
-                sqlite.update("context_result", args, "_id=" + String.valueOf(id), null);
+                mDb.update("context_result", args, "_id=" + String.valueOf(id), null);
 
-                result = insertNewContextValue(sqlite, context, time);
+                result = insertNewContextValue(mDb, context, time);
 
-                sqlite.setTransactionSuccessful();
+                mDb.setTransactionSuccessful();
             } catch (Exception sqlerror) {
                 Log.v("Table insert error", sqlerror.getMessage());
                 return null;
             } finally {
-                sqlite.endTransaction();
+                mDb.endTransaction();
                 return result;
             }
         }
@@ -418,23 +431,21 @@ public class ContextDBImpl implements ContextDB{
 
     public boolean updateContextValueToTime(ContextResult contextResult, long time) {
 
-        SQLiteDatabase sqlite = dbHelper.getWritableDatabase();
-
         try {
-            sqlite.beginTransaction();
+            mDb.beginTransaction();
 
             ContentValues args = new ContentValues();
             args.put("totime", time);
 
             long id = contextResult.getId();
-            sqlite.update("context_result", args, "_id=" + String.valueOf(id), null);
+            mDb.update("context_result", args, "_id=" + String.valueOf(id), null);
 
-            sqlite.setTransactionSuccessful();
+            mDb.setTransactionSuccessful();
         } catch (Exception sqlerror) {
             Log.v("Table insert error", sqlerror.getMessage());
             return false;
         } finally {
-            sqlite.endTransaction();
+            mDb.endTransaction();
             return true;
         }
     }
@@ -461,8 +472,6 @@ public class ContextDBImpl implements ContextDB{
     public boolean contextValuePresentAbsolute(String context, long startTime,
                                                long endTime, boolean strict) {
 
-        SQLiteDatabase sqlite = dbHelper.getReadableDatabase();
-
         String query = "";
 
         String start = String.valueOf(startTime);
@@ -476,20 +485,20 @@ public class ContextDBImpl implements ContextDB{
                     " fromtime >= " +  start + " AND (totime <= " + end + " OR totime = 0";
         }
 
-        Cursor crsr = sqlite.rawQuery(query, null);
+        Cursor crsr = mDb.rawQuery(query, null);
 
         crsr.moveToFirst();
 
         if ( crsr.getCount() > 0 ) {
+            crsr.close();
             return true;
         } else {
+            crsr.close();
             return false;
         }
     }
 
     public boolean contextValuePresentRelative(String context, long startTime, boolean strict) {
-
-        SQLiteDatabase sqlite = dbHelper.getReadableDatabase();
 
         String query = "";
 
@@ -503,13 +512,15 @@ public class ContextDBImpl implements ContextDB{
                     " fromtime >= " +  start;
         }
 
-        Cursor crsr = sqlite.rawQuery(query, null);
+        Cursor crsr = mDb.rawQuery(query, null);
 
         crsr.moveToFirst();
 
         if ( crsr.getCount() > 0 ) {
+            crsr.close();
             return true;
         } else {
+            crsr.close();
             return false;
         }
     }

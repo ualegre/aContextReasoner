@@ -53,6 +53,7 @@ public class ContextReasonerCore {
     private Context mContext;
     public HashMap<String, ContextResult> mContextValues = new HashMap<>();
     private DataLogger mLogger;
+    public boolean mReady = false;
 
 
     public ContextReasonerCore(Context c) {
@@ -61,16 +62,15 @@ public class ContextReasonerCore {
         new Thread(new Runnable() {
             @Override
             public void run() {
+                mContextDatabase = new ContextDBImpl(mContext);
+                mLogger = new DataLogger(mContext, mContextDatabase);
                 //Dispatch first as C-SPARQL takes longer to start
                 mReasonerManager = new ReasonerManager(mContext,
                         ContextReasonerCore.this, mContextDatabase);
-
-                mContextDatabase = new ContextDBImpl(mContext);
-                mLogger = new DataLogger(mContext, mContextDatabase);
                 //Now we can add the datalogger to the reasoner
-                mReasonerManager.setLogger(mLogger);
                 mContextManager = new ContextManager(mContext,
                         ContextReasonerCore.this, mContextDatabase);
+                mReady = true;
             }
         }).start();
     }
@@ -165,6 +165,8 @@ public class ContextReasonerCore {
             for (ContextResult cr : mContextValues.values()) {
                 mContextDatabase.updateContextValueToTime(cr,time);
             }
+
+            mContextDatabase.closeDB();
         }
 
         if ( mLogger != null ) {
@@ -185,12 +187,8 @@ public class ContextReasonerCore {
             mLogger.logVerbose(DataLogger.REASONER,
                     LOGTAG, "Context: " + contextName + " set to " + value);
 
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    mReasonerManager.fireAggregateRules(contextName);
-                }
-            }).start();
+
+            mReasonerManager.fireAggregateRules(contextName);
 
         }
 

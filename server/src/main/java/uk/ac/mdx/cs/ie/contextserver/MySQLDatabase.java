@@ -38,6 +38,29 @@ public class MySQLDatabase implements Database{
     private static final String DB_USER = "";
     private static final String DB_PASS = "";
     private Connection mConnection;
+    private boolean mStarted = false;
+
+    private static final String LOG_TABLE_CREATE =
+            "CREATE TABLE IF NOT EXISTS `log` (\n" +
+                    "  `id` bigint(20) NOT NULL AUTO_INCREMENT,\n" +
+                    "  `user_id` smallint(6) NOT NULL,\n" +
+                    "  `event_origin` tinyint(4) NOT NULL,\n" +
+                    "  `event_location` varchar(25) NOT NULL,\n" +
+                    "  `event_date` datetime NOT NULL,\n" +
+                    "  `event_text` varchar(200) NOT NULL,\n" +
+                    "  PRIMARY KEY (`id`),\n" +
+                    "  KEY `user` (`user_id`)\n" +
+                    ")";
+
+    private static final String USER_TABLE_CREATE =
+            "CREATE TABLE IF NOT EXISTS `user` (\n" +
+                    "  `id` smallint(6) NOT NULL AUTO_INCREMENT,\n" +
+                    "  `user_id` varchar(40) NOT NULL,\n" +
+                    "  `device_id` varchar(50) NOT NULL,\n" +
+                    "  `learning` int(1) NOT NULL DEFAULT '1',\n" +
+                    "  `last_sync` datetime NOT NULL,\n" +
+                    "  PRIMARY KEY (`id`)\n" +
+                    ")";
 
     private static final String ADD_EVENT_STRING =
             "INSERT INTO log (user_id, event_origin, event_location, event_date, event_text)" +
@@ -69,6 +92,12 @@ public class MySQLDatabase implements Database{
 
             if (mConnection == null || ! mConnection.isValid(1)) {
                 mConnection = (Connection) DriverManager.getConnection(DB_URL, DB_USER, DB_PASS);
+
+                if (! mStarted) {
+                    mConnection.createStatement().execute(LOG_TABLE_CREATE);
+                    mConnection.createStatement().execute(USER_TABLE_CREATE);
+                    mStarted = true;
+                }
             }
 
         } catch (SQLException e) {

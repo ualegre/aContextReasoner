@@ -9,7 +9,7 @@ As I am no longer a MDX Employee, I continue to develop this reasoner as a hobby
 * see [INSTRUCTIONS](https://github.com/deankramer/aContextReasoner/blob/master/INSTRUCTIONS.md) file
 
 ## License
-* see [LICENSE] (https://github.com/deankramer/aContextReasoner/blob/master/LICENSE.md) file.
+* see [LICENSE](https://github.com/deankramer/aContextReasoner/blob/master/LICENSE.md) file.
 
 ### Developer Contact
 * author: Dean Kramer

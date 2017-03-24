@@ -9,7 +9,7 @@
         <Preference
             android:key="@string/pref_userid"
             android:title="@string/user_identifier"/>
-        <org.poseidon_project.context.ui.TimePreferenceDialog
+        <uk.co.deansserver.acontextreasoner.ui.TimePreferenceDialog
             android:key="@string/pref_backuptime"
             android:title="@string/backup_time"
             android:defaultValue="20:00"/>

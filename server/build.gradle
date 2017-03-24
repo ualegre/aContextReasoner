@@ -63,7 +63,7 @@ apply plugin: 'application'
 startScripts.enabled = false
 
 task contextServer(type: CreateStartScripts) {
-    mainClassName = 'uk.ac.mdx.cs.ie.contextserver.ContextServer'
+    mainClassName = 'uk.co.deansserver.contextserver.ContextServer'
     applicationName = 'context-service'
     outputDir = new File(project.buildDir, 'tmp')
     classpath = jar.outputs.files + project.configurations.runtime

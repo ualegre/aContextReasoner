@@ -5,10 +5,10 @@ def grpcVersion = '1.0.2'
 
 android {
     compileSdkVersion 23
-    buildToolsVersion "23.0.3"
+    buildToolsVersion '25.0.0'
 
     defaultConfig {
-        applicationId "org.poseidon_project.context"
+        applicationId "uk.co.deansserver.acontextreasoner"
         minSdkVersion 16
         targetSdkVersion 21
         versionCode 28
@@ -88,7 +88,7 @@ dependencies {
     compile 'com.android.support:multidex:1.0.0'
     compile 'com.android.support:support-v4:23.0.1'
     compile 'de.timroes:aXMLRPC:1.8.0'
-    compile 'uk.ac.mdx.cs.ie:acontextlib:0.9.8'
+    compile 'uk.ac.mdx.cs.ie:acontextlib:0.9.10'
 
     compile "io.grpc:grpc-okhttp:${grpcVersion}"
     compile "io.grpc:grpc-protobuf-lite:${grpcVersion}"

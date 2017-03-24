@@ -11,11 +11,11 @@ To build the Android reasoner, you will need to edit the reasoner AndroidManifes
 
 
 ###Build Server
-To build the Server, you will need to edit the `uk.ac.mdx.cs.ie.contextserver.ContextServer` class file and add the following:
+To build the Server, you will need to edit the `uk.co.deansserver.contextserver.ContextServer` class file and add the following:
 
 * API_KEY : The same API key as you placed for item "contextService_ApiKey" in the reasoner.
 
-You will also need to edit `uk.ac.mdx.cs.ie.contextserver.MySQLDatabase` class with the relevent database/user details
+You will also need to edit `uk.co.deansserver.contextserver.MySQLDatabase` class with the relevent database/user details
 
 To build, you will need to use the command: `gradlew installDist`
 This command will create a folder named `install` in the `build` folder.

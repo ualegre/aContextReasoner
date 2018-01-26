@@ -7,28 +7,6 @@ package edu.casetools.icase.custom;
 public class CustomModellingRules {
 
     /*
-      Check that the battery has less than 25 percent remaining.
-   */
-    private static final String batteryLOWQuery =
-            "REGISTER STREAM batteryContextIsLOW AS "
-                    + "PREFIX ex: <http://ie.cs.mdx.ac.uk/POSEIDON/system#> "
-                    + "CONSTRUCT { ?s <http://poseidon-project.org/context/is> \"BATTERY_LOW\"} "
-                    + "FROM STREAM <http://poseidon-project.org/context-stream> [RANGE TRIPLES 1] "
-                    + "WHERE { ?s ex:batteryRemaining ?o "
-                    + "FILTER ( ?o < 25) }";
-
-    /*
-        Check that the battery has 25 percent or more remaining.
-     */
-    private static final String batteryOkQuery =
-            "REGISTER STREAM batteryContextIsOkay AS "
-                    + "PREFIX ex: <http://ie.cs.mdx.ac.uk/POSEIDON/system#> "
-                    + "CONSTRUCT { ?s <http://poseidon-project.org/context/is> \"BATTERY_OKAY\"} "
-                    + "FROM STREAM <http://poseidon-project.org/context-stream> [RANGE TRIPLES 1] "
-                    + "WHERE { ?s ex:batteryRemaining ?o "
-                    + "FILTER ( ?o >= 25) }";
-
-    /*
         Check that the precipitation value is greater than zero, and temperature is less than 15c
      */
     private static final String weatherRainingAndColdQuery =
@@ -44,21 +22,9 @@ public class CustomModellingRules {
                     + "FILTER (?tempValue < 15) "
                     + "}";
 
-    /*
-        Check that the temperature is 15c or greater, and that precipitation is greater than zero.
-     */
-    private static final String weatherRainingQuery =
-            "REGISTER QUERY weatherContextIsRaining AS "
-                    + "PREFIX ex: <http://ie.cs.mdx.ac.uk/POSEIDON/envir#> "
-                    + "CONSTRUCT { ex:weather <http://ie.cs.mdx.ac.uk/POSEIDON/context/is> \"WEATHER_RAINING\" } "
-                    + "FROM STREAM <http://poseidon-project.org/context-stream> [RANGE 10s STEP 4s] "
-                    + "WHERE { ?m ex:hasTemperatureValue ?tempValueIRI . "
-                    + "?m ex:hasPrecipitationValue ?precipValueIRI . "
-                    + "?precipValueIRI ex:precipitationValue ?precipValue . "
-                    + "?tempValueIRI ex:temperatureValue ?tempValue . "
-                    + "FILTER (?precipValue >= 0.1) "
-                    + "FILTER (?tempValue >= 15) "
-                    + "}";
+    public String getWeatherRainingAndColdQuery(){
+        return  weatherRainingAndColdQuery;
+    }
 
     /*
         Check that precipitation is less than 0.1mm, and temperature is less than 15c.
@@ -76,6 +42,10 @@ public class CustomModellingRules {
                     + " FILTER (?tempValue < 15) "
                     + "}";
 
+    public String getWeatherColdQuery(){
+        return weatherColdQuery;
+    }
+
     /*
         Check that precipitation is less than 0.1mm, and temperature is greater than 25c.
      */
@@ -91,6 +61,30 @@ public class CustomModellingRules {
                     + " FILTER (?precipValue < 0.1) "
                     + " FILTER (?tempValue >= 25) "
                     + "}";
+
+    public String getWeatherHotQuery(){
+        return  weatherHotQuery;
+    }
+
+    /*
+        Check that the temperature is 15c or greater, and that precipitation is greater than zero.
+     */
+    private static final String weatherRainingQuery =
+            "REGISTER QUERY weatherContextIsRaining AS "
+                    + "PREFIX ex: <http://ie.cs.mdx.ac.uk/POSEIDON/envir#> "
+                    + "CONSTRUCT { ex:weather <http://ie.cs.mdx.ac.uk/POSEIDON/context/is> \"WEATHER_RAINING\" } "
+                    + "FROM STREAM <http://poseidon-project.org/context-stream> [RANGE 10s STEP 4s] "
+                    + "WHERE { ?m ex:hasTemperatureValue ?tempValueIRI . "
+                    + "?m ex:hasPrecipitationValue ?precipValueIRI . "
+                    + "?precipValueIRI ex:precipitationValue ?precipValue . "
+                    + "?tempValueIRI ex:temperatureValue ?tempValue . "
+                    + "FILTER (?precipValue >= 0.1) "
+                    + "FILTER (?tempValue >= 15) "
+                    + "}";
+
+    public String getWeatherRainingQuery(){
+        return weatherRainingQuery;
+    }
 
     /*
         Check that precipitation is less than 0.1mm, temperature is between 15c-24.9c.
@@ -109,16 +103,9 @@ public class CustomModellingRules {
                     + " FILTER (?tempValue < 25) "
                     + "}";
 
-    private static final String tempOkay =
-            "REGISTER QUERY tempContextIsOkay AS "
-                    + "PREFIX ex: <http://ie.cs.mdx.ac.uk/POSEIDON/envir#> "
-                    + "CONSTRUCT { ex:temp <http://ie.cs.mdx.ac.uk/POSEIDON/context/is> \"TEMP_OKAY\" } "
-                    + "FROM STREAM <http://poseidon-project.org/context-stream> [RANGE 10s STEP 4s] "
-                    + "WHERE { ?m ex:hasTemperatureValue ?tempValueIRI . "
-                    + "?tempValueIRI ex:temperatureValue ?tempValue . "
-                    + "FILTER (?tempValue >= $$pref_cold) "
-                    + "FILTER (?tempValue < $$pref_hot) "
-                    + "}";
+    public String getWeatherOkayQuery(){
+        return weatherOkayQuery;
+    }
 
     private static final String tempCold =
             "REGISTER QUERY tempContextIsCold AS "
@@ -130,6 +117,11 @@ public class CustomModellingRules {
                     + "FILTER (?tempValue < $$pref_cold) "
                     + "}";
 
+    public String getColdQuery(String coldValue) {
+        String cold = new String(tempCold);
+        return cold.replace("$$pref_cold", String.valueOf(coldValue));
+    }
+
     private static final String tempHot =
             "REGISTER QUERY tempContextIsOkay AS "
                     + "PREFIX ex: <http://ie.cs.mdx.ac.uk/POSEIDON/envir#> "
@@ -139,6 +131,28 @@ public class CustomModellingRules {
                     + "?tempValueIRI ex:temperatureValue ?tempValue . "
                     + "FILTER (?tempValue >= $$pref_hot) "
                     + "}";
+
+    public String getTempHotQuery(String tempHotValue){
+        String hot = new String(tempHot);
+        return hot.replace("$$pref_hot", String.valueOf(tempHotValue));
+    }
+
+    private static final String tempOkay =
+            "REGISTER QUERY tempContextIsOkay AS "
+                    + "PREFIX ex: <http://ie.cs.mdx.ac.uk/POSEIDON/envir#> "
+                    + "CONSTRUCT { ex:temp <http://ie.cs.mdx.ac.uk/POSEIDON/context/is> \"TEMP_OKAY\" } "
+                    + "FROM STREAM <http://poseidon-project.org/context-stream> [RANGE 10s STEP 4s] "
+                    + "WHERE { ?m ex:hasTemperatureValue ?tempValueIRI . "
+                    + "?tempValueIRI ex:temperatureValue ?tempValue . "
+                    + "FILTER (?tempValue >= $$pref_cold) "
+                    + "FILTER (?tempValue < $$pref_hot) "
+                    + "}";
+
+    public String getTempOkQuery(String hotTempValue, String coldTempValue){
+        String ok = new String(tempOkay);
+        ok = ok.replace("$$pref_hot", String.valueOf(hotTempValue));
+        return ok.replace("$$pref_cold", String.valueOf(coldTempValue));
+    }
 
     private static final String precipRain =
             "REGISTER QUERY precipContextIsRaining AS "
@@ -150,6 +164,10 @@ public class CustomModellingRules {
                     + "FILTER (?precipValue >= 0.1) "
                     + "}";
 
+    public String getPrecipRain(){
+        return precipRain;
+    }
+
     private static final String precipDry =
             "REGISTER QUERY precipContextIsDry AS "
                     + "PREFIX ex: <http://ie.cs.mdx.ac.uk/POSEIDON/envir#> "
@@ -159,6 +177,10 @@ public class CustomModellingRules {
                     + "?precipValueIRI ex:precipitationValue ?precipValue . "
                     + "FILTER (?precipValue < 0.1) "
                     + "}";
+
+    public String getPrecipDry(){
+        return  precipDry;
+    }
 
     /*
         Checks if navigation assistance is required. We do this by seeing if the user has either:
@@ -186,6 +208,11 @@ public class CustomModellingRules {
                     + " }"
                     + " FILTER( ?smallDevNum >= $$pref_max_dev || ?o = 1 ) "
                     + " } ";
+
+    public String getNavigationAssistNeededQuery(String maxDevValue){
+        String navAssNeeded = new String(navigationAssistNeededQuery);
+        return navAssNeeded.replace("$$pref_max_dev", maxDevValue);
+    }
 
     /*
         Checks if navigation assistance is NOT required. We do this by seeing if the user has either:
@@ -218,6 +245,12 @@ public class CustomModellingRules {
                     //+ " FILTER( ?o = 3) "
                     + " } ";
 
+
+    public String getNavigationAssistNotNeededQuery(String maxDevValue){
+        String navAssNotNeeded = new String(navigationAssistNotNeededQuery);
+        return navAssNotNeeded.replace("$$pref_max_dev", maxDevValue);
+    }
+
     /*
         Checks to see how fast the user is walking, to tell if they are too standstill for too long.
         Checks that the user is walking less than 20m every 5 minutes.
@@ -233,6 +266,12 @@ public class CustomModellingRules {
                     + " } . "
                     + " FILTER ( ?totalDistance < $$tDistance) "
                     + " }";
+
+    public String getIsStandstillForLongQuery(String maxTimeValue, String maxDistanceValue){
+        String standStillLong = new String(isStandstillForLongQuery);
+        standStillLong = standStillLong.replace("$$time", String.valueOf(maxTimeValue));
+        return standStillLong.replace("$$tDistance", String.valueOf(maxDistanceValue));
+    }
 
     /*
         Checks to see how fast the user is walking, to tell if they are not stanstill for long.
@@ -250,79 +289,40 @@ public class CustomModellingRules {
                     + " FILTER( ?totalDistance >= $$tDistance) "
                     + " }";
 
-    public String getColdQuery(String coldValue) {
-        String cold = new String(tempCold);
-        return cold.replace("$$pref_cold", String.valueOf(coldValue));
-    }
-
-    public String getTempHotQuery(String tempHotValue){
-        String hot = new String(tempHot);
-        return hot.replace("$$pref_hot", String.valueOf(tempHotValue));
-    }
-
-    public String getTempOkQuery(String hotTempValue, String coldTempValue){
-        String ok = new String(tempOkay);
-        ok = ok.replace("$$pref_hot", String.valueOf(hotTempValue));
-        return ok.replace("$$pref_cold", String.valueOf(coldTempValue));
-    }
-
-    public String getPrecipRain(){
-        return precipRain;
-    }
-
-    public String getPrecipDry(){
-        return  precipDry;
-    }
-
-
-
-    public String getIsStandstillForLongQuery(String maxTimeValue, String maxDistanceValue){
-        String standStillLong = new String(isStandstillForLongQuery);
-        standStillLong = standStillLong.replace("$$time", String.valueOf(maxTimeValue));
-        return standStillLong.replace("$$tDistance", String.valueOf(maxDistanceValue));
-    }
-
     public String getIsStandstillForShortQuery(String maxTimeValue, String maxDistanceValue){
         String standStillShort = new String(isStandstillForShortQuery);
         standStillShort = standStillShort.replace("$$time", String.valueOf(maxTimeValue));
         return standStillShort.replace("$$tDistance", String.valueOf(maxDistanceValue));
     }
 
-    public String getNavigationAssistNeededQuery(String maxDevValue){
-        String navAssNeeded = new String(navigationAssistNeededQuery);
-        return navAssNeeded.replace("$$pref_max_dev", maxDevValue);
-    }
-
-    public String getNavigationAssistNotNeededQuery(String maxDevValue){
-        String navAssNotNeeded = new String(navigationAssistNotNeededQuery);
-        return navAssNotNeeded.replace("$$pref_max_dev", maxDevValue);
-    }
-
-    public String getWeatherRainingAndColdQuery(){
-        return  weatherRainingAndColdQuery;
-    }
-
-    public String getWeatherColdQuery(){
-        return weatherColdQuery;
-    }
-
-    public String getWeatherHotQuery(){
-        return  weatherHotQuery;
-    }
-
-    public String getWeatherRainingQuery(){
-        return weatherRainingQuery;
-    }
-
-    public String getWeatherOkayQuery(){
-        return weatherOkayQuery;
-    }
+    /*
+      Check that the battery has less than 25 percent remaining.
+    */
+    private static final String batteryLOWQuery =
+            "REGISTER STREAM batteryContextIsLOW AS "
+                    + "PREFIX ex: <http://ie.cs.mdx.ac.uk/POSEIDON/system#> "
+                    + "CONSTRUCT { ?s <http://poseidon-project.org/context/is> \"BATTERY_LOW\"} "
+                    + "FROM STREAM <http://poseidon-project.org/context-stream> [RANGE TRIPLES 1] "
+                    + "WHERE { ?s ex:batteryRemaining ?o "
+                    + "FILTER ( ?o < 25) }";
 
     public String getBatteryLOWQuery(){
         return  batteryLOWQuery;
     }
 
+    /*
+        Check that the battery has 25 percent or more remaining.
+     */
+    private static final String batteryOkQuery =
+            "REGISTER STREAM batteryContextIsOkay AS "
+                    + "PREFIX ex: <http://ie.cs.mdx.ac.uk/POSEIDON/system#> "
+                    + "CONSTRUCT { ?s <http://poseidon-project.org/context/is> \"BATTERY_OKAY\"} "
+                    + "FROM STREAM <http://poseidon-project.org/context-stream> [RANGE TRIPLES 1] "
+                    + "WHERE { ?s ex:batteryRemaining ?o "
+                    + "FILTER ( ?o >= 25) }";
+
     public String getBatteryOkQuery(){
         return batteryOkQuery;
     }
+
 }

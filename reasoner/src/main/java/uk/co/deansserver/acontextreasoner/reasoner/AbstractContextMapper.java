@@ -92,7 +92,7 @@ public abstract class AbstractContextMapper {
         return false;
     }
 
-    protected boolean registerModellingRule(String queryName, CsparqlQueryResultProxy queryResult, boolean okExit) {
+    public boolean registerModellingRule(String queryName, CsparqlQueryResultProxy queryResult, boolean okExit) {
         if (queryResult != null) {
             rules.put(queryName, queryResult);
         } else {
@@ -102,7 +102,7 @@ public abstract class AbstractContextMapper {
         return okExit;
     }
 
-    protected boolean unregisterModellingRule(String queryName, CsparqlQueryResultProxy queryResult, boolean okExit) {
+    public boolean unregisterModellingRule(String queryName, CsparqlQueryResultProxy queryResult, boolean okExit) {
         if (queryResult != null) {
             mReasonerManager.unregisterCSPARQLQuery(queryResult.getId());
         } else {

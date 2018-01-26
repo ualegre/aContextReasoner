@@ -24,6 +24,7 @@ import uk.co.deansserver.acontextreasoner.logging.DataLogger;
 import uk.co.deansserver.acontextreasoner.management.ContextManager;
 import uk.co.deansserver.acontextreasoner.utility.Prefs;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,33 +37,30 @@ import eu.larkc.csparql.core.engine.CsparqlQueryResultProxy;
  */
 public abstract class AbstractContextMapper {
 
-    protected ContextReasonerCore mReasonerCore;
-    protected ContextManager mContextManager;
-    protected ReasonerManager mReasonerManager;
-    protected HashMap<String, CsparqlQueryResultProxy> rules = new HashMap<>();
-    protected static final String LOGTAG = "CustomContextMapper";
-    protected DataLogger mLogger;
-    protected static final String mStreamRoot = "http://poseidon-project.org/context-stream";
-    protected SharedPreferences mRuleSettings;
-    protected Context mContext;
-    public HashMap<String, Map> mContextParameters;
+    public    HashMap<String, Map>                      mContextParameters;
+    protected ContextReasonerCore                       mReasonerCore;
+    protected ContextManager                            mContextManager;
+    protected ReasonerManager                           mReasonerManager;
+    protected HashMap<String, CsparqlQueryResultProxy>  rules = new HashMap<>();
+    protected DataLogger                                mLogger;
+    protected SharedPreferences                         mRuleSettings;
+    protected Context                                   mContext;
+    protected ArrayList<SituationOfInterest>            situationsOfInterest;
+    protected String                                    contextMapperName;
 
-    public AbstractContextMapper(ContextReasonerCore crc, ReasonerManager rm, Context con) {
-
+    public AbstractContextMapper(String contextMapperName, ContextReasonerCore crc, ReasonerManager rm, Context con) {
+        this.contextMapperName = contextMapperName;
+        mContextParameters  = new HashMap<>();
         mReasonerCore       = crc;
         mContext            = con;
         mRuleSettings       = con.getSharedPreferences(Prefs.RULE_PREFS, 0);
         mLogger             = crc.getLogger();
         mContextManager     = crc.getContextManager();
         mReasonerManager    = rm;
-        mContextParameters  = new HashMap<>();
+        situationsOfInterest = new ArrayList<>();
 
         //checkForDefaultContextPrefs();
-
     }
-
-    public abstract boolean registerCustomContextRules(String context, Map parameters);
-    public abstract boolean unregisterCustomContextRules(String context, Map parameters);
 
     private void checkForDefaultContextPrefs() {
 
@@ -72,15 +70,26 @@ public abstract class AbstractContextMapper {
 
         if (mContextManager == null)
             mContextManager = mReasonerCore.getContextManager();
-        return registerCustomContextRules(context, parameters);
+
+        for(SituationOfInterest soi : situationsOfInterest){
+            if(context.equals(soi.getName()))
+                return soi.registerSituationOfInterest(mReasonerManager,this, mRuleSettings, mLogger, contextMapperName, parameters);
+        }
+
+        mLogger.logError(DataLogger.REASONER, contextMapperName, "Context: " + context + " not found!");
+        return false;
     }
 
     public boolean unregisterContext(String context, Map parameters) {
 
-        boolean result = unregisterCustomContextRules(context, parameters);
-        mLogger.logError(DataLogger.REASONER, LOGTAG, "Context: " + context + " not found!");
+        for(SituationOfInterest soi : situationsOfInterest){
+            if(context.equals(soi.getName()))
+                return soi.unRegisterSituationOfInterest(mReasonerCore,mReasonerManager,this, mLogger, contextMapperName);
+        }
 
-        return result;
+        mLogger.logError(DataLogger.REASONER, contextMapperName, "Context: " + context + " not found!");
+
+        return false;
     }
 
     protected boolean registerModellingRule(String queryName, CsparqlQueryResultProxy queryResult, boolean okExit) {
@@ -88,7 +97,7 @@ public abstract class AbstractContextMapper {
             rules.put(queryName, queryResult);
         } else {
             okExit = false;
-            mLogger.logError(DataLogger.REASONER, LOGTAG, queryName+"Query could't register");
+            mLogger.logError(DataLogger.REASONER, contextMapperName, queryName+"Query could't register");
         }
         return okExit;
     }
@@ -98,7 +107,7 @@ public abstract class AbstractContextMapper {
             mReasonerManager.unregisterCSPARQLQuery(queryResult.getId());
         } else {
             okExit = false;
-            mLogger.logError(DataLogger.REASONER, LOGTAG,
+            mLogger.logError(DataLogger.REASONER, contextMapperName,
                     queryName+"Query was not registered");
         }
         return okExit;

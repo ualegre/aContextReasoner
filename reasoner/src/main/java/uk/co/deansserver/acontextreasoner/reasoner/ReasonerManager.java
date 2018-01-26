@@ -65,7 +65,7 @@ public class ReasonerManager implements IReasonerManager{
     private ContextRuleObserver mContextRuleObserver;
     private DataLogger mLogger;
     //Only required for the pilot until the main infrastructure is done.
-    public CustomContextMapper pilotMapper;
+    public  AbstractContextMapper pilotMapper;
     private HashMap<String, AggregateRule> mAggregateRules;
     private ContextDB mContextDatabase;
     private HashMap<String,HashSet<String>> mCurrentPrefContexts;

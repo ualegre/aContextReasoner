@@ -204,10 +204,10 @@ public class ContextManager implements IContextManager {
             }
 
             mLogger.logVerbose(DataLogger.CONTEXT_MANAGER,
-                    LOGTAG, "Added dex file: " + newDex);
+                    contextMapperName, "Added dex file: " + newDex);
 
         } catch (IOException ioe) {
-            Log.e(LOGTAG, ioe.getStackTrace().toString());
+            Log.e(contextMapperName, ioe.getStackTrace().toString());
 
         }
     }*/

@@ -20,6 +20,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
+import edu.casetools.icase.custom.CustomContextMapper;
 import uk.co.deansserver.acontextreasoner.ContextReasonerCore;
 import uk.co.deansserver.acontextreasoner.database.ContextDB;
 import uk.co.deansserver.acontextreasoner.database.ContextResult;
@@ -64,7 +65,7 @@ public class ReasonerManager implements IReasonerManager{
     private ContextRuleObserver mContextRuleObserver;
     private DataLogger mLogger;
     //Only required for the pilot until the main infrastructure is done.
-    public ContextMapper pilotMapper;
+    public  AbstractContextMapper pilotMapper;
     private HashMap<String, AggregateRule> mAggregateRules;
     private ContextDB mContextDatabase;
     private HashMap<String,HashSet<String>> mCurrentPrefContexts;
@@ -89,7 +90,7 @@ public class ReasonerManager implements IReasonerManager{
         mContext = context;
         mAggregateRules = new HashMap<>();
         mContextDatabase = db;
-        pilotMapper = new ContextMapper(mReasonerCore, this, mContext);
+        pilotMapper = new CustomContextMapper(mReasonerCore, this, mContext);
         mCurrentPrefContexts = new HashMap<>();
         mContextSettings = mContext.getSharedPreferences(Prefs.RULE_PREFS, 0);
         Prefs.setupFirstTime(mContext);
@@ -258,7 +259,7 @@ public class ReasonerManager implements IReasonerManager{
         }
     }
 
-    public void registerAggregateRule(String name, String rule) {
+    public void registerReasoningRule(String name, String rule) {
 
         long currentTime = System.currentTimeMillis();
 
@@ -287,7 +288,7 @@ public class ReasonerManager implements IReasonerManager{
         }
     }
 
-    public boolean unregisterAggregateRule(String name) {
+    public boolean unregisterReasoningRule(String name) {
 
         AggregateRule agg = mAggregateRules.remove(name);
 
@@ -299,7 +300,7 @@ public class ReasonerManager implements IReasonerManager{
     }
 
     //Should make sure we fire all rules before considering rerunning due to context change
-    public synchronized void fireAggregateRules(String newContextValue) {
+    public synchronized void fireReasoningRules(String newContextValue) {
 
         long mCurrentTime = System.currentTimeMillis();
         mUpdatedContextNames.clear();

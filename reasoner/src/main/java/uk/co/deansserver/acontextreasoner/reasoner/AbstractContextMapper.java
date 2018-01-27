@@ -102,7 +102,9 @@ public abstract class AbstractContextMapper {
         return okExit;
     }
 
-    public boolean unregisterModellingRule(String queryName, CsparqlQueryResultProxy queryResult, boolean okExit) {
+    public boolean unregisterModellingRule(String queryName, boolean okExit) {
+
+        CsparqlQueryResultProxy queryResult = rules.remove(queryName);
         if (queryResult != null) {
             mReasonerManager.unregisterCSPARQLQuery(queryResult.getId());
         } else {

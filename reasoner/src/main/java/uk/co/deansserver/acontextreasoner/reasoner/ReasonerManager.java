@@ -300,7 +300,7 @@ public class ReasonerManager implements IReasonerManager{
     }
 
     //Should make sure we fire all rules before considering rerunning due to context change
-    public synchronized void fireAggregateRules(String newContextValue) {
+    public synchronized void fireReasoningRules(String newContextValue) {
 
         long mCurrentTime = System.currentTimeMillis();
         mUpdatedContextNames.clear();

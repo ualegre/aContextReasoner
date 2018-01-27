@@ -113,14 +113,14 @@ public abstract class AbstractContextMapper {
         return okExit;
     }
 
-    protected boolean addObserverRequirement(String appkey, String observerName, boolean okExit) {
+    public boolean addObserverRequirement(String appkey, String observerName, boolean okExit) {
         if (okExit)
             return mContextManager.addObserverRequirement(appkey, observerName);
         else
             return false;
     }
 
-    protected boolean addObserverRequirementWithParameters(String appkey, String observerName, boolean okExit, Map parameters) {
+    public boolean addObserverRequirementWithParameters(String appkey, String observerName, boolean okExit, Map parameters) {
         if (okExit)
             return mContextManager.addObserverRequirementWithParameters(appkey, observerName, parameters);
         else

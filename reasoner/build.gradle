@@ -88,7 +88,7 @@ dependencies {
     compile 'com.android.support:multidex:1.0.0'
     compile 'com.android.support:support-v4:23.0.1'
     compile 'de.timroes:aXMLRPC:1.8.0'
-    compile 'uk.ac.mdx.cs.ie:acontextlib:0.9.10'
+
 
     compile "io.grpc:grpc-okhttp:${grpcVersion}"
     compile "io.grpc:grpc-protobuf-lite:${grpcVersion}"

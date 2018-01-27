@@ -188,7 +188,7 @@ public class ContextReasonerCore {
                     LOGTAG, "Context: " + contextName + " set to " + value);
 
 
-            mReasonerManager.fireAggregateRules(contextName);
+            mReasonerManager.fireReasoningRules(contextName);
 
         }
 

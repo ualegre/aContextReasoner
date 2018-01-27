@@ -12,7 +12,7 @@ import uk.co.deansserver.acontextreasoner.reasoner.ReasonerManager;
 import uk.co.deansserver.acontextreasoner.logging.DataLogger;
 
 /**
- * Created by Unai on 26/01/2018.
+ * @author Dean Kramer <deankramer99@gmail.com> and Unai Alegre-Ibarra <u.alegre@mdx.ac.uk>
  */
 
 public class BatterySOI extends SituationOfInterest {

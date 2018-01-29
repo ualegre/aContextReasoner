@@ -25,7 +25,7 @@ package uk.co.deansserver.acontextreasoner;
 interface IContextReasoner {
 
     //***Copy new context Components over***
-    void importDexFile(in String appKey, in String newDex, in String[] contexts, in String packageName, int permission);
+   // void importDexFile(in String appKey, in String newDex, in String[] contexts, in String packageName, int permission);
 
     //***Asks for a particular context to be used***
     boolean addContextRequirement(in String appKey, in String observerName);

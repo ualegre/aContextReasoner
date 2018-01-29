@@ -19,12 +19,12 @@ package uk.co.deansserver.acontextreasoner.management;
 import android.content.Context;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.os.Environment;
 import android.util.Log;
 
 import uk.co.deansserver.acontextreasoner.ContextReasonerCore;
 import uk.co.deansserver.acontextreasoner.database.ContextDB;
 import uk.co.deansserver.acontextreasoner.logging.DataLogger;
-import uk.co.deansserver.acontextreasoner.utility.ClassPackage;
 import uk.co.deansserver.acontextreasoner.utility.Prefs;
 
 import java.io.BufferedInputStream;
@@ -171,7 +171,7 @@ public class ContextManager implements IContextManager {
         }
     }
 
-    /*public void copyDexFile(String appKey, final String newDex,
+    public void copyDexFile(String appKey, final String newDex,
                             String[] contexts, String packagename, int permission) {
 
         File dexInternalStoragePath = new File(mContext.getDir("dex",
@@ -200,19 +200,19 @@ public class ContextManager implements IContextManager {
             dexWriter.close();
             bis.close();
             for (String c: contexts) {
-                mContextDatabase.insertComponent(packagename, c, appKey, permission, newDex);
+                mContextDatabase.insertObserver(packagename, c, appKey, permission, newDex);
             }
 
             mLogger.logVerbose(DataLogger.CONTEXT_MANAGER,
-                    contextMapperName, "Added dex file: " + newDex);
+                    LOGTAG, "Added dex file: " + newDex);
 
         } catch (IOException ioe) {
-            Log.e(contextMapperName, ioe.getStackTrace().toString());
+            Log.e(LOGTAG, ioe.getStackTrace().toString());
 
         }
-    }*/
+    }
 
-    public void copyDexFile(String appKey, String classpackage, String classpackagemeta) {
+/*    public void copyDexFile(String appKey, String classpackage, String classpackagemeta) {
 
         File newDexFile = new File(classpackage);
 
@@ -263,7 +263,7 @@ public class ContextManager implements IContextManager {
             Log.e(LOGTAG, ioe.getStackTrace().toString());
 
         }
-    }
+    } */
 
     protected ContextObserver loadContextClass(String appId, String componentName) {
         List<String> componentInfo = mContextDatabase.getLoadObserverInfo(appId,

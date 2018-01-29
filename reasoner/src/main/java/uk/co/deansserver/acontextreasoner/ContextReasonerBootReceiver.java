@@ -20,7 +20,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v4.content.WakefulBroadcastReceiver;
 
-import org.poseidon_project.acontextreasoner.IContextReasoner;
 
 import uk.co.deansserver.acontextreasoner.utility.ExplicitIntentGenerator;
 

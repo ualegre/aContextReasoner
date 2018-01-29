@@ -25,8 +25,8 @@ import java.text.DecimalFormat;
 import java.util.Map;
 
 import uk.ac.mdx.cs.ie.acontextlib.IContextReceiver;
-import uk.ac.mdx.cs.ie.acontextlib.hardware.CurrentLocationContext;
-import uk.ac.mdx.cs.ie.acontextlib.hardware.PluggedInContext;
+import uk.ac.mdx.cs.ie.acontextlib.hardware.CurrentLocationObserver;
+import uk.ac.mdx.cs.ie.acontextlib.hardware.PluggedInObserver;
 
 /**
  * Deals with receiving location updates for the logger
@@ -35,8 +35,8 @@ import uk.ac.mdx.cs.ie.acontextlib.hardware.PluggedInContext;
  */
 public class LogLocationReceiver {
 
-    private PluggedInContext mPluggedInContext;
-    private CurrentLocationContext mLocationContext;
+    private PluggedInObserver mPluggedInContext;
+    private CurrentLocationObserver mLocationContext;
     private long mLastUpdate = 0;
     private Location mCurrentLocation;
     private Thread mGetterThread;
@@ -49,11 +49,11 @@ public class LogLocationReceiver {
     private static final int TIME_TO_REFRESH = 1000 * 60 * 10;
 
     public LogLocationReceiver(Context context) {
-        mPluggedInContext = new PluggedInContext(context);
+        mPluggedInContext = new PluggedInObserver(context);
         mPluggedInContext.addContextReceiver(mContextListener);
         mPluggedInContext.addRequiringApp("logger");
 
-        mLocationContext = new CurrentLocationContext(context, "passive");
+        mLocationContext = new CurrentLocationObserver(context, "passive");
         mLocationContext.addContextReceiver(mContextListener);
         mLocationContext.addRequiringApp("logger");
 

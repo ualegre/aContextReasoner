@@ -21,9 +21,9 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.os.RemoteException;
 
-import org.poseidon_project.acontextreasoner.IContextPreference;
-import org.poseidon_project.acontextreasoner.IContextReasoner;
-import org.poseidon_project.acontextreasoner.ILogBackup;
+import uk.co.deansserver.acontextreasoner.IContextPreference;
+import uk.co.deansserver.acontextreasoner.IContextReasoner;
+import uk.co.deansserver.acontextreasoner.ILogBackup;
 
 import java.util.Map;
 
@@ -148,10 +148,8 @@ public class ContextReasonerService extends Service{
 
     public final IContextReasoner.Stub mContextBinder = new IContextReasoner.Stub() {
 
-
-        @Override
         public void importContextPackage(String appKey, String filename) throws RemoteException {
-            mReasonerCore.importContextPackage(appKey,filename);
+            mReasonerCore.importContextPackage(appKey, filename);
         }
 
         @Override
@@ -182,7 +180,6 @@ public class ContextReasonerService extends Service{
             mReasonerCore.getLogger().registerUser(userIdentifier);
         }
 
-        @Override
         public boolean hasOwnerImported(String appkey) throws RemoteException {
             return mReasonerCore.hasOwnerImported(appkey);
         }

@@ -87,9 +87,7 @@ public class StandStillSOI extends SituationOfInterest {
     }
 
     public boolean unRegisterSituationOfInterest(ContextReasonerCore mReasonerCore, ReasonerManager mReasonerManager, AbstractContextMapper contextMapper, DataLogger mLogger, String logTag) {
-        boolean okExit = true;
-
-        okExit = contextMapper.removeObserverRequirement("engine", "DistanceTravelledContext", okExit);
+        boolean okExit = contextMapper.removeObserverRequirement("engine", "DistanceTravelledContext");
 
         okExit = contextMapper.unregisterModellingRule("standstill_long", okExit );
         okExit = contextMapper.unregisterModellingRule("standstill_short", okExit );

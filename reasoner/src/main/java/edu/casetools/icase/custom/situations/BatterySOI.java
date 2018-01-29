@@ -68,9 +68,7 @@ public class BatterySOI extends SituationOfInterest {
 
     @Override
     public boolean unRegisterSituationOfInterest(ContextReasonerCore mReasonerCore, ReasonerManager mReasonerManager, AbstractContextMapper contextMapper, DataLogger mLogger, String logTag)  {
-        boolean okExit = true;
-
-        okExit = contextMapper.removeObserverRequirement("engine", "BatteryContext", okExit);
+        boolean okExit = contextMapper.removeObserverRequirement("engine", "BatteryContext");
 
         okExit = contextMapper.unregisterModellingRule(getBatteryLOWQuery(),okExit);
         okExit = contextMapper.unregisterModellingRule(getBatteryOkQuery(),okExit);

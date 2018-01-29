@@ -161,8 +161,7 @@ public class WeatherSOI extends SituationOfInterest {
 
     @Override
     public boolean unRegisterSituationOfInterest(ContextReasonerCore mReasonerCore, ReasonerManager mReasonerManager, AbstractContextMapper contextMapper, DataLogger mLogger, String logTag) {
-        boolean okExit = true;
-        okExit = contextMapper.removeObserverRequirement("engine", "LocationWeatherContext", okExit);
+        boolean okExit = contextMapper.removeObserverRequirement("engine", "LocationWeatherContext");
 
         okExit = contextMapper.unregisterModellingRule("tempOkay",   okExit);
         okExit = contextMapper.unregisterModellingRule("tempCold",   okExit);

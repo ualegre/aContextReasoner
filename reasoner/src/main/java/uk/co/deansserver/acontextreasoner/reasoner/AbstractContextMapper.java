@@ -129,4 +129,8 @@ public abstract class AbstractContextMapper {
             return false;
     }
 
+    public boolean removeObserverRequirement(String appkey, String observerName){
+        return mContextManager.removeObserverRequirement(appkey, observerName);
+    }
+
 }

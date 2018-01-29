@@ -40,8 +40,6 @@ import java.util.Map;
  */
 public class CustomContextMapper extends AbstractContextMapper {
 
-
-
     public CustomContextMapper(ContextReasonerCore crc, ReasonerManager rm, Context con) {
         super("CustomContextMapper",crc,rm,con);
         initialiseSituationsOfInterest();

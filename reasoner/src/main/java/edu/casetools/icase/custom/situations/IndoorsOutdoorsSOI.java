@@ -29,7 +29,7 @@ public class IndoorsOutdoorsSOI extends SituationOfInterest {
     @Override
     public boolean unRegisterSituationOfInterest(ContextReasonerCore mReasonerCore, ReasonerManager mReasonerManager, AbstractContextMapper contextMapper, DataLogger mLogger, String logTag) {
 
-        boolean okExit = contextMapper.removeObserverRequirement("engine", "GPSIndoorOutdoorContext",true);
+        boolean okExit = contextMapper.removeObserverRequirement("engine", "GPSIndoorOutdoorContext");
         mReasonerCore.removeContextValue("INDOOROUTDOOR");
         mLogger.logVerbose(DataLogger.REASONER, logTag, "Unregistered GPSIndoorOutdoor");
 

@@ -188,7 +188,7 @@ public class ContextReasonerCore {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    mReasonerManager.fireAggregateRules(contextName);
+                    mReasonerManager.fireReasoningRules(contextName);
                 }
             }).start();
 

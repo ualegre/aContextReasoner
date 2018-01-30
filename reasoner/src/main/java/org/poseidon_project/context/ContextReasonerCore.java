@@ -26,8 +26,8 @@ import org.poseidon_project.context.database.ContextResult;
 import org.poseidon_project.context.logging.DataLogger;
 import org.poseidon_project.context.management.ContextManager;
 import org.poseidon_project.context.reasoner.ReasonerManager;
-import org.poseidon_project.context.utility.ClassPackage;
-import org.poseidon_project.context.utility.ContextPackage;
+//import org.poseidon_project.context.utility.ClassPackage;
+//import org.poseidon_project.context.utility.ContextPackage;
 import org.poseidon_project.context.utility.FileOperations;
 
 import java.io.File;
@@ -82,7 +82,7 @@ public class ContextReasonerCore {
     public ContextManager getContextManager() {return mContextManager;}
 
     public void importContextPackage(String appkey, String filename) {
-
+/*
         try {
             String newfolder = FileOperations.unzip(filename);
 
@@ -106,7 +106,7 @@ public class ContextReasonerCore {
 
         } catch (IOException e) {
             Log.e(LOGTAG, e.toString());
-        }
+        }*/
     }
 
 

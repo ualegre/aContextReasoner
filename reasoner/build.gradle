@@ -54,6 +54,12 @@ android {
             }
         }
     }
+
+    configurations{
+        compiler.exclude group: 'org.poseidon_project.context', module: 'IContextReasoner.class'
+    }
+
+
 }
 
 protobuf {

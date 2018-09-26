@@ -16,8 +16,8 @@ import org.poseidon_project.context.reasoner.ReasonerManager;
 
 public class IndoorsOutdoorsSOI extends SituationOfInterest {
 
-    public IndoorsOutdoorsSOI(String name) {
-        super(name);
+    public IndoorsOutdoorsSOI() {
+        super("indoorOutdoor");
     }
 
     @Override

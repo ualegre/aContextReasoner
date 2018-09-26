@@ -17,8 +17,8 @@ import org.poseidon_project.context.utility.Prefs;
 
 public class NavAssistanceSOI extends SituationOfInterest {
 
-    public NavAssistanceSOI(String name) {
-        super(name);
+    public NavAssistanceSOI() {
+        super("navassistance");
     }
 
     /*

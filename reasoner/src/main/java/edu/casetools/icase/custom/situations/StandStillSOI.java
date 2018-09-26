@@ -18,8 +18,8 @@ import org.poseidon_project.context.utility.Prefs;
 
 public class StandStillSOI extends SituationOfInterest {
 
-    public StandStillSOI(String name) {
-        super(name);
+    public StandStillSOI() {
+        super("standstill");
     }
 
     /*

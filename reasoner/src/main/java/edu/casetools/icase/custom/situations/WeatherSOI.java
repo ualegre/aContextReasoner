@@ -19,8 +19,8 @@ import org.poseidon_project.context.utility.Prefs;
 
 public class WeatherSOI extends SituationOfInterest {
 
-    public WeatherSOI(String name){
-        super(name);
+    public WeatherSOI(){
+        super("weather");
     }
 
     // Modelling Rules
@@ -33,6 +33,7 @@ public class WeatherSOI extends SituationOfInterest {
                     + "?tempValueIRI ex:temperatureValue ?tempValue . "
                     + "FILTER (?tempValue < $$pref_cold) "
                     + "}";
+
     public String getColdQuery(String coldValue) {
         String cold = new String(tempCold);
         return cold.replace("$$pref_cold", String.valueOf(coldValue));
@@ -62,6 +63,7 @@ public class WeatherSOI extends SituationOfInterest {
                     + "FILTER (?tempValue >= $$pref_cold) "
                     + "FILTER (?tempValue < $$pref_hot) "
                     + "}";
+
     public String getTempOkQuery(String hotTempValue, String coldTempValue){
         String ok = new String(tempOkay);
         ok = ok.replace("$$pref_hot", String.valueOf(hotTempValue));
@@ -125,9 +127,10 @@ public class WeatherSOI extends SituationOfInterest {
 
 
     @Override
-    public boolean registerSituationOfInterest(ReasonerManager mReasonerManager, AbstractContextMapper contextMapper, SharedPreferences mRuleSettings, DataLogger mLogger, String logTag, Map parameters){    boolean okExit = true;
+    public boolean registerSituationOfInterest(ReasonerManager mReasonerManager, AbstractContextMapper contextMapper, SharedPreferences mRuleSettings, DataLogger mLogger, String logTag, Map parameters){
+        boolean okExit = true;
 
-        String coldTemp = String.valueOf(mRuleSettings.getInt(Prefs.WEATHER_COLD, 15));
+        String coldTemp    = String.valueOf(mRuleSettings.getInt(Prefs.WEATHER_COLD, 15));
         String hotTemp     = String.valueOf(mRuleSettings.getInt(Prefs.WEATHER_HOT, 25));
 
         CsparqlQueryResultProxy c1 = mReasonerManager.registerCSPARQLQuery(getColdQuery(coldTemp));

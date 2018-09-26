@@ -42,12 +42,12 @@ public class CustomContextMapper extends AbstractContextMapper {
     }
 
     private void initialiseSituationsOfInterest() {
-        situationsOfInterest.add(new BatterySOI("battery"));
-        situationsOfInterest.add(new WeatherSOI("weather"));
-        situationsOfInterest.add(new StandStillSOI("standstill"));
-        situationsOfInterest.add(new NavAssistanceSOI("navassistance"));
-        situationsOfInterest.add(new IndoorsOutdoorsSOI("indoorOutdoor"));
-        situationsOfInterest.add(new OldWeatherSOI("oldweather"));
+        situationsOfInterest.add(new BatterySOI());
+        situationsOfInterest.add(new WeatherSOI());
+        situationsOfInterest.add(new StandStillSOI());
+        situationsOfInterest.add(new NavAssistanceSOI());
+        situationsOfInterest.add(new IndoorsOutdoorsSOI());
+        situationsOfInterest.add(new OldWeatherSOI());
     }
 
 }

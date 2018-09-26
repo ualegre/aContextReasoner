@@ -18,8 +18,8 @@ import org.poseidon_project.context.reasoner.ReasonerManager;
 
 public class OldWeatherSOI extends SituationOfInterest {
 
-    public OldWeatherSOI(String name) {
-        super(name);
+    public OldWeatherSOI() {
+        super("oldweather");
     }
 
     /*

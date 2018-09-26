@@ -16,6 +16,7 @@
 
 package org.poseidon_project.context.reasoner;
 
+import edu.casetools.icase.custom.OntologyManager;
 import eu.larkc.csparql.cep.api.RdfQuadruple;
 import eu.larkc.csparql.cep.api.RdfStream;
 
@@ -26,14 +27,12 @@ import eu.larkc.csparql.cep.api.RdfStream;
  */
 public class ContextStream extends RdfStream {
 
-    private String streamiri = "http://ie.cs.mdx.ac.uk/POSEIDON/";
-
     public ContextStream(String iri) {
         super(iri);
     }
 
     public void sendStream(String subject, String predicate, String value, long time) {
-        final RdfQuadruple q = new RdfQuadruple(streamiri + subject, streamiri + predicate, value, time);
+        final RdfQuadruple q = new RdfQuadruple(OntologyManager.BASE_ONTOLOGY + subject, OntologyManager.BASE_ONTOLOGY + predicate, value, time);
         this.put(q);
     }
 

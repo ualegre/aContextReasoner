@@ -17,8 +17,8 @@ import org.poseidon_project.context.reasoner.ReasonerManager;
 
 public class BatterySOI extends SituationOfInterest {
 
-    public BatterySOI(String name){
-        super(name);
+    public BatterySOI(){
+        super("battery");
     }
 
     /*

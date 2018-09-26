@@ -43,6 +43,7 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import edu.casetools.icase.custom.OntologyManager;
 import eu.larkc.csparql.core.engine.CsparqlEngine;
 import eu.larkc.csparql.core.engine.CsparqlEngineImpl;
 import eu.larkc.csparql.core.engine.CsparqlQueryResultProxy;
@@ -133,7 +134,7 @@ public class ReasonerManager implements IReasonerManager{
         mCsparqlEngine = new CsparqlEngineImpl();
 
         mCsparqlEngine.initialize(true);
-        mContextStream = new ContextStream("http://poseidon-project.org/context-stream");
+        mContextStream = new ContextStream(OntologyManager.STREAM_IRI);
 
         mCsparqlEngine.registerStream(mContextStream);
         mContextRuleObserver = new ContextRuleObserver(mReasonerCore);

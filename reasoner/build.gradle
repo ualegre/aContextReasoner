@@ -1,5 +1,8 @@
 apply plugin: 'com.android.application'
 apply plugin: 'com.google.protobuf'
+apply plugin: 'maven'
+
+group = 'com.github.ualegre'
 
 android {
     compileSdkVersion 23
